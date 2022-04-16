@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<table id="data" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Professor</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for Courses in courses %} <!--prima tabella poi elemento query-->
+        <tr>
+          <td>{{ Courses.name }}</td>
+          <td>{{ Courses.department }}</td>
+          <td>{{ Courses.professor }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#data').DataTable({
+        columns: [
+          {searchable: true},
+          {orderable: true, searchable: false},
+          {orderable: false, searchable: false}],
+      });
+    });
+  </script>
+{% endblock %}
+
+
