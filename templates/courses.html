@@ -15,7 +15,7 @@
           <td>{{ Courses.name }}</td>
           <td>{{ Courses.department }}</td>
           <td>{{ Courses.professor }}</td>
-             <td> <a href = "{{ url_for('main.single_course',course='informatica') }}">I</a> </td>
+             <td> <a href = "{{ url_for('main.single_course',course= Courses.name ) }}">I</a> </td>
         </tr>
       {% endfor %}
     </tbody>
