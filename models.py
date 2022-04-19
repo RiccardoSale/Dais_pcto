@@ -7,7 +7,7 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False,index=True)
     password = db.Column(db.String(200), nullable=False)
 
     def __repr__(self):
@@ -16,12 +16,12 @@ class User(UserMixin, db.Model):
 
 # ruolo studente / professore dove lo salviamo come effettuiamo il login ???-> in base a cosa determiniamo il ruolo???
 
-
+#index=true -> USO DI INDICE x migliorare velocità delle query più frequenti
 class Courses(UserMixin, db.Model):
     __tablename__ = "courses"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), unique=True, nullable=False,index=True)
     department = db.Column(db.String(120), unique=False, nullable=False)
     professor = db.Column(db.String(120), unique=False, nullable=False)
 

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<table id="data" class="table table-striped">
+<table id="data" class="table table-striped table-dark">
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Department</th>
-        <th>Professor</th>
+          <th>Name</th>
+          <th>Department</th>
+          <th>Professor</th>
+          <th>Iscrizione</th>
       </tr>
     </thead>
     <tbody>
@@ -14,6 +15,7 @@
           <td>{{ Courses.name }}</td>
           <td>{{ Courses.department }}</td>
           <td>{{ Courses.professor }}</td>
+             <td> <a href = "{{ url_for('main.single_course',course='informatica') }}">I</a> </td>
         </tr>
       {% endfor %}
     </tbody>
@@ -27,7 +29,8 @@
         columns: [
           {searchable: true},
           {orderable: true, searchable: false},
-          {orderable: false, searchable: false}],
+          {orderable: false, searchable: false},
+           null ],
       });
     });
   </script>

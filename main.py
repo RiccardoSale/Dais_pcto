@@ -29,6 +29,15 @@ def profile():
 def courses():
     return render_template('courses.html', name=current_user.username, courses=Courses.query)
 
+@main.route('/courses/<string:course>',methods=["GET","POST"])
+def single_course(course):
+    q = Courses.query.filter_by(name=course).first_or_404()
+    id= q.id
+    name = course
+    department = q.department
+    professor = q.professor
+    return render_template('single_course.html',id=id, name=name, department=department,professor=professor)
+
 
 @main.route('/administration', methods=("GET", "POST"))
 @login_required
