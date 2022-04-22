@@ -1,0 +1,10 @@
+# Virtualenvs
+venv/
+.cache/v/cache
+
+# Intellij IDEA based IDEs folder
+.idea/**
+
+#cache
+__pycache__/
+

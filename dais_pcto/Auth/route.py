@@ -1,45 +1,59 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from . import db
-from . import bcrypt
-from flask_login import login_user, login_required, logout_user
-from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceError, InvalidRequestError, )
+from flask import Blueprint, url_for, current_app, redirect, g, flash, render_template
+from flask_login import login_required, logout_user, login_user
+from flask_principal import Permission, RoleNeed, ActionNeed, identity_loaded, identity_changed, AnonymousIdentity, \
+    Identity
 from werkzeug.routing import BuildError
-from wtforms import (StringField, PasswordField, BooleanField, IntegerField, DateField, TextAreaField)
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Length, EqualTo, Email, Regexp, Optional
-import email_validator
-from flask_login import current_user
-from wtforms import ValidationError, validators
-from .models import User
 from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
+from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceError, InvalidRequestError, )
+from wtforms import StringField, PasswordField, ValidationError
+from wtforms.validators import InputRequired, Email, Length, Regexp, Optional
+from dais_pcto.Auth.models import User
+from dais_pcto.app import db
+from dais_pcto.module_extensions import bcrypt
 
-authentication = Blueprint('authentication', __name__)
+blueprint = Blueprint('Auth', __name__)
+
+be_admin = RoleNeed('admin')
+be_editor = RoleNeed('editor')
+to_sign_in = ActionNeed('sign in')
+
+# Permissions
+user = Permission(to_sign_in)
+user.description = "User's permissions"
+editor = Permission(be_editor)
+editor.description = "Editor's permissions"
+admin = Permission(be_admin)
+admin.description = "Admin's permissions"
+
+admin_permission = Permission(RoleNeed('admin'))
+professor_permission = Permission(RoleNeed('professor'))
 
 
-@authentication.route("/login", methods=("GET", "POST"))
+@blueprint.route("/login", methods=("GET", "POST"))
 def login():
-    form = login_form()
-
+    form = LoginForm()
+    print("ciaociao")
     if form.validate_on_submit():
         try:
-            user = User.query.filter_by(email=form.email.data).first()
-            if user is not None:
-                if check_password_hash(user.password, form.password.data):
-                    login_user(user)
-                    return redirect(url_for('main.profile'))
+            q = User.query.filter_by(email=form.email.data).first()
+            if q is not None:
+                if check_password_hash(q.password, form.password.data):
+                    login_user(q)
+                    identity_changed.send(current_app._get_current_object(), identity=Identity(q.role))
+                    return redirect(url_for('BaseRoute.profile'))
                 else:
                     flash("Invalid Username or password!", "danger")
             else:
                 flash("Invalid Username or password!", "danger")
         except Exception as e:
             flash(e, "danger")
-
     return render_template("signup.html", form=form, text="Login", title="Login", btn_action="Login")
 
 
-@authentication.route("/signup", methods=("GET", "POST"))
+@blueprint.route("/signup", methods=("GET", "POST"))
 def signup():
-    form = signup_form()
+    form = SignupForm()
     if form.validate_on_submit():
         try:
             email = form.email.data
@@ -49,7 +63,7 @@ def signup():
             db.session.add(newuser)
             db.session.commit()
             flash(f"Account Succesfully created", "success")
-            return redirect(url_for('authentication.login'))
+            return redirect(url_for('Auth.login'))
 
         except InvalidRequestError:
             db.session.rollback()
@@ -73,14 +87,15 @@ def signup():
                            btn_action="Register account")
 
 
-@authentication.route('/logout')
+@blueprint.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    identity_changed.send(current_app._get_current_object(), identity=AnonymousIdentity())
+    return redirect(url_for('BaseRoute.index'))
 
 
-class login_form(FlaskForm):
+class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Email(), Length(1, 64)])
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=72)])
     # Placeholder labels to enable form rendering
@@ -89,7 +104,7 @@ class login_form(FlaskForm):
     )
 
 
-class signup_form(FlaskForm):
+class SignupForm(FlaskForm):
     username = StringField(
         validators=[
             InputRequired(),
@@ -107,3 +122,14 @@ class signup_form(FlaskForm):
     def validate_email(self, email):
         if User.query.filter_by(email=email.data).first():
             raise ValidationError("Email already registered!")
+
+
+@identity_loaded.connect
+def on_identity_loaded(sender, identity):
+    needs = []
+
+    if identity.id == 'admin':
+        needs.append(be_admin)
+
+    for n in needs:
+        g.identity.provides.add(n)

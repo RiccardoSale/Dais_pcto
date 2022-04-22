@@ -10,12 +10,12 @@
       </tr>
     </thead>
     <tbody>
-      {% for Courses in courses %} <!--prima tabella poi elemento query-->
+      {% for Course in courses %} <!--prima tabella poi elemento query-->
         <tr>
-          <td>{{ Courses.name }}</td>
-          <td>{{ Courses.department }}</td>
-          <td>{{ Courses.professor }}</td>
-             <td> <a href = "{{ url_for('main.single_course',course= Courses.name ) }}">I</a> </td>
+          <td>{{ Course.name }}</td>
+          <td>{{ Course.department }}</td>
+          <td>{{ Course.professor }}</td>
+             <td> <a href = "{{ url_for('courses.single_course',course= Course.name ) }}">vai al corso</a> </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
         </tr>
       {% endfor %}
     </tbody>

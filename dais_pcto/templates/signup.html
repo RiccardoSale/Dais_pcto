@@ -83,11 +83,11 @@
                     <p>
                         {% if request.path == '/login' %}
                         New here?
-                        <a href="{{url_for('authentication.signup')}}">Create account</a>
+                        <a href="{{url_for('Auth.signup')}}">Create account</a>
                         {% endif %}
                         {% if request.path == '/signup' %}
                         Already have an account?
-                        <a href="{{url_for('authentication.login')}}">Login</a>
+                        <a href="{{url_for('Auth.login')}}">Login</a>
                         {% endif %}
                     </p>
                 </div>
