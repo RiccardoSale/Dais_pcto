@@ -17,6 +17,7 @@
                 {% endfor %}
                 {% endif %}
                 {% endwith %}
+                <!-- INIZIO GESTIONE AMMINISTRAZIONE (CREAZIONE CORSO ) -->
                 {%  if request.path =='/administration' %}
                 <div class="form-group mb-3">
                     {{ form.name(class_="form-control",placeholder="Name")}}
@@ -27,26 +28,93 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
+
                 <div class="form-group mb-3">
-                    {{ form.department(class_="form-control",placeholder="Department")}}
+                    {{ form.mode(class_="form-control",placeholder="Mode")}}
                 </div>
-                {% for error in form.department.errors %}
+                {% for error in form.mode.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
                 <div class="form-group mb-3">
-                    {{ form.professor(class_="form-control",placeholder="Professor")}}
+                    {{ form.description(class_="form-control",placeholder="Description")}}
                 </div>
-                {% for error in form.professor.errors %}
+                {% for error in form.description.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.max_student(class_="form-control",placeholder="max_student")}}
+                </div>
+                {% for error in form.max_student.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.min_student(class_="form-control",placeholder="min_student")}}
+                </div>
+                {% for error in form.min_student.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.n_hour(class_="form-control",placeholder="n_hour")}}
+                </div>
+                {% for error in form.n_hour.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.start_month(class_="form-control",placeholder="start_month")}}
+                </div>
+                {% for error in form.start_month.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                 <div class="form-group mb-3">
+                    {{ form.end_month(class_="form-control",placeholder="end_month")}}
+                </div>
+                {% for error in form.end_month.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
                 {% endif%}
+                <!-- FINE GESTIONE AMMINISTRAZIONE (CREAZIONE CORSO ) -->
+
+                <!-- INIZIO GESTIONE REGISTRAZIONE  -->
                 {% if request.path == '/signup' %}
+                 <div class="form-group mb-3">
+                    {{ form.name(class_="form-control",placeholder="Name")}}
+                </div>
+                {% for error in form.name.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.surname(class_="form-control",placeholder="Surname")}}
+                </div>
+                {% for error in form.surname.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
                 <div class="form-group mb-3">
                     {{ form.username(class_="form-control",placeholder="Username")}}
                 </div>
@@ -57,6 +125,9 @@
                 </div>
                 {% endfor%}
                 {% endif%}
+                <!-- FINE GESTIONE REGISTRAZIONE (CREAZIONE CORSO ) -->
+
+                <!-- INIZIO PARTI IN COMUNE TRA REGISTRAZIONE E LOGIN -->
                 {%  if request.path != '/administration' %}
                 <div class="form-group mb-3">
                     {{ form.email(class_="form-control",placeholder="Email")}}
@@ -74,7 +145,8 @@
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div> {% endfor%}
+                </div>
+                {% endfor%}
                 {% endif %}
                 <div class="text-center">
                     <div class="d-grid gap-2">

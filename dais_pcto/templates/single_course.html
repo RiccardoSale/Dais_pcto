@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+    {% if current_user.is_authenticated %}<!--PAGINA PER MODIFICARE IL CORSO DISPONIBILE SOLO AI PROF E AGLI ADMIN-->
+                        {% if (current_user.role=='admin' or current_user.role=='professor') %}
+
+                        {% endif %}
+    {% endif %}
+    <!--Pagina che renderizza il corso per gli utenti e modulo da cui ci si può iscrivere -->
     <thead>
       <tr>
           <th>{{ name }}</th>
-          <th>{{ department }} </th>
           <th>{{ professor  }}</th>
           <form action method="POST" class="card-body">
                 {% with messages = get_flashed_messages(with_categories=true) %}
