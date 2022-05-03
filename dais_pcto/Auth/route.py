@@ -99,6 +99,7 @@ def on_identity_loaded(sender, identity):
     needs = []
     if identity.id == 'admin':
         needs.append(be_admin)
+        needs.append(be_professor)
     if identity.id == 'professor':
         needs.append(be_professor)
 

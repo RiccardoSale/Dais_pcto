@@ -12,7 +12,6 @@ blueprint = Blueprint('courses', __name__)
 
 
 @blueprint.route('/courses')
-@login_required
 def courses():
     all_course_prof = db.session.query(Course).join(User)
     return render_template('courses.html',
@@ -20,28 +19,36 @@ def courses():
 
 
 @blueprint.route('/courses/<string:course>', methods=["GET"])
+@login_required
 def single_course(course):
-    q = Course.query.filter_by(name=course).first_or_404()  # ORM
-    name = course
-    prof = q.professor
-    return render_template('single_course.html', name=name, professor=prof)
+    q = Course.query.filter_by(name=course).join(User).first_or_404()
+    count = len(q.r_users)
+    if count < q.max_student:
+        attivo = "Corso aperto"
+    else:
+        attivo = "Corso chiuso"
+    return render_template('single_course.html', Course=q, attivo=attivo)
 
 
 @blueprint.route('/courses/<string:course>', methods=["POST"])
-def single_course_post(course):
-    q = Course.query.filter_by(name=course).first_or_404()  # ORM
-    user = current_user
-    q2 = Course.users
-    name = course
-    # professor = q.professor
-    # try:    # DA FINIREEEEE
-    #     if q2 is not None:
+@login_required
+def single_course_post(course):  # ISCRIZIONE AL CORSO
+    q = Course.query.filter_by(name=course).join(User).first_or_404()  # ORM
     try:
-        user.courses.append(q)
-        db.session.commit()
-        flash(f"Subscribe succesfull", "success")
-    #     else:
-    #         flash(f"sei già iscritto succesfull", "danger")
+        val = True
+        for test in current_user.r_courses:
+            if test == q:
+                val = False
+        if not val:
+            flash(f'Sei già iscritto a questo corso', "warning")
+        else:
+            if len(q.r_users) < q.max_student:#Controllo se numero utenti al corso minore del numero massimo di studenti
+                current_user.r_courses.append(q)
+                db.session.commit()
+                flash(f"Subscribe succesfull", "success")
+            else:
+                flash(f'Non ci sono più posti disponibili',"warning")
+
     except InvalidRequestError:
         db.session.rollback()
         flash(f"Something went wrong!", "danger")
@@ -61,7 +68,7 @@ def single_course_post(course):
         db.session.rollback()
         flash(f"An error occured !", "danger")
 
-    return render_template('single_course.html', id=id, name=name, professor=professor)
+    return render_template('single_course.html', Course=q)
 
 
 @blueprint.route('/administration', methods=("GET", "POST"))
@@ -82,37 +89,33 @@ def administration():
             n_hour = form.n_hour.data
             start_month = form.start_month.data
             end_month = form.end_month.data
-
             flag = True
-
             if max_student < min_student:
                 flag = False
                 flash("Il numero di studenti minimi deve essere minore del numero di studenti massimi", "warning")
-
             if str(end_month) < str(start_month):
                 flag = False
                 flash("La data di fine del corso deve essere successiva alla data di inizio del corso", "warning")
-
             if flag:
                 newcourses = Course(name=name, professor=current_user.id, mode=mode, description=description,
-                                max_student=max_student, min_student=min_student, n_hour=n_hour,
-                                start_month=start_month, end_month=end_month)
+                                    max_student=max_student, min_student=min_student, n_hour=n_hour,
+                                    start_month=start_month, end_month=end_month)
                 db.session.add(newcourses)
-                #non serve backref aggiunge in automatico
-                #current_user.r_courses_prof.append(newcourses)
+                # non serve backref aggiunge in automatico
+                # current_user.r_courses_prof.append(newcourses)
                 db.session.commit()
                 flash(f"Course created", "success")
                 return redirect(url_for('courses.single_course', course=name))
             else:
-                return redirect(url_for('courses.administration'))
-
+                return render_template('signup.html', name=current_user.username, form=form, title="Course",
+                                       btn_action="Create course")
 
         except InvalidRequestError:
             db.session.rollback()
             flash(f"Something went wrong!", "danger")
         except IntegrityError:
             db.session.rollback()
-            flash(f"An error occured!.", "warning")
+            flash(f"An error has occurred!.", "warning")
         except DataError:
             db.session.rollback()
             flash(f"Invalid Entry", "warning")

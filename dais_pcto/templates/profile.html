@@ -3,7 +3,118 @@
     Profilo
 {% endblock %}
 {% block content %}
-<h1 class="title">
- Benvenuto, {{ name }}
-</h1>
+    <div class="container-fluid center">
+    <h3 class="text-dark mb-4"></h3>
+    <div class="row">
+        <div class="col">
+            <div class="card shadow mb-3">
+                <div class="card-header py-3">
+                    <p class="text-primary m-0 fw-bold">User Settings</p>
+                </div>
+                <div class="card-body">
+                    <form action method="POST" class="card-body">
+                        {{ form.csrf_token }}
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> {{ form.name(class_="form-control",placeholder= current_user.name )}} </div>
+                            </div>
+                            {% for error in form.name.errors %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor%}
+                            <div class="col">
+                                <div class="mb-3"><label class="form-label" for="surname"><strong class="text-primary m-0 fw-bold">Cognome</strong></label> {{ form.surname(class_="form-control",placeholder= current_user.surname )}}  </div>
+                            </div>
+                            {% for error in form.surname.errors %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor%}
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3"><label class="form-label" for="username"><strong class="text-primary m-0 fw-bold">Username</strong></label>  {{ form.username(class_="form-control",placeholder= current_user.username )}}        </div>
+                            </div>
+                            {% for error in form.username.errors %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor%}
+                            <div class="col">
+                                <div class="mb-3"><label class="form-label" for="email"><strong class="text-primary m-0 fw-bold">Email</strong></label>  {{ form.email(class_="form-control",placeholder= current_user.email )}}           </div>
+                            </div>
+                            {% for error in form.email.errors %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor%}
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3"><label class="form-label" for="username"><strong class="text-primary m-0 fw-bold">Nuova password</strong></label>  {{ form.new_password(class_="form-control",placeholder="   " )}}        </div>
+                            </div>
+                            {% for error in form.new_password.errors %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor%}
+                            <div class="col">
+                                <div class="mb-3"><label class="form-label" for="email"><strong class="text-primary m-0 fw-bold">Inserisci password attuale per modificare</strong></label> {{ form.old_password(class_="form-control",placeholder="   " )}}              </div>
+                            </div>
+                            {% for error in form.old_password.errors %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor%}
+                        </div>
+                        <div class="mb-3"><button class="btn btn-primary btn-sm" type="submit">Save Settings</button></div>
+                    </form>
+                </div>
+            </div>
+            {% if current_user.is_authenticated %}
+            {% if  current_user.role=='professor' %}
+            <div class="card shadow mb-3">
+                <div class="card-header py-3">
+                    <p class="text-primary m-0 fw-bold">Course section</p>
+                       <tbody>
+      {% for Course in courses %} <!--prima tabella poi elemento query-->
+        <tr>
+          <td>{{ Course.name }}</td>
+          <td>{{ Course.mode }}</td>
+            <!--Bisogna usare il nome del backref e non della foreign key-->
+          <td>{{ Course.users.name +" "+Course.users.surname }}</td>
+          <td>{{ Course.start_month }}</td>
+          <td>{{ Course.end_month }}</td>
+          <td>{{ Course.n_hour }} h</td>
+            <td> <a href = "{{ url_for('courses.single_course',course= Course.name ) }}"> <img class="info" src="/static/info.jpg" style="width: 20px;"></a></a> </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
+        </tr>
+      {% endfor %}
+    </tbody>
+
+
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

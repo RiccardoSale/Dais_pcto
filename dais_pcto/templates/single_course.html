@@ -6,10 +6,63 @@
                         {% endif %}
     {% endif %}
     <!--Pagina che renderizza il corso per gli utenti e modulo da cui ci si può iscrivere -->
-    <thead>
-      <tr>
-          <th>{{ name }}</th>
-          <th>{{ professor  }}</th>
+    <div class="container-fluid">
+    <h3 class="text-dark mb-4"></h3>
+            <div class="row">
+                <div class="col">
+                    <div class="card shadow mb-3">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Informazioni del corso</p>
+                        </div>
+                        <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> <p class="text-muted">{{ Course.name }}</p></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="mode"><strong class="text-primary m-0 fw-bold">Modalità</strong></label><p class="text-muted">{{ Course.mode }}</p></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Num massimo studenti</strong></label><p class="text-muted">{{ Course.max_student }}</p></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Num minimo studenti</strong></label><p class="text-muted">{{ Course.min_student }}</p></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Data Inizio</strong></label><p class="text-muted">{{ Course.start_month }}</p></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Data Fine</strong></label><p class="text-muted">{{ Course.end_month }}</p></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Prof referente</strong></label><p class="text-muted">{{ Course.users.name +" " +Course.users.surname }}</p></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Email prof</strong></label><p class="text-muted">{{ Course.users.email }}</p></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Stato corso</strong></label><p class="text-muted">{{ attivo }}</p></div>
+                                    </div>
+
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Descrizione</strong></label><p class="text-muted">{{ Course.description }}</p></div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
           <form action method="POST" class="card-body">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
@@ -22,14 +75,18 @@
                 {% endfor %}
                 {% endif %}
                 {% endwith %}
-                 <div class="text-center">
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="button is-block is-info is-large is-fullwidth"> Iscriviti   </button>
+                 {% if current_user.is_authenticated %}
+                    {% if current_user.role=='user' %}
+                    <div class="text-center">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="button is-block is-info is-large is-fullwidth"> Iscriviti   </button>
+                        </div>
                     </div>
-                 </div>
+                    {% endif %}
+                {% endif %}
           </form>
-      </tr>
-    </thead>
+
+
 
 {% endblock %}
 

@@ -20,6 +20,13 @@ class User(UserMixin, db.Model):
 
     # relazioni
     #molti a molti
+    #relazione con la scuola di appartenenza e
+
+    #pensa all entita scuola aggiunge la relazione
+    #è fatta identica alla relazione dei corsi
+
+    #cambiare form iscrizione aggiungendo campo choice -> con scuole
+
     r_courses = db.relationship("Course", secondary=user_course, back_populates="r_users")
 
     #uno a molti

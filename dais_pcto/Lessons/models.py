@@ -12,9 +12,9 @@ class Lesson(UserMixin, db.Model):
     mode = db.Column(db.Integer, nullable=False)  # modalita 0 = online modalità 1 = presenza modalita 3 = blendend
     link = db.Column(db.String(2083), nullable=False)
     structure = db.Column(db.String(64), nullable=True)  # può essere null esempio lezione solo online
-    description = db.Column(db.TEXT, nullable=False,default="Descrizione non ancora disponibile")
+    description = db.Column(db.TEXT, nullable=False, default="Descrizione non ancora disponibile")
 
-    #relazioni
+    # relazioni
     course = db.Column(db.Integer, db.ForeignKey(
         'courses.id'))
 
