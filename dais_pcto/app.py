@@ -62,6 +62,10 @@ def register_blueprints(app):
     app.register_blueprint(BaseRoute.route.blueprint)
     app.register_blueprint(Lessons.route.blueprint)
 
+#@dais_pcto.errorhandler(403)
+#def forbidden(e):
+#    return render_template('403.html'), 403
+
 # def register_errorhandlers(app):
 #
 #     def errorhandler(error):

@@ -1,3 +1,4 @@
+from sqlalchemy import CheckConstraint
 from dais_pcto.app import db
 from flask_login import UserMixin
 from dais_pcto.Auth.models import user_course
@@ -10,11 +11,13 @@ class Course(UserMixin, db.Model):
     name = db.Column(db.String(64), unique=True, nullable=False, index=True)
     mode = db.Column(db.Integer, nullable=False)  # modalita 0 = online modalità 1 = presenza modalita 3 = blendend
     description = db.Column(db.TEXT, nullable=False, default="Descrizione non ancora disponibile")
-    max_student = db.Column(db.Integer, nullable=False)
-    min_student = db.Column(db.Integer, nullable=False)
+    max_student = db.Column(db.Integer, CheckConstraint('max_student > min_student', name = 'max_stud_costr'), nullable=False)
+    min_student = db.Column(db.Integer, CheckConstraint('min_student < max_student', name = 'min_stud_costr'), nullable=False)
     n_hour = db.Column(db.Integer, nullable=False)
-    start_month = db.Column(db.DATE, nullable=False)  # da start month o end month ricavo periodo
-    end_month = db.Column(db.DATE, nullable=False)
+    # da start month o end month ricavo periodo
+    start_month = db.Column(db.DATE, CheckConstraint('str(end_month) > str(start_month)', name = 'start_month_costr'), nullable=False)
+    end_month = db.Column(db.DATE, CheckConstraint('str(start_month) < str(end_month)', name = 'end_month_costr'), nullable=False)
+    #if the dates are in ISO notation you can perform a standard comparison of the dates as strings
 
     # relazioni
     #molti a molti

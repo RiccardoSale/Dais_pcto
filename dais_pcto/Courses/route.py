@@ -82,22 +82,37 @@ def administration():
             n_hour = form.n_hour.data
             start_month = form.start_month.data
             end_month = form.end_month.data
-            newcourses = Course(name=name, professor=current_user.id, mode=mode, description=description,
+
+            flag = True
+
+            if max_student < min_student:
+                flag = False
+                flash("Il numero di studenti minimi deve essere minore del numero di studenti massimi", "warning")
+
+            if str(end_month) < str(start_month):
+                flag = False
+                flash("La data di fine del corso deve essere successiva alla data di inizio del corso", "warning")
+
+            if flag:
+                newcourses = Course(name=name, professor=current_user.id, mode=mode, description=description,
                                 max_student=max_student, min_student=min_student, n_hour=n_hour,
                                 start_month=start_month, end_month=end_month)
-            db.session.add(newcourses)
-            #non serve backref aggiunge in automatico
-            #current_user.r_courses_prof.append(newcourses)
-            db.session.commit()
-            flash(f"Course created", "success")
-            return redirect(url_for('courses.single_course', course=name))
+                db.session.add(newcourses)
+                #non serve backref aggiunge in automatico
+                #current_user.r_courses_prof.append(newcourses)
+                db.session.commit()
+                flash(f"Course created", "success")
+                return redirect(url_for('courses.single_course', course=name))
+            else:
+                return redirect(url_for('courses.administration'))
+
 
         except InvalidRequestError:
             db.session.rollback()
             flash(f"Something went wrong!", "danger")
         except IntegrityError:
             db.session.rollback()
-            flash(f"User already exists!.", "warning")
+            flash(f"An error occured!.", "warning")
         except DataError:
             db.session.rollback()
             flash(f"Invalid Entry", "warning")
