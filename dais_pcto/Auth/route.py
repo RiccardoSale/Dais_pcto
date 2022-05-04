@@ -76,9 +76,8 @@ def signup():
         except InterfaceError:
             db.session.rollback()
             flash(f"Error connecting to the database", "danger")
-        except DatabaseError:
-            db.session.rollback()
-            flash(f"Error connecting to the database", "danger")
+            #db.session.rollback()
+            #flash(f"Error connecting to the database", "danger")
         except BuildError:
             db.session.rollback()
             flash(f"An error occured !", "danger")

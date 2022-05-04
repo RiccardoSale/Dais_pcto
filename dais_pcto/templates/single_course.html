@@ -15,6 +15,9 @@
                             <p class="text-primary m-0 fw-bold">Informazioni del corso</p>
                         </div>
                         <div class="card-body">
+                                <div class="progress mb-4">
+                                    <div class="progress-bar bg-success" style="width: {{ progress_bar }}%;"><span class="visually-hidden"></span></div>
+                                </div>
                                 <div class="row">
                                     <div class="col">
                                         <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> <p class="text-muted">{{ Course.name }}</p></div>
@@ -61,8 +64,6 @@
                 </div>
             </div>
         </div>
-
-
           <form action method="POST" class="card-body">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
@@ -85,10 +86,9 @@
                     {% endif %}
                 {% endif %}
           </form>
-
-
-
 {% endblock %}
+
+
 
 
 

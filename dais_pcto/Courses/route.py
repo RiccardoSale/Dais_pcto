@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from dais_pcto.Auth.route import admin, professor
 from dais_pcto.Courses.models import Course
 from flask import Blueprint, url_for, current_app, redirect, g, flash, render_template
@@ -22,12 +24,17 @@ def courses():
 @login_required
 def single_course(course):
     q = Course.query.filter_by(name=course).join(User).first_or_404()
-    count = len(q.r_users)
+    count = len(q.r_users)   ##len o query ???
     if count < q.max_student:
         attivo = "Corso aperto"
     else:
         attivo = "Corso chiuso"
-    return render_template('single_course.html', Course=q, attivo=attivo)
+
+
+
+    date = datetime.now()#servirà per vedere quante lezioni sono state completate
+    progress_bar=10
+    return render_template('single_course.html', Course=q, attivo=attivo,progress_bar=progress_bar)
 
 
 @blueprint.route('/courses/<string:course>', methods=["POST"])

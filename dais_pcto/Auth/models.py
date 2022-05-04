@@ -19,17 +19,20 @@ class User(UserMixin, db.Model):
                          nullable=False)  # lunghezza dopo hashing CONTROLLARE DOPO AVER LIMITATO PASSWORD A TOT CARATTERI
 
     # relazioni
-    #molti a molti
-    #relazione con la scuola di appartenenza e
+    # molti a molti
+    # relazione con la scuola di appartenenza e
 
-    #pensa all entita scuola aggiunge la relazione
-    #è fatta identica alla relazione dei corsi
+    # pensa all entita scuola aggiunge la relazione
+    # è fatta identica alla relazione dei corsi
 
-    #cambiare form iscrizione aggiungendo campo choice -> con scuole
+    # cambiare form iscrizione aggiungendo campo choice -> con scuole
 
     r_courses = db.relationship("Course", secondary=user_course, back_populates="r_users")
 
-    #uno a molti
+    r_school = db.Column(db.Integer, db.ForeignKey(
+        'schools._id'))
+
+    # uno a molti
     r_courses_prof = db.relationship('Course', backref='users', cascade="all, delete",
                                      passive_deletes=True)  # VALUTARE ON CASCADE DELETE
 

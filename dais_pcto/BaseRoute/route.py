@@ -19,12 +19,28 @@ def index():
     return render_template('index.html')
 
 
+@blueprint.route('/prova')
+def prova():
+    return render_template('prova.html')
+
+
 @blueprint.route('/profile', methods=("GET", "POST"))
 @login_required
 def profile():
+    subscribed_users = []
+    courses = ""
     if current_user.role == "professor":
+        # return count of user "id" grouped
+        # by "name"
+        # session.query(func.count(User.id)). \ ->utile per pagina corso singolo ??
+        #     group_by(User.name)
         courses = Course.query.filter_by(professor=current_user.id)
-        print(courses)
+        for elem in courses:  # passo i campi che mi servono
+            subscribed_users.append(len(elem.r_users))  # meglio usare query o usare len ???
+    if current_user.role == "user":
+        courses = User.query.filter_by(id=current_user.id).first()
+        courses = courses.r_courses
+
     form = EditProfile()
     if form.validate_on_submit():
         try:
@@ -48,7 +64,8 @@ def profile():
                 db.session.commit()
                 flash("Modifica avvenuta con successo!", "success")
                 return redirect(
-                    url_for('BaseRoute.profile', form=form, courses=courses))  # redirect per resettare campi inseriti
+                    url_for('BaseRoute.profile', form=form, courses=courses,
+                            subscribed_users=subscribed_users))  # redirect per resettare campi inseriti
             else:
                 flash("Invalid password!", "danger")
 
@@ -70,4 +87,4 @@ def profile():
         except BuildError:
             db.session.rollback()
             flash(f"An error occured !", "danger")
-    return render_template('profile.html', form=form, courses=courses)
+    return render_template('profile.html', form=form, courses=courses, subscribed_users=subscribed_users)

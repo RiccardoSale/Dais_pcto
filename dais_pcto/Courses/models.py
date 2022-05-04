@@ -37,7 +37,9 @@ class Course(UserMixin, db.Model):
 
     professor = db.Column(db.Integer, db.ForeignKey(
         'users.id',
-        ondelete="CASCADE"))  # ->chiave esterna a utente -> e poi vincolo trigger blocca inserimento e la modifica di un eventuale utente che non abbia ruolo professore
+        ondelete="CASCADE"))
+
+    # ->chiave esterna a utente -> e poi vincolo trigger blocca inserimento e la modifica di un eventuale utente che non abbia ruolo professore
     # email professore la piglio dall'utente ->
 
     r_users = db.relationship("User", secondary=user_course, back_populates="r_courses")
