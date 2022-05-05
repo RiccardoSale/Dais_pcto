@@ -6,7 +6,7 @@ from wtforms.validators import InputRequired, Length, Regexp
 class coursesForm(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(1, 64),
                                    Regexp("^[A-Za-z][A-Za-z0-9_.]*$", 0, "Il nome del corso non è valido")])
-    mode = SelectField('mode', choices=['in presenza', 'online', 'blended'])
+    mode = SelectField('mode', choices=['presenza', 'online', 'blended'])
     description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9]*$", 0, "Descrizione non valida")])
     max_student = IntegerField(validators=[InputRequired()])
     min_student = IntegerField(validators=[InputRequired()])  # DEVE ESSERE MINORE DI MAX STUDENT DOVE METTO VINCOLO

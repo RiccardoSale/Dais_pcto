@@ -20,7 +20,7 @@ class ProdConfig(Config):
     ENV = 'prod'
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
-                                             'postgresql://localhost/example')
+                                             "postgresql://postgres:postgres@localhost:5432/dais_pcto")
 
 
 class DevConfig(Config):
@@ -31,7 +31,7 @@ class DevConfig(Config):
     #DB_NAME = 'dev.db'
     # Put the db file in project root
     #DB_PATH = os.path.join(Config.PROJECT_ROOT, DB_NAME)
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///db.sqlite'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234@localhost:5432/dais_pcto'
     #CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
 
 

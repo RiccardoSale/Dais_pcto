@@ -123,15 +123,15 @@ def administration():
         except IntegrityError:
             db.session.rollback()
             flash(f"An error has occurred!.", "warning")
-        except DataError:
-            db.session.rollback()
-            flash(f"Invalid Entry", "warning")
+        #except DataError:
+        #    db.session.rollback()
+        #    flash(f"Invalid Entry", "warning")
         except InterfaceError:
             db.session.rollback()
             flash(f"Error connecting to the database", "danger")
-        except DatabaseError:
-            db.session.rollback()
-            flash(f"Error connecting to the database", "danger")
+        #except DatabaseError:
+        #    db.session.rollback()
+        #    flash(f"Error connecting to the database", "danger")
         except BuildError:
             db.session.rollback()
             flash(f"An error occured !", "danger")

@@ -53,12 +53,13 @@ def signup():
             username = form.username.data
             name = form.name.data
             surname = form.surname.data
-            try:#SISTEMARE IN MODO CHE VADA
-                validate_email(email)
-                validate_username(username)
-            except ValidationError:
-                flash(f"User or email already exists!", "warning")
-            new_user = User(username=username,name=name,surname=surname,email=email, password=bcrypt.generate_password_hash(password))
+            #try:#SISTEMARE IN MODO CHE VADA
+                #validate_email(email)
+                #validate_username(username)
+            #except ValidationError:
+                #flash(f"User or email already exists!", "warning")
+            new_user = User(username=username,name=name,surname=surname,email=email, password=bcrypt.generate_password_hash(password).decode('utf8'))
+            #decode necessario altrimenti con postgres la password viene "hashata 2 volte"
             db.session.add(new_user)
             db.session.commit()
             flash(f"Account Succesfully created", "success")

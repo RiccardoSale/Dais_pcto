@@ -6,10 +6,11 @@ from sqlalchemy import MetaData
 from flask_login import LoginManager
 from flask import Flask
 from dais_pcto.module_extensions import bcrypt, db, migrate
-from dais_pcto import Lessons, Auth, Courses, BaseRoute
+from dais_pcto import Lessons, Auth, Courses, BaseRoute, HSchool
 from dais_pcto.settings import ProdConfig, DevConfig
 from .Auth.models import User
-from .Lessons.models import Lesson
+from .HSchool.models import Hschool
+from .Lessons.models import Lesson #NECESSARIO PER FAR VEDERE TABELLA ANCHE SE RISULTANO IMPORT INUSATI !!!!
 
 
 # from conduit.exceptions import InvalidUsage
@@ -38,7 +39,8 @@ def create_app(config_object=DevConfig):
     login_manager.login_message_category = "info"
     login_manager.login_view = 'Auth.login'
     login_manager.init_app(app)
-    #db.create_all()
+
+    # db.create_all()
     @login_manager.user_loader  # -> diciamo a flask login come trovare uno specifico utente dall id che e salvato nella loro sessione dei cookie
     def load_user(user_id):
         # usiamo l id per effettare la query ( chiave primaria)
@@ -61,6 +63,7 @@ def register_blueprints(app):
     app.register_blueprint(Courses.route.blueprint)
     app.register_blueprint(BaseRoute.route.blueprint)
     app.register_blueprint(Lessons.route.blueprint)
+    app.register_blueprint(HSchool.route.blueprint)
 
 # def register_errorhandlers(app):
 #
