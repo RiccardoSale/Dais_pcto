@@ -16,29 +16,19 @@ class LoginForm(FlaskForm):
     # )
 
 
-def validate_username(username):#capire se usarlo ha senso o effettuare integrity error ->al posto di raise cosa usare
-    if User.query.filter_by(username=username).first():
-        raise ValidationError("Username already registered")
-
-
-def validate_email(email):
-    if User.query.filter_by(email=email).first():
-        raise ValidationError("Email already registered!")
-
-
 class SignupForm(FlaskForm):
-    username = StringField(
-        validators=[InputRequired(), Length(3, 64, message="Please provide a valid username"), Regexp(
-            "^[A-Za-z0-9]*$",
-            0,
-            "Usernames must have only letters, " "numbers, dots or underscores",
-        ),
-                    ]
-    )
+    # username = StringField(
+    #     validators=[InputRequired(), Length(3, 64, message="Please provide a valid username"), Regexp(
+    #         "^[A-Za-z0-9]*$",
+    #         0,
+    #         "Usernames must have only letters, " "numbers, dots or underscores",
+    #     ),
+    #                 ]
+    # )
     email = StringField(validators=[InputRequired(), Email(), Length(1, 64)])
     password = PasswordField(validators=[InputRequired(), Length(8, 72)])
     name = StringField(validators=[InputRequired(), Length(3, 64, message="Please provide a valid name"), Regexp(
-        "^[A-Za-z][A-Za-z0-9_.]*$",#trovare regex per lettere italiane e straniere
+        "^[A-Za-z][A-Za-z0-9_.]*$",  # trovare regex per lettere italiane e straniere
         0,
         "Name can have only letters",
     )])
@@ -48,3 +38,7 @@ class SignupForm(FlaskForm):
             0,
             "Surname can have only letters",
         )])
+
+    def validate_email(self,field):
+        if User.query.filter_by(_email=field.data).first():
+            raise ValidationError("Email già registrata!")

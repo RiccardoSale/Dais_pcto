@@ -62,7 +62,7 @@
                 </li>
                 <li class="nav-item">
                     {% if current_user.is_authenticated %}
-                        {% if (current_user.role=='admin' or current_user.role=='professor') %}
+                        {% if (current_user._role=='admin' or current_user._role=='professor') %}
                     <a class="nav-link" href="{{ url_for('courses.administration') }}" >
                                 Crea corso
                     </a>
@@ -74,6 +74,15 @@
                     <a class="nav-link" href="{{ url_for('courses.courses') }}" >
                                 Lista corsi
                     </a>
+                    {% endif %}
+                </li>
+                <li class="nav-item">
+                    {% if current_user.is_authenticated %}
+                    {% if current_user._role == "admin" %}
+                    <a class="nav-link" href="{{ url_for('Hschool.schools') }}" >
+                        Sezione Scuole
+                    </a>
+                    {% endif %}
                     {% endif %}
                 </li>
                 <li>

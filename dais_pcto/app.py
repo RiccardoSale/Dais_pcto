@@ -6,7 +6,7 @@ from sqlalchemy import MetaData
 from flask_login import LoginManager
 from flask import Flask
 from dais_pcto.module_extensions import bcrypt, db, migrate
-from dais_pcto import Lessons, Auth, Courses, BaseRoute, HSchool, Errors
+from dais_pcto import Lessons, Auth, Courses, BaseRoute, HSchool
 from dais_pcto.settings import ProdConfig, DevConfig
 from .Auth.models import User
 from .HSchool.models import Hschool
@@ -26,7 +26,7 @@ def create_app(config_object=DevConfig):
     app = Flask(__name__.split('.')[0])
     app.url_map.strict_slashes = False
     app.config.from_object(config_object)
-    app.permanent_session_lifetime = timedelta(minutes=1)
+    app.permanent_session_lifetime = timedelta(minutes=30)
     register_extensions(app)
     meta = MetaData()
     meta.bind = db
@@ -64,7 +64,6 @@ def register_blueprints(app):
     app.register_blueprint(BaseRoute.route.blueprint)
     app.register_blueprint(Lessons.route.blueprint)
     app.register_blueprint(HSchool.route.blueprint)
-    app.register_blueprint(Errors.errors.errors)
 
 # def register_errorhandlers(app):
 #

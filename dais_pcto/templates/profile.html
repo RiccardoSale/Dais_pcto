@@ -27,7 +27,7 @@
                         {% endwith %}
                         <div class="row">
                             <div class="col">
-                                <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> {{ form.name(class_="form-control",placeholder= current_user.name )}} </div>
+                                <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> {{ form.name(class_="form-control",placeholder= current_user._name )}} </div>
                             </div>
                             {% for error in form.name.errors %}
                             <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -36,7 +36,7 @@
                             </div>
                             {% endfor%}
                             <div class="col">
-                                <div class="mb-3"><label class="form-label" for="surname"><strong class="text-primary m-0 fw-bold">Cognome</strong></label> {{ form.surname(class_="form-control",placeholder= current_user.surname )}}  </div>
+                                <div class="mb-3"><label class="form-label" for="surname"><strong class="text-primary m-0 fw-bold">Cognome</strong></label> {{ form.surname(class_="form-control",placeholder= current_user._surname )}}  </div>
                             </div>
                             {% for error in form.surname.errors %}
                             <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -47,16 +47,10 @@
                         </div>
                         <div class="row">
                             <div class="col">
-                                <div class="mb-3"><label class="form-label" for="username"><strong class="text-primary m-0 fw-bold">Username</strong></label>  {{ form.username(class_="form-control",placeholder= current_user.username )}}        </div>
+                                <div class="mb-3"><label class="form-label" for="username"><strong class="text-primary m-0 fw-bold">Username : </strong></label>  <strong class="text-primary m-0 fw-bold">{{ current_user._user_id }} </strong></label>    </div>
                             </div>
-                            {% for error in form.username.errors %}
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                            {{ error }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                            {% endfor%}
                             <div class="col">
-                                <div class="mb-3"><label class="form-label" for="email"><strong class="text-primary m-0 fw-bold">Email</strong></label>  {{ form.email(class_="form-control",placeholder= current_user.email )}}           </div>
+                                <div class="mb-3"><label class="form-label" for="email"><strong class="text-primary m-0 fw-bold">Email</strong></label>  {{ form.email(class_="form-control",placeholder= current_user._email )}}           </div>
                             </div>
                             {% for error in form.email.errors %}
                             <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -90,14 +84,14 @@
                 </div>
             </div>
             {% if current_user.is_authenticated %}
-            {% if current_user.role!="admin" %}
+            {% if current_user._role!="admin" %}
             <div class="card shadow mb-3">
                 <div class="card-header py-3">
                     <p class="text-primary m-0 fw-bold">Course section</p>
                         <table id="data" class="table table-striped table-dark">
                             <thead>
                               <tr>
-                                  {% if  current_user.role=='professor' %}
+                                  {% if  current_user._role=='professor' %}
                                       <th>Nome</th>
                                       <th>Modalità</th>
                                       <th>Numero studenti iscritti</th>
@@ -105,7 +99,7 @@
                                       <th>Fine Lezioni</th>
                                       <th>Pagina corso</th>
                                   {% endif %}
-                                  {% if current_user.role=='user' %}
+                                  {% if current_user._role=='user' %}
                                       <th>Nome</th>
                                       <th>Modalità</th>
                                       <th>Lezioni a cui ho partecipato ??</th>
@@ -118,18 +112,18 @@
                             <tbody>
                               {% for Course in courses %} <!--prima tabella poi elemento query-->
                                 <tr>
-                                  <td>{{ Course.name }}</td>
-                                  <td>{{ Course.mode }}</td>
-                                    {% if  current_user.role=='professor' %}
+                                  <td>{{ Course._name }}</td>
+                                  <td>{{ Course._mode }}</td>
+                                    {% if  current_user._role=='professor' %}
                                     <td>   {{ subscribed_users[loop.index0] }}</td>
                                     {% endif %}
-                                    {% if current_user.role=='user' %}
+                                    {% if current_user._role=='user' %}
                                     <td>  campo da aggiungere </td>
                                     {% endif %}
 
-                                  <td>{{ Course.start_month }}</td>
-                                  <td>{{ Course.end_month }}</td>
-                                    <td> <a href = "{{ url_for('courses.single_course',course= Course.name ) }}"> <img class="info" src="/static/info.jpg" style="width: 20px;"></a></a> </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
+                                  <td>{{ Course._start_month }}</td>
+                                  <td>{{ Course._end_month }}</td>
+                                    <td> <a href = "{{ url_for('courses.single_course',course= Course._name ) }}"> <img class="info" src="/static/info.jpg" style="width: 20px;"></a></a> </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
                                 </tr>
                               {% endfor %}
                             </tbody>

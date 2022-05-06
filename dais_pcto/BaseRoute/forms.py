@@ -4,13 +4,13 @@ from wtforms.validators import Length, Regexp, Email, InputRequired, Optional
 
 
 class EditProfile(FlaskForm):
-    username = StringField(
-        validators=[Length(3, 64, message="Please provide a valid username"), Optional(), Regexp(
-            "^[A-Za-z0-9]*$",
-            0,
-            "Usernames must have only letters, " "numbers, dots or underscores",
-        )]
-    )
+    # username = StringField(
+    #     validators=[Length(3, 64, message="Please provide a valid username"), Optional(), Regexp(
+    #         "^[A-Za-z0-9]*$",
+    #         0,
+    #         "Usernames must have only letters, " "numbers, dots or underscores",
+    #     )]
+    # )
     email = StringField(validators=[Email(), Length(1, 64), Optional()])
     new_password = PasswordField(validators=[Length(8, 72), Optional()])
     old_password = PasswordField(

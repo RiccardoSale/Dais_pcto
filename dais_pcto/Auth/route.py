@@ -8,7 +8,7 @@ from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceE
 from dais_pcto.Auth.models import User
 from dais_pcto.app import db
 from dais_pcto.module_extensions import bcrypt
-from .forms import LoginForm,SignupForm,validate_email,validate_username
+from .forms import LoginForm, SignupForm
 
 blueprint = Blueprint('Auth', __name__)
 
@@ -27,12 +27,11 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         try:
-            print("login")
-            q = User.query.filter_by(email=form.email.data).first()
+            q = User.query.filter_by(_email=form.email.data).first()
             if q is not None:
-                if check_password_hash(q.password, form.password.data):
+                if check_password_hash(q._password, form.password.data):
                     login_user(q)
-                    identity_changed.send(current_app._get_current_object(), identity=Identity(q.role))
+                    identity_changed.send(current_app._get_current_object(), identity=Identity(q._role))
                     return redirect(url_for('BaseRoute.profile'))
                 else:
                     flash("Invalid Username or password!", "danger")
@@ -49,17 +48,14 @@ def signup():
     if form.validate_on_submit():
         try:
             email = form.email.data
-            password = form.password.data
-            username = form.username.data
-            name = form.name.data
-            surname = form.surname.data
-            #try:#SISTEMARE IN MODO CHE VADA
-                #validate_email(email)
-                #validate_username(username)
-            #except ValidationError:
-                #flash(f"User or email already exists!", "warning")
-            new_user = User(username=username,name=name,surname=surname,email=email, password=bcrypt.generate_password_hash(password).decode('utf8'))
-            #decode necessario altrimenti con postgres la password viene "hashata 2 volte"
+            role = "user"
+            if "@unive.it" in email:
+                role = "professor"
+            if "@segunive.it" in email:
+                role = "admin"
+            new_user = User(form.name.data, form.surname.data, email,
+                            bcrypt.generate_password_hash(form.password.data).decode('utf8'),
+                            role)  # decode necessario altrimenti con postgres la password viene "hashata 2 volte"
             db.session.add(new_user)
             db.session.commit()
             flash(f"Account Succesfully created", "success")
@@ -70,15 +66,15 @@ def signup():
             flash(f"Something went wrong!", "danger")
         except IntegrityError:
             db.session.rollback()
-            flash(f"User or email already existsdsa!", "warning")
+            flash(f"User or email already exits!", "warning")
         except DataError:
             db.session.rollback()
             flash(f"Invalid Entry", "warning")
         except InterfaceError:
             db.session.rollback()
             flash(f"Error connecting to the database", "danger")
-            #db.session.rollback()
-            #flash(f"Error connecting to the database", "danger")
+            # db.session.rollback()
+            # flash(f"Error connecting to the database", "danger")
         except BuildError:
             db.session.rollback()
             flash(f"An error occured !", "danger")

@@ -29,38 +29,35 @@ def prova():
 def profile():
     subscribed_users = []
     courses = ""
-    if current_user.role == "professor":
+    if current_user._role == "professor":
         # return count of user "id" grouped
         # by "name"
         # session.query(func.count(User.id)). \ ->utile per pagina corso singolo ??
         #     group_by(User.name)
-        courses = Course.query.filter_by(professor=current_user.id)
+        courses = Course.query.filter_by(_professor=current_user._user_id)
         for elem in courses:  # passo i campi che mi servono
-            subscribed_users.append(len(elem.r_users))  # meglio usare query o usare len ???
-    if current_user.role == "user":
-        courses = User.query.filter_by(id=current_user.id).first()
-        courses = courses.r_courses
+            subscribed_users.append(len(elem._users))  # meglio usare query o usare len ???
+    if current_user._role == "user":
+        courses = User.query.filter_by(_user_id=current_user._user_id).first()
+        courses = courses._courses
 
     form = EditProfile()
     if form.validate_on_submit():
         try:
-            q = User.query.filter_by(id=current_user.id).first()
-            if check_password_hash(q.password, form.old_password.data):
+            q = User.query.filter_by(_user_id=current_user._user_id).first()
+            if check_password_hash(q._password, form.old_password.data):
                 name = form.name.data  # da rifare con def per upload codice ripetuto = brutto
                 if name != "":
-                    q.name = name
+                    q._name = name
                 surname = form.surname.data
                 if surname != "":
-                    q.surname = surname
-                username = form.username.data
-                if username != "":
-                    q.username = username
+                    q._surname = surname
                 email = form.email.data
                 if email != "":
-                    q.email = email
+                    q._email = email
                 new_psw = form.new_password.data
                 if new_psw != "":
-                    q.password = bcrypt.generate_password_hash(new_psw)
+                    q._password = bcrypt.generate_password_hash(new_psw)
                 db.session.commit()
                 flash("Modifica avvenuta con successo!", "success")
                 return redirect(
