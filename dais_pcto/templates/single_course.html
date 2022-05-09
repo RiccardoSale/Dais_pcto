@@ -15,9 +15,12 @@
                             <p class="text-primary m-0 fw-bold">Informazioni del corso</p>
                         </div>
                         <div class="card-body">
+                            {% if current_user._role == "professor" %}
+                            <strong class="text-primary m-0 fw-bold">Percentuale utenti iscritti al corso</strong>
                                 <div class="progress mb-4">
-                                    <div class="progress-bar bg-success" style="width: {{ progress_bar }}%;"><span class="visually-hidden"></span></div>
+                                    <div class="progress-bar bg-success" style="width: {{ progress_bar }}%;"><span class="visually-hidden"></span>{{ progress_bar }} %</div>
                                 </div>
+                            {% endif %}
                                 <div class="row">
                                     <div class="col">
                                         <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> <p class="text-muted">{{ Course._name }}</p></div>
@@ -47,7 +50,7 @@
                                         <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Prof referente</strong></label><p class="text-muted">{{ Course.users._name +" " +Course.users._surname }}</p></div>
                                     </div>
                                     <div class="col">
-                                        <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Email prof</strong></label><p class="text-muted">{{ Course._users._email }}</p></div>
+                                        <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Email prof</strong></label><p class="text-muted">{{ Course.users._email }}</p></div>
                                     </div>
                                     <div class="col">
                                         <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Stato corso</strong></label><p class="text-muted">{{ attivo }}</p></div>
@@ -64,6 +67,8 @@
                 </div>
             </div>
         </div>
+
+
           <form action method="POST" class="card-body">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
@@ -86,9 +91,125 @@
                     {% endif %}
                 {% endif %}
           </form>
+
+        <div class="container-fluid">
+        <h3 class="text-dark mb-4"></h3>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
+                Aggiungi Lezione
+            </button>
+        </div>
+            {% for lesson in Lessons %}
+             <div class="container-fluid">
+            <h3 class="text-dark mb-4"></h3>
+            <div class="card-body" style="color: var(--bs-gray-100);background: var(--bs-gray-900);">
+            <h4 class="card-title">{{ lesson._description }}</h4>
+            <p class="card-text">  Modalità della lezione: {{ lesson._mode  }}
+                {% if lesson._mode == "presenza" %}La struttura di riferimento è : {{ lesson._structure }} {% endif %}
+                Data : {{ lesson._date }}  Ora Inizio : {{ lesson._start_hour }} Fine : {{ lesson._end_hour }}
+                {% if current_user._role == "professor" %}Token segreto per prof :{{ lesson._secret_token }} {% endif %}
+            </p>
+
+            <a class="card-link" href={{ lesson._link }}> Link Lezione      </a>
+                 {% if current_user._role == "user" %}
+                <button class="btn btn-primary" type="button" style="background: var(--bs-red);">Registra la tua presenza!</button>
+                {% endif %}
+            </div>
+             </div>
+          {% endfor %}
+
+
+
+
+    <div class="modal fade" id="aggiungi" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Aggiungi Lezione</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form action method="POST" class="card-body">
+                {{ form.csrf_token }}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                <div class="form-group mb-3">
+                    {{ form.start_hour(class_="form-control",placeholder="Ora Inizio")}}
+                </div>
+                {% for error in form.start_hour.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.end_hour(class_="form-control",placeholder="Ora Fine")}}
+                </div>
+                {% for error in form.end_hour.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.date(class_="form-control",placeholder="Data Lezione")}}
+                </div>
+                {% for error in form.date.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.mode(class_="form-control",placeholder="Modalità")}}
+                </div>
+                {% for error in form.mode.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.link(class_="form-control",placeholder="Link")}}
+                </div>
+                {% for error in form.link.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <div class="form-group mb-3">
+                    {{ form.structure(class_="form-control",placeholder="Struttura")}}
+                </div>
+                {% for error in form.structure.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+          <div class="form-group mb-3">
+                    {{ form.description(class_="form-control",placeholder="Descrizione / Argomenti")}}
+                </div>
+                {% for error in form.description.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" id="btninvio" class="btn btn-primary">Invio</button>
+          </form>
+      </div>
+      </div>
+    </div>
+  </div>
+        </div>
 {% endblock %}
-
-
-
-
-

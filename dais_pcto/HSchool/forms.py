@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, IntegerField, DateField, TimeField
+from wtforms import StringField, SelectField, IntegerField, DateField, TimeField, HiddenField, SubmitField
 from wtforms.validators import InputRequired, Length, Regexp, NumberRange, ValidationError
 from dais_pcto.HSchool.models import Hschool
 
@@ -15,6 +15,7 @@ class SchoolForm(FlaskForm):
     street = StringField(validators=[InputRequired(), Length(3, 64, message="Indica un indirizzo corretto ")])
     number = StringField(validators=[InputRequired(), Length(1, 5, message="Civico non valido")])
     phone = StringField(validators=[InputRequired(), Length(9, 10, message="Indica un numero di telefono valido")])
+    submit1 = SubmitField('submit')  # per identificare i due form presenti nella stessa pagina
 
     def validate_name(self, field):
         school = Hschool.query.filter_by(_name=field.data, _region=self.region.data, _city=self.city.data,
@@ -24,4 +25,5 @@ class SchoolForm(FlaskForm):
 
 
 class DeleteSchoolForm(FlaskForm):
-    id = IntegerField()
+    id = HiddenField()
+    submit2 = SubmitField('submit')

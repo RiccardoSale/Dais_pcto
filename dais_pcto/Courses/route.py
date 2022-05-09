@@ -1,4 +1,7 @@
+import secrets
 from datetime import datetime
+
+from sqlalchemy import func
 
 from dais_pcto.Auth.route import admin, professor
 from dais_pcto.Courses.models import Course
@@ -9,6 +12,9 @@ from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceE
 from dais_pcto.app import db
 from .forms import coursesForm
 from ..Auth.models import User
+from dais_pcto import Lessons
+from ..Lessons.forms import LessonsForm
+from ..Lessons.models import Lesson
 
 blueprint = Blueprint('courses', __name__)
 
@@ -20,25 +26,36 @@ def courses():
                            courses=all_course_prof)  # Course.query passa tutti i corsi
 
 
-@blueprint.route('/courses/<string:course>', methods=["GET"])
+@blueprint.route('/courses/<string:course>', methods=["GET","POST"])
 @login_required
 def single_course(course):
-    q = db.session.Course.query.filter_by(_name=course).join(User).first_or_404()
-    count = len(q._users)  ##len o query ???
-    if count < q._max_student:
+    form = LessonsForm()
+    info_corso = db.session.query(Course).filter_by(_name=course).join(User).first_or_404()
+    utenti_user_totali = db.session.query(func.count(User._user_id)).where(User._role=="user").scalar()
+    print("utenti user totali" )
+    print(utenti_user_totali)
+    count = len(info_corso._users)  ##len o query ???
+    print("utenti iscritti al corso" )
+    print(count)
+    progress_bar=0
+    if count> 0:
+        progress_bar = (utenti_user_totali /count )*10
+    print(progress_bar)
+    if count < info_corso._max_student:
         attivo = "Corso aperto"
     else:
         attivo = "Corso chiuso"
 
-    progress_bar = 10
-    return render_template('single_course.html', Course=q, attivo=attivo, progress_bar=progress_bar)
+    if form.validate_on_submit():
+        new_lesson = Lesson(form.start_hour.data, form.end_hour.data, form.date.data, form.mode.data, form.link.data,
+                            form.structure.data, form.description.data,info_corso._course_id,secrets.token_hex(16))
+        db.session.add(new_lesson)
+        db.session.commit()
+        flash("Lezione aggiunta", "success")
+        return redirect(url_for('courses.single_course', course=course))
 
-
-@blueprint.route('/courses/<string:course>', methods=["POST"])
-@login_required
-def single_course_post(course):  # ISCRIZIONE AL CORSO
-    q = Course.query.filter_by(_name=course).join(User).first_or_404()  # ORM
-    try:
+    if current_user._role == "user":
+        q = Course.query.filter_by(_name=course).join(User).first_or_404()  # ORM
         val = True
         for test in current_user._courses:
             if test == q:
@@ -53,26 +70,11 @@ def single_course_post(course):  # ISCRIZIONE AL CORSO
             else:
                 flash(f'Non ci sono più posti disponibili', "warning")
 
-    except InvalidRequestError:
-        db.session.rollback()
-        flash(f"Something went wrong!", "danger")
-    except IntegrityError:
-        db.session.rollback()
-        flash(f"User already exists!.", "warning")
-    except DataError:
-        db.session.rollback()
-        flash(f"Invalid Entry", "warning")
-    except InterfaceError:
-        db.session.rollback()
-        flash(f"Error connecting to the database", "danger")
-    except DatabaseError:
-        db.session.rollback()
-        flash(f"Error connecting to the database", "danger")
-    except BuildError:
-        db.session.rollback()
-        flash(f"An error occured !", "danger")
-
-    return render_template('single_course.html', Course=q)
+    # course_lesson = db.session.query(Lessons).filter_by(course=info_corso._name)
+    course_lesson = info_corso._lessons
+    print(course_lesson)
+    return render_template('single_course.html', Course=info_corso, attivo=attivo, progress_bar=progress_bar,
+                           Lessons=course_lesson, form=form)
 
 
 @blueprint.route('/administration', methods=("GET", "POST"))
@@ -92,5 +94,5 @@ def administration():
         flash(f"Course created", "success")
         return redirect(url_for('courses.single_course', course=form.name.data))
 
-    return render_template('signup.html', name=current_user._username, form=form, title="Course",
+    return render_template('signup.html', name=current_user._user_id, form=form, title="Course",
                            btn_action="Create course")
