@@ -16,7 +16,7 @@ from dais_pcto import Lessons
 from ..Lessons.forms import LessonsForm
 from ..Lessons.models import Lesson
 
-blueprint = Blueprint('courses', __name__)
+blueprint = Blueprint('courses', __name__,)
 
 
 @blueprint.route('/courses')
@@ -26,20 +26,20 @@ def courses():
                            courses=all_course_prof)  # Course.query passa tutti i corsi
 
 
-@blueprint.route('/courses/<string:course>', methods=["GET","POST"])
+@blueprint.route('/<string:course>', methods=["GET", "POST"])
 @login_required
 def single_course(course):
     form = LessonsForm()
     info_corso = db.session.query(Course).filter_by(_name=course).join(User).first_or_404()
-    utenti_user_totali = db.session.query(func.count(User._user_id)).where(User._role=="user").scalar()
-    print("utenti user totali" )
+    utenti_user_totali = db.session.query(func.count(User._user_id)).where(User._role == "user").scalar()
+    print("utenti user totali")
     print(utenti_user_totali)
     count = len(info_corso._users)  ##len o query ???
-    print("utenti iscritti al corso" )
+    print("utenti iscritti al corso")
     print(count)
-    progress_bar=0
-    if count> 0:
-        progress_bar = (utenti_user_totali /count )*10
+    progress_bar = 0
+    if count > 0:
+        progress_bar = (utenti_user_totali / count) * 10
     print(progress_bar)
     if count < info_corso._max_student:
         attivo = "Corso aperto"
@@ -48,7 +48,7 @@ def single_course(course):
 
     if form.validate_on_submit():
         new_lesson = Lesson(form.start_hour.data, form.end_hour.data, form.date.data, form.mode.data, form.link.data,
-                            form.structure.data, form.description.data,info_corso._course_id,secrets.token_hex(16))
+                            form.structure.data, form.description.data, info_corso._course_id, secrets.token_hex(16))
         db.session.add(new_lesson)
         db.session.commit()
         flash("Lezione aggiunta", "success")
@@ -77,11 +77,11 @@ def single_course(course):
                            Lessons=course_lesson, form=form)
 
 
-@blueprint.route('/administration', methods=("GET", "POST"))
+@blueprint.route('/buildcourse', methods=("GET", "POST"))
 @professor.require()  # la creazione del coros richiede di essere almeno professor
 # come far accedere admin da vedere ???!
 @login_required
-def administration():
+def buildcourse():
     form = coursesForm()
     if form.validate_on_submit():
         newcourses = Course(form.name.data, form.mode.data, form.description.data, form.max_student.data,
@@ -94,5 +94,5 @@ def administration():
         flash(f"Course created", "success")
         return redirect(url_for('courses.single_course', course=form.name.data))
 
-    return render_template('signup.html', name=current_user._user_id, form=form, title="Course",
+    return render_template('buildcourse.html', name=current_user._user_id, form=form, title="Course",
                            btn_action="Create course")

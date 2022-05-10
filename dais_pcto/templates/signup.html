@@ -1,161 +1,73 @@
 {% extends "base.html" %}
 {% block title%} {{ title }} {% endblock %}
 {% block content%}
-<div class="container">
-    <div class="row mt-4">
-        <div class="col-lg-5 col-md-6 m-auto card p-4">
-            <form action method="POST" class="card-body">
-                {{ form.csrf_token }}
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
-                {% if messages %}
+    <section class="login-dark">
+    <form method="post">
+        {{ form.csrf_token }}
+        {{ form.csrf_token }}
+        {% with messages = get_flashed_messages(with_categories=true) %}<!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
+            {% if messages %}
                 {% for category, message in messages %}
                 <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor %}
-                {% endif %}
-                {% endwith %}
-                <!-- INIZIO GESTIONE AMMINISTRAZIONE (CREAZIONE CORSO ) -->
-                {%  if request.path =='/administration' %}
-                <div class="form-group mb-3">
-                    {{ form.name(class_="form-control",placeholder="Name")}}
-                </div>
-                {% for error in form.name.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
+            {% endif %}
+        {% endwith %}
+        <h2 class="visually-hidden">Login Form</h2>
+        <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
 
-                <div class="form-group mb-3">
-                    {{ form.mode(class_="form-control",placeholder="Mode")}}
-                </div>
-                {% for error in form.mode.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.description(class_="form-control",placeholder="Description")}}
-                </div>
-                {% for error in form.description.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.max_student(class_="form-control",placeholder="max_student")}}
-                </div>
-                {% for error in form.max_student.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.min_student(class_="form-control",placeholder="min_student")}}
-                </div>
-                {% for error in form.min_student.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.n_hour(class_="form-control",placeholder="n_hour")}}
-                </div>
-                {% for error in form.n_hour.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.start_month(class_="form-control",placeholder="start_month")}}
-                </div>
-                {% for error in form.start_month.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                 <div class="form-group mb-3">
-                    {{ form.end_month(class_="form-control",placeholder="end_month")}}
-                </div>
-                {% for error in form.end_month.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                {% endif%}
-                <!-- FINE GESTIONE AMMINISTRAZIONE (CREAZIONE CORSO ) -->
 
-                <!-- INIZIO GESTIONE REGISTRAZIONE  -->
-                {% if request.path == '/signup' %}
-                 <div class="form-group mb-3">
-                    {{ form.name(class_="form-control",placeholder="Name")}}
-                </div>
-                {% for error in form.name.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.surname(class_="form-control",placeholder="Surname")}}
-                </div>
-                {% for error in form.surname.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                {% endif%}
-                <!-- FINE GESTIONE REGISTRAZIONE (CREAZIONE CORSO ) -->
+        <!--INIZIO CAMPI REGISTRAZIONE -->
+        {% if request.path == '/signup' %}
+            <div class="mb-3">{{ form.name(class_="form-control",placeholder="Name")}}</div>
 
-                <!-- INIZIO PARTI IN COMUNE TRA REGISTRAZIONE E LOGIN -->
-                {%  if request.path != '/administration' %}
-                <div class="form-group mb-3">
-                    {{ form.email(class_="form-control",placeholder="Email")}}
-                </div>
-                {% for error in form.email.errors %}
+            {% for errors in form.name.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.password(class_="form-control",placeholder="Password")}}
-                </div>
-                {% for error in form.password.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                {% endif %}
-                <div class="text-center">
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="button is-block is-info is-large is-fullwidth">{{ btn_action }}   </button>
+            {% endfor%}
+
+            <div class="mb-3">{{ form.surname(class_="form-control",placeholder="Surname")}}</div>
+            {% for error in form.surname.errors %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                    <p>
-                        {% if request.path == '/login' %}
-                        New here?
-                        <a href="{{url_for('Auth.signup')}}">Create account</a>
-                        {% endif %}
-                        {% if request.path == '/signup' %}
-                        Already have an account?
-                        <a href="{{url_for('Auth.login')}}">Login</a>
-                        {% endif %}
-                    </p>
+            {% endfor%}
+        {% endif%}
+
+        <!--INIZIO CAMPI IN COMUNE REGISTRAZIONE E LOGIN ! -->
+        {%  if request.path != '/administration' %}
+            <div class="mb-3">{{ form.email(class_="form-control",placeholder="Email")}}</div>
+
+            {% for error in form.email.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
+            {% endfor%}
+
+            <div class="mb-3">{{ form.password(class_="form-control",placeholder="Password")}}</div>
+
+            {% for error in form.password.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor%}
+        {% endif %}
+
+        <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit">{{ btn_action }}</button></div>
+        <a class="forgot" href="#">Forgot your email or password?</a>
+        {% if request.path =='/login' %}
+            <a class="forgot" href="{{url_for('Auth.signup')}}">New here create an account!</a>
+        {% endif %}
+        {% if request.path == '/signup' %}
+            <a class="forgot" href="{{url_for('Auth.login')}}"> Already have an account? Login</a>
+        {% endif %}
+    </form>
+    </section>
 {% endblock %}

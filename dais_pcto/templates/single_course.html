@@ -7,7 +7,7 @@
     {% endif %}
     <!--Pagina che renderizza il corso per gli utenti e modulo da cui ci si può iscrivere -->
     <div class="container-fluid">
-    <h3 class="text-dark mb-4"></h3>
+    <h3 class="text-dark mb-2"></h3>
             <div class="row">
                 <div class="col">
                     <div class="card shadow mb-3">
@@ -85,38 +85,70 @@
                     {% if current_user._role=='user' %}
                     <div class="text-center">
                         <div class="d-grid gap-2">
-                            <button type="submit" class="button is-block is-info is-large is-fullwidth"> Iscriviti   </button>
+                            <button type="submit" class="button is-block is-info is-large is-fullwidth"> Iscriviti  </button>
                         </div>
                     </div>
                     {% endif %}
                 {% endif %}
           </form>
 
+
         <div class="container-fluid">
-        <h3 class="text-dark mb-4"></h3>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
+        <h3 class="text-dark"></h3>
+            <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
                 Aggiungi Lezione
             </button>
         </div>
-            {% for lesson in Lessons %}
-             <div class="container-fluid">
-            <h3 class="text-dark mb-4"></h3>
-            <div class="card-body" style="color: var(--bs-gray-100);background: var(--bs-gray-900);">
-            <h4 class="card-title">{{ lesson._description }}</h4>
-            <p class="card-text">  Modalità della lezione: {{ lesson._mode  }}
-                {% if lesson._mode == "presenza" %}La struttura di riferimento è : {{ lesson._structure }} {% endif %}
-                Data : {{ lesson._date }}  Ora Inizio : {{ lesson._start_hour }} Fine : {{ lesson._end_hour }}
-                {% if current_user._role == "professor" %}Token segreto per prof :{{ lesson._secret_token }} {% endif %}
-            </p>
-
-            <a class="card-link" href={{ lesson._link }}> Link Lezione      </a>
-                 {% if current_user._role == "user" %}
-                <button class="btn btn-primary" type="button" style="background: var(--bs-red);">Registra la tua presenza!</button>
-                {% endif %}
+        <div class="container-fluid">
+        {% for lesson in Lessons %}
+        <div class="mt-5 row">
+            <div class="col">
+                <div class="mx-auto" style="width: 1800px;">
+                    <div class="card shadow tb-4 mb-1" style="width: 1650px;height: 200px;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">{{ lesson._description }}</h5>
+                                <ul class="nav nav-tabs card-header-tabs" data-bs-tabs="tabs">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" aria-current="true" data-bs-toggle="tab" href="#info">Info</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#date">Date e Orari</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#extra">extra</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#token">Token Lezioni</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <form class="card-body tab-content">
+                                <div class="tab-pane active" id="info">
+                                    <p class="card-text">Modalità della lezione: {{ lesson._mode  }}.</p>
+                                    <a class="card-link" href={{ lesson._link }}> Link Lezione</a>
+                                </div>
+                                <div class="tab-pane" id="date">
+                                    <p class=" card-text">Data : {{ lesson._date }}</p>
+                                    <p class=" card-text">Ora Inizio : {{ lesson._start_hour }}   Fine : {{ lesson._end_hour }}</p>
+                                </div>
+                                <div class="tab-pane" id="token">
+                                    {% if current_user._role == "professor" %}
+                                        <p class=" card-text">Token segreto per prof: </p>
+                                        <p class=" card-text">{{ lesson._secret_token }}</p>
+                                    {% endif %}
+                                    {% if current_user._role == "user" %}
+                                        <button class="btn btn-primary" type="button" style="background: var(--bs-red);">Registra la tua presenza!</button> <!--implementare-->
+                                    {% endif %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-             </div>
-          {% endfor %}
-
+        </div>
+{% endfor %}
+</div>
 
 
 

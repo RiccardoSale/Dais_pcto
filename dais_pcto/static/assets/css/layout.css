@@ -1,0 +1,154 @@
+:root {
+    --blue: #007bff;
+    --indigo: #6610f2;
+    --purple: #6f42c1;
+    --pink: #e83e8c;
+    --red: #dc3545;
+    --orange: #fd7e14;
+    --yellow: #ffc107;
+    --green: #28a745;
+    --teal: #20c997;
+    --cyan: #17a2b8;
+    --white: #fff;
+    --gray: #6c757d;
+    --gray-dark: #343a40;
+    --primary: #007bff;
+    --secondary: #6c757d;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --breakpoint-xs: 0;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans:ital@0;1&display=swap');
+
+html,
+body {
+    background-color: #1f1f1f;
+    color: whitesmoke;
+    padding: 0;
+    margin: 0px;
+    overflow-x: hidden;
+}
+html{
+    color:whitesmoke;
+}
+table{
+    color:whitesmoke;
+}
+tbody{
+    color:whitesmoke;
+}
+tr{
+    color:whitesmoke;
+}
+td{
+    color:whitesmoke;
+}
+#wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+}
+.nav-container {
+    max-width: 900px;
+}
+
+.navbar {
+    background-color: black;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: whitesmoke;
+    padding-right: 1em;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.outnow {
+    font-size: 50px;
+    display: inline-block;
+    width: 100%;
+    padding-top: 10px;
+    padding-left: 20px;
+    color: whitesmoke;
+    padding-right: 1em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-left: 20px;
+}
+
+.platest2 {
+    margin-bottom: 0px;
+    font-size: 50px;
+    margin-top: 40px;
+    display: inline-block;
+    font-style: italic;
+    font-family: 'PT Sans', sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+    width: 100%;
+    color: whitesmoke;
+    letter-spacing: 1px;
+}
+
+.platestlite {
+    font-style: italic;
+    font-size: 20px;
+    display: inline-block;
+    font-family: 'PT Sans', sans-serif;
+    width: 100%;
+    color: whitesmoke;
+    letter-spacing: 1px;
+}
+
+.center-justified {
+    text-align: justify;
+    margin: 0 auto;
+    width: 22em;
+}
+
+.center-justified2 {
+    text-align: justify;
+    margin: 0 auto;
+    width: 33em;
+}
+
+.descrizione {
+    overflow-wrap: break-word;
+    font-size: 20px;
+    display: inline-block;
+    font-family: 'PT Sans', sans-serif;
+    font-style: italic;
+    width: 100%;
+    color: whitesmoke;
+    letter-spacing: 1px;
+}
+
+.Titolo {
+    overflow-wrap: break-word;
+    font-size: 50px;
+    display: inline-block;
+    font-family: 'PT Sans', sans-serif;
+    width: 100%;
+    color: whitesmoke;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Add a hover effect if you want */
+.social:hover {
+    opacity: 0.7;
+}

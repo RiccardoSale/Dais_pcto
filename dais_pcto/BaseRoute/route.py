@@ -57,7 +57,7 @@ def profile():
                     q._email = email
                 new_psw = form.new_password.data
                 if new_psw != "":
-                    q._password = bcrypt.generate_password_hash(new_psw)
+                    q._password = bcrypt.generate_password_hash(new_psw).decode('utf8')
                 db.session.commit()
                 flash("Modifica avvenuta con successo!", "success")
                 return redirect(

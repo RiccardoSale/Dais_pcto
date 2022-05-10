@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col" style="height: 800px;">
+            <div class="mx-auto" style="width: 1400px;">
+            <div class="card shadow mb-4" style="width: 1300px;height: 800px;">
+                <div class="card-header py-3" style="width: 1300px;height: 55.1875px;">
+                    <h6 class="text-primary fw-bold m-0">                                                                                                                       AGGIUNGI CORSO</h6>
+                </div>
+                <div class="card-body" style="height: 500px;border-style: none;">
+                    <form action method="POST" class="card-body">
+                        {{ form.csrf_token }}
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        <!-- INIZIO GESTIONE AMMINISTRAZIONE (CREAZIONE CORSO ) -->
+                        <div class="form-group mb-3">
+                            {{ form.name(class_="form-control",placeholder="Nome")}}
+                        </div>
+                        {% for error in form.name.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ form.mode(class_="form-control",placeholder="Modalità")}}
+                        </div>
+                        {% for error in form.mode.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ form.description(class_="form-control",placeholder="Descrizione")}}
+                        </div>
+                        {% for error in form.description.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ form.max_student(class_="form-control",placeholder="Numero massimo studenti")}}
+                        </div>
+                        {% for error in form.max_student.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ form.min_student(class_="form-control",placeholder="Numero minimo studenti")}}
+                        </div>
+                        {% for error in form.min_student.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ form.n_hour(class_="form-control",placeholder="ore corso totali")}}
+                        </div>
+                        {% for error in form.n_hour.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ form.start_month(class_="form-control",placeholder="Data di inizio")}}
+                        </div>
+                        {% for error in form.start_month.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                         <div class="form-group mb-3">
+                            {{ form.end_month(class_="form-control",placeholder="Data di fine")}}
+                        </div>
+                        {% for error in form.end_month.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="row">
+                            <div class="col">
+                                 <div class="mb-3">
+                                    <button type="submit" class="btn btn-primary">
+                                        Aggiungi
+                                    </button>
+                                 </div>
+                            </div>
+                        </div>
+                        <!-- FINE GESTIONE AMMINISTRAZIONE (CREAZIONE CORSO ) -->
+                    </form>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
