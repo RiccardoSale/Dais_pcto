@@ -7,24 +7,9 @@ from .models import User
 class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Email(), Length(1, 64)])
     password = PasswordField(validators=[Optional()])
-    # username = StringField(
-    #     validators=[InputRequired(), Length(3, 64, message="Please provide a valid username"), Regexp(
-    #         "^[A-Za-z0-9]*$",
-    #         0,
-    #         "Usernames must have only letters, " "numbers, dots or underscores",
-    #     )]
-    # )
 
 
 class SignupForm(FlaskForm):
-    # username = StringField(
-    #     validators=[InputRequired(), Length(3, 64, message="Please provide a valid username"), Regexp(
-    #         "^[A-Za-z0-9]*$",
-    #         0,
-    #         "Usernames must have only letters, " "numbers, dots or underscores",
-    #     ),
-    #                 ]
-    # )
     email = StringField(validators=[InputRequired(), Email(), Length(1, 64)])
     password = PasswordField(validators=[InputRequired(), Length(8, 72)])
     name = StringField(validators=[InputRequired(), Length(3, 64, message="Please provide a valid name"), Regexp(
@@ -39,6 +24,6 @@ class SignupForm(FlaskForm):
             "Surname can have only letters",
         )])
 
-    def validate_email(self,field):
+    def validate_email(self, field):
         if User.query.filter_by(_email=field.data).first():
             raise ValidationError("Email già registrata!")

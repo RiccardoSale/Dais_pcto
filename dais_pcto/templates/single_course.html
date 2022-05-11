@@ -16,7 +16,7 @@
                         </div>
                         <div class="card-body">
                             {% if current_user._role == "professor" %}
-                            <strong class="text-primary m-0 fw-bold">Percentuale utenti iscritti al corso</strong>
+                            <strong class="text-primary m-0 fw-bold">Percentuale progresso corso</strong>
                                 <div class="progress mb-4">
                                     <div class="progress-bar bg-success" style="width: {{ progress_bar }}%;"><span class="visually-hidden"></span>{{ progress_bar }} %</div>
                                 </div>
@@ -236,6 +236,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
+                {{ form.course(value=Course._name) }}
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" id="btninvio" class="btn btn-primary">Invio</button>
           </form>

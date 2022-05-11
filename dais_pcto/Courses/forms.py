@@ -28,3 +28,7 @@ class coursesForm(FlaskForm):
     def validate_max_student(self, field):
         if self.max_student.data < self.min_student.data:
             raise ValidationError("Il numero di studenti minimi deve essere minore del numero di studenti massimi")
+
+    def validate_min_student(self, field):
+        if field.data < 10:
+            raise ValidationError("Il numero di studenti minimi deve essere almeno 10")

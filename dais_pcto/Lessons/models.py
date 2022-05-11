@@ -8,7 +8,7 @@ class Lesson(UserMixin, db.Model):
     _lesson_id = db.Column(db.Integer, primary_key=True)
     _start_hour = db.Column(db.TIME, nullable=False)
     _end_hour = db.Column(db.TIME, nullable=False)
-    _date = db.Column(db.TIMESTAMP, nullable=False)
+    _date = db.Column(db.DATE, nullable=False)
     _mode = db.Column(db.String(10), nullable=False)  # modalita 0 = online modalità 1 = presenza modalita 3 = blendend
     _link = db.Column(db.String(2083), nullable=False)
     _structure = db.Column(db.String(64), nullable=True)  # può essere null esempio lezione solo online

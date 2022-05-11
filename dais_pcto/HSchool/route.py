@@ -43,7 +43,6 @@ def schools():
     q = db.session.query(Hschool)
     form2 = DeleteSchoolForm()
     if form2.submit2.data and form2.validate_on_submit():
-        print("ziobagigio")
         rhschool = db.session.query(Hschool).filter_by(_hschool_id=form2.id.data).first()
         db.session.delete(rhschool)
         db.session.commit()

@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 from sqlalchemy import func
 
@@ -16,7 +16,14 @@ from dais_pcto import Lessons
 from ..Lessons.forms import LessonsForm
 from ..Lessons.models import Lesson
 
-blueprint = Blueprint('courses', __name__,)
+blueprint = Blueprint('courses', __name__, )
+
+
+def course_open_or_closed(course, count, max):
+    if count < max:
+        return "Corso aperto"
+    else:
+        return "Corso chiuso"
 
 
 @blueprint.route('/courses')
@@ -32,21 +39,32 @@ def single_course(course):
     form = LessonsForm()
     info_corso = db.session.query(Course).filter_by(_name=course).join(User).first_or_404()
     utenti_user_totali = db.session.query(func.count(User._user_id)).where(User._role == "user").scalar()
+    course_lesson = info_corso._lessons
     print("utenti user totali")
     print(utenti_user_totali)
     count = len(info_corso._users)  ##len o query ???
     print("utenti iscritti al corso")
     print(count)
     progress_bar = 0
-    if count > 0:
-        progress_bar = (utenti_user_totali / count) * 10
-    print(progress_bar)
-    if count < info_corso._max_student:
-        attivo = "Corso aperto"
-    else:
-        attivo = "Corso chiuso"
+
+    numero_ore_fatte = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+    zero = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+    for x in course_lesson:
+        if x._date < date.today():
+            numero_ore_fatte += datetime.combine(date.today(), x._end_hour) - datetime.combine(date.today(),
+                                                                                               x._start_hour)
+
+    if numero_ore_fatte > zero:
+        progress_bar = int(((numero_ore_fatte.seconds / 3600) / info_corso._n_hour) * 100)
+
+    # if count > 0:
+    #     progress_bar = (utenti_user_totali / count) * 10
+    # print(progress_bar)
+    attivo = course_open_or_closed(course, count, info_corso._max_student)
 
     if form.validate_on_submit():
+        print(form.start_hour.data)
+
         new_lesson = Lesson(form.start_hour.data, form.end_hour.data, form.date.data, form.mode.data, form.link.data,
                             form.structure.data, form.description.data, info_corso._course_id, secrets.token_hex(16))
         db.session.add(new_lesson)
@@ -58,7 +76,7 @@ def single_course(course):
         q = Course.query.filter_by(_name=course).join(User).first_or_404()  # ORM
         val = True
         for test in current_user._courses:
-            if test == q:
+            if test._course_id == q._course_id:
                 val = False
         if not val:
             flash(f'Sei già iscritto a questo corso', "warning")
@@ -71,8 +89,7 @@ def single_course(course):
                 flash(f'Non ci sono più posti disponibili', "warning")
 
     # course_lesson = db.session.query(Lessons).filter_by(course=info_corso._name)
-    course_lesson = info_corso._lessons
-    print(course_lesson)
+
     return render_template('single_course.html', Course=info_corso, attivo=attivo, progress_bar=progress_bar,
                            Lessons=course_lesson, form=form)
 
