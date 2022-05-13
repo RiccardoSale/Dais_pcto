@@ -76,7 +76,7 @@
                                   {% if current_user._role=='user' %}
                                       <th>Nome</th>
                                       <th>Modalità</th>
-                                      <th>Lezioni a cui ho partecipato ??</th>
+                                      <th>Lezioni con presenza registrata</th>
                                       <th>Inizio Lezioni</th>
                                       <th>Fine Lezioni</th>
                                       <th>Pagina corso</th>
@@ -89,10 +89,10 @@
                                   <td>{{ Course._name }}</td>
                                   <td>{{ Course._mode }}</td>
                                     {% if  current_user._role=='professor' %}
-                                    <td>   {{ subscribed_users[loop.index0] }}</td>
+                                    <td> {{ Course._users|count }}</td>
                                     {% endif %}
                                     {% if current_user._role=='user' %}
-                                    <td>  campo da aggiungere </td>
+                                    <td>  {{ Course._lessons|count }} </td>
                                     {% endif %}
 
                                   <td>{{ Course._start_month }}</td>

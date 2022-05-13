@@ -35,7 +35,7 @@ class Course(UserMixin, db.Model):
                              back_populates="_courses")  # collegamento molti a molti tra utenti e corsi per fattore iscrizione utente normale
 
     def __repr__(self):
-        return '<Course %r>' % self.name
+        return '<Course %r>' % self._name
 
     # Costruttore oggetto
     def __init__(self, name, mode, description, max_student, min_student, n_hour, start_month, end_month, professor):

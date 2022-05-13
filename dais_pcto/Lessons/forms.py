@@ -23,6 +23,11 @@ from dais_pcto.module_extensions import db
 # se la lezione blended o in presenza il campo struttura va indicato e popolato
 
 
+# SE una lezione è online il campo link è obbligatorio #fatto!
+# Se una lezione e blendend campo link non obbligatorio??    #todo
+# Se una lezione e in presenza campo link non obbligatorio   #todo valutare
+
+
 class LessonsForm(FlaskForm):
     start_hour = TimeField(validators=[InputRequired()])
     end_hour = TimeField(validators=[InputRequired()])
@@ -32,11 +37,7 @@ class LessonsForm(FlaskForm):
     structure = StringField()  # Possibile campo choices
     description = StringField(validators=[InputRequired()])
     course = HiddenField(validators=[InputRequired()])
-    submit1 = SubmitField('submit')
-
-    ## Le lezioni di un corso non si devono sovrappore ! -> TODO
-
-    # NON far aggiungere una lezione che va a sforare le ore del corso totali ->TODO
+    submit1 = SubmitField('Aggiungi Lezione')
 
     def validate_start_hour(self, field):
         if self.start_hour.data > self.end_hour.data:
@@ -93,8 +94,6 @@ class LessonsForm(FlaskForm):
         if self.end_hour.data > date_time_obj:
             raise ValidationError("L'orario di fine deve essere prima delle 20:00")
 
-    # def validate_description(self, field):
-
     def validate_date(self, field):
         if str(self.date) <= str(datetime.now()):
             raise ValidationError("La data della lezione deve essere successiva a quella odierna")
@@ -103,6 +102,8 @@ class LessonsForm(FlaskForm):
         if field.data == "online":
             if self.structure.data != "":
                 raise ValidationError("Se la lezione è online non va indicata la struttura")
+            if self.link.data == "":
+                raise ValidationError("Se la lezione è online va inserito un link !")
         else:
             if self.structure.data == "":
                 raise ValidationError(

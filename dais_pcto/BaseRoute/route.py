@@ -1,14 +1,20 @@
+from datetime import datetime
+from urllib import response
+
 from flask import Blueprint, render_template, flash, url_for, redirect
 from flask_bcrypt import check_password_hash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import InvalidRequestError, IntegrityError, DataError, InterfaceError, DatabaseError
 from werkzeug.routing import BuildError
-
+from flask import render_template
+from flask import make_response
+import pdfkit
 from dais_pcto.app import db
 
 from .forms import EditProfile
 from ..Auth.models import User
 from ..Courses.models import Course
+from ..Lessons.models import Lesson
 from ..module_extensions import bcrypt
 
 blueprint = Blueprint('BaseRoute', __name__)
@@ -24,22 +30,30 @@ def prova():
     return render_template('prova.html')
 
 
+def certificate(course, professor, ore):
+    professor = db.session.query(User).filter_by(_user_id=professor).first()
+    date = str(datetime.now())
+    date = date[0:10]
+    rendered = render_template('certificate.html', name=current_user._name, surname=current_user._surname,
+                               professor=professor, course=course, date=date, ore=ore)
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+    pdf = pdfkit.from_string(rendered, False, configuration=config)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment;filename=output.pdf'
+    return response
+
+
 @blueprint.route('/profile', methods=("GET", "POST"))
 @login_required
 def profile():
-    subscribed_users = []
     courses = ""
     if current_user._role == "professor":
-        # return count of user "id" grouped
-        # by "name"
-        # session.query(func.count(User.id)). \ ->utile per pagina corso singolo ??
-        #     group_by(User.name)
         courses = Course.query.filter_by(_professor=current_user._user_id)
-        for elem in courses:  # passo i campi che mi servono
-            subscribed_users.append(len(elem._users))  # meglio usare query o usare len ???
+
     if current_user._role == "user":
-        courses = User.query.filter_by(_user_id=current_user._user_id).first()
-        courses = courses._courses
+        courses = Course.query.join(User._courses).join(Lesson).filter(User._user_id==current_user._user_id).all()
 
     form = EditProfile()
     if form.validate_on_submit():
@@ -60,9 +74,7 @@ def profile():
                     q._password = bcrypt.generate_password_hash(new_psw).decode('utf8')
                 db.session.commit()
                 flash("Modifica avvenuta con successo!", "success")
-                return redirect(
-                    url_for('BaseRoute.profile', form=form, courses=courses,
-                            subscribed_users=subscribed_users))  # redirect per resettare campi inseriti
+                return redirect(url_for('BaseRoute.profile', form=form, courses=courses))  # redirect per resettare campi inseriti
             else:
                 flash("Invalid password!", "danger")
 
@@ -84,4 +96,4 @@ def profile():
         except BuildError:
             db.session.rollback()
             flash(f"An error occured !", "danger")
-    return render_template('profile.html', form=form, courses=courses, subscribed_users=subscribed_users)
+    return render_template('profile.html', form=form, courses=courses)

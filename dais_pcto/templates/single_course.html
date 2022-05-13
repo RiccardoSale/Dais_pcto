@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+
+{% block script %}
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+{% endblock %}
+
 {% block content %}
     {% if current_user.is_authenticated %}<!--PAGINA PER MODIFICARE IL CORSO DISPONIBILE SOLO AI PROF E AGLI ADMIN-->
                         {% if (current_user.role=='admin' or current_user.role=='professor') %}
@@ -61,6 +66,24 @@
                                     <div class="col">
                                         <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Descrizione</strong></label><p class="text-muted">{{ Course._description }}</p></div>
                                     </div>
+                                    <div class="col">
+                                        <form action method="POST" class="card-body">
+                                            {% for error in form4.id.errors %}
+                                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                {{ error }}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                            {% endfor%}
+                                             {% if current_user.is_authenticated %}
+                                                {% if current_user._role=='user' %}
+                                                     {{ form4.csrf_token }}
+                                                     {{ form4.user(value=current_user._user_id) }}
+                                                     {{ form4.id(value=Course._course_id) }}
+                                                     {{ form4.submit4(type="submit",class="m-2 pb-1 btn btn-primary") }}
+                                                {% endif %}
+                                            {% endif %}
+                                        </form>
+                                    </div>
                                 </div>
                         </div>
                     </div>
@@ -106,6 +129,7 @@
                     {% endif %}
                 {% endif %}
           </form>
+
 
 
         <div class="container-fluid">
@@ -269,13 +293,30 @@
                 </div>
                 {% endfor%}
                 {{ form.course(value=Course._name) }}
-                {{ form.submit1 }}
+                {{ form.submit1(type="submit",class="m-2 pb-1 btn btn-primary") }}
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" id="btninvio" class="btn btn-primary">Invio</button>
           </form>
       </div>
       </div>
     </div>
   </div>
-        </div>
+<script>
+    var doc = new jsPDF();
+    var elementHandler = {
+      '#ignorePDF': function (element, renderer) {
+        return true;
+      }
+    };
+    var source = window.document.getElementsByTagName("body")[0];
+    doc.fromHTML(
+        source,
+        15,
+        15,
+        {
+          'width': 180,'elementHandlers': elementHandler
+        });
+
+    doc.output("dataurlnewwindow");
+</script>
+
 {% endblock %}

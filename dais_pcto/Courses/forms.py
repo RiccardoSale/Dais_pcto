@@ -6,6 +6,7 @@ from wtforms.validators import InputRequired, Length, Regexp, ValidationError
 
 from dais_pcto.Auth.models import User
 from dais_pcto.Courses.models import Course
+from dais_pcto.Lessons.models import Lesson
 from dais_pcto.module_extensions import db
 
 
@@ -43,8 +44,9 @@ class CourseSubscription(FlaskForm):
     user = HiddenField()
     submit3 = SubmitField('Iscriviti al corso')
 
-    def validate_id(self,data):
-        q = db.session.query(User).join(Course._users).filter(User._user_id ==self.user.data,Course._course_id==self.id.data ).first()
+    def validate_id(self, data):
+        q = db.session.query(User).join(Course._users).filter(User._user_id == self.user.data,
+                                                              Course._course_id == self.id.data).first()
         if q:
             if q._role == "user":
                 raise ValidationError("Sei già registrato al corso")
@@ -52,3 +54,20 @@ class CourseSubscription(FlaskForm):
             q2 = db.session.query(Course).filter_by(_course_id=self.id.data).join(User).first()
             if len(q2._users) >= q2._max_student:
                 raise ValidationError("Il corso è chiuso non sono più disponibili posti")
+
+
+class PartecipationCertificate(FlaskForm):
+    id = HiddenField()
+    user = HiddenField()
+    submit4 = SubmitField('Genera il certificato di Partecipazione')
+
+    def validate_id(self, data):
+        q = db.session.query(Lesson).join(Course).filter(Course._course_id == self.id.data).all()
+        # q= LEZIONI CHE FANNO PARTE DEL CORSO ATTUALE DA CONFRONTARE CON LE LEZIONI SEGUITE DALLO STUDENTE DI QUEL CORSO PARTICOLARE
+
+        #Lezioni a cui l utente ha partecipato di quel particolare corso e di cui ha registrato la presenza
+        subquery = db.session.query(Lesson).join(User._lessons).filter(User._user_id==self.user.data,Lesson.course==self.id.data).all()
+
+        #DEVE AVER PARTECIPATO ALMENO AL 70 %
+        if len(subquery)/len(q)*100 < 70:
+            raise ValidationError("Non hai attestato la partecipazione ad abbastanza lezioni")

@@ -1,7 +1,7 @@
 import secrets
 from datetime import datetime, date, timedelta
 
-from sqlalchemy import func
+from sqlalchemy import func, desc
 
 from dais_pcto.Auth.route import admin, professor
 from dais_pcto.Courses.models import Course
@@ -10,9 +10,10 @@ from flask_login import login_required, logout_user, login_user, current_user
 from werkzeug.routing import BuildError
 from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceError, InvalidRequestError, )
 from dais_pcto.app import db
-from .forms import coursesForm
+from .forms import coursesForm, PartecipationCertificate
 from ..Auth.models import User
 from dais_pcto import Lessons
+from ..BaseRoute.route import certificate
 from ..Courses.forms import CourseSubscription
 from ..Lessons.forms import LessonsForm, TokenForm
 from ..Lessons.models import Lesson
@@ -36,13 +37,18 @@ def courses():
 
 @blueprint.route('/<string:course>', methods=["GET", "POST"])
 @login_required
-def single_course(course): #AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO per visualizzare lezioni nella route TODO
+def single_course(
+        course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO per visualizzare lezioni nella route TODO
     form = LessonsForm()
     form2 = TokenForm()
     form3 = CourseSubscription()
+    form4 = PartecipationCertificate()
     info_corso = db.session.query(Course).filter_by(_name=course).join(User).first_or_404()
     utenti_user_totali = db.session.query(func.count(User._user_id)).where(User._role == "user").scalar()
-    course_lesson = info_corso._lessons
+
+
+    course_lesson = db.session.query(Lesson).join(Course).filter(Course._name==course).order_by(Lesson._date).order_by(Lesson._start_hour)
+    #course_lesson = info_corso._lessons.order_by(desc(Lesson._date))
     count = len(info_corso._users)  ##len o query ???
     progress_bar = 0
 
@@ -59,6 +65,7 @@ def single_course(course): #AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO p
     # if count > 0:
     #     progress_bar = (utenti_user_totali / count) * 10
     # print(progress_bar)
+
     attivo = course_open_or_closed(course, count, info_corso._max_student)
 
     if form.submit1.data and form.validate_on_submit():
@@ -82,8 +89,11 @@ def single_course(course): #AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO p
             db.session.commit()
             flash(f"Subscribe succesfull", "success")
 
+    if form4.submit4.data and form4.validate_on_submit():
+        return certificate(course=info_corso._name, professor=info_corso._professor, ore=info_corso._n_hour)
+
     return render_template('single_course.html', Course=info_corso, attivo=attivo, progress_bar=progress_bar,
-                           Lessons=course_lesson, form=form, form2=form2, form3=form3)
+                           Lessons=course_lesson, form=form, form2=form2, form3=form3, form4=form4)
 
 
 @blueprint.route('/buildcourse', methods=("GET", "POST"))
