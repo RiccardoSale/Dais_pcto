@@ -1,5 +1,6 @@
 from flask_login import UserMixin
 from dais_pcto.app import db
+from dais_pcto.Auth.models import user_lesson
 
 
 class Lesson(UserMixin, db.Model):
@@ -18,6 +19,10 @@ class Lesson(UserMixin, db.Model):
     # relazioni
     course = db.Column(db.Integer, db.ForeignKey(
         'courses._course_id'))
+
+    _users = db.relationship("User", secondary=user_lesson,
+                             back_populates="_lessons")
+    # collegamento molti a molti tra utenti e lezioni per fattore partecipazione alla lezione
 
     # Costruttore oggetto
     def __init__(self, start_hour, end_hour, date, mode, link, structure, description, course, token):

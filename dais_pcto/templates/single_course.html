@@ -70,6 +70,18 @@
 
 
           <form action method="POST" class="card-body">
+                {% for error in form3.id.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor%}
+                {% for error in form2.token.errors %}
+                                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                    {{ error }}
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                </div>
+                                                {% endfor%}
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
                 {% if messages %}
@@ -83,9 +95,12 @@
                 {% endwith %}
                  {% if current_user.is_authenticated %}
                     {% if current_user._role=='user' %}
+                         {{ form3.csrf_token }}
+                         {{ form3.user(value=current_user._user_id) }}
+                         {{ form3.id(value=Course._course_id,class_='button is-block is-info is-large is-fullwidth',_type='submit') }}
                     <div class="text-center">
                         <div class="d-grid gap-2">
-                            <button type="submit" class="button is-block is-info is-large is-fullwidth"> Iscriviti  </button>
+                             {{ form3.submit3(type="submit",class="m-2 pb-1 btn btn-primary") }}
                         </div>
                     </div>
                     {% endif %}
@@ -95,9 +110,11 @@
 
         <div class="container-fluid">
         <h3 class="text-dark"></h3>
+            {% if current_user._role == "professor" %}
             <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
                 Aggiungi Lezione
             </button>
+            {% endif %}
         </div>
         <div class="container-fluid">
         {% for lesson in Lessons %}
@@ -110,38 +127,53 @@
                                 <h5 class="card-title">{{ lesson._description }}</h5>
                                 <ul class="nav nav-tabs card-header-tabs" data-bs-tabs="tabs">
                                     <li class="nav-item">
-                                        <a class="nav-link active" aria-current="true" data-bs-toggle="tab" href="#info">Info</a>
+                                        <a class="nav-link active" aria-current="true" data-bs-toggle="tab" href="#info{{ loop.index }}">Info</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#date">Date e Orari</a>
+                                        <a class="nav-link" data-bs-toggle="tab" href="#date{{ loop.index }}">Date e Orari</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#extra">extra</a>
+                                        <a class="nav-link" data-bs-toggle="tab" href="#extra{{ loop.index }}">extra</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#token">Token Lezioni</a>
+                                        <a class="nav-link" data-bs-toggle="tab" href="#token{{ loop.index }}">Token Lezioni</a>
                                     </li>
                                 </ul>
                             </div>
-                            <form class="card-body tab-content">
-                                <div class="tab-pane active" id="info">
+                            <div class="card-body tab-content">
+                                <div class="tab-pane active" id="info{{ loop.index }}">
                                     <p class="card-text">Modalità della lezione: {{ lesson._mode  }}.</p>
                                     <a class="card-link" href={{ lesson._link }}> Link Lezione</a>
                                 </div>
-                                <div class="tab-pane" id="date">
+                                <div class="tab-pane" id="date{{ loop.index }}">
                                     <p class=" card-text">Data : {{ lesson._date }}</p>
                                     <p class=" card-text">Ora Inizio : {{ lesson._start_hour }}   Fine : {{ lesson._end_hour }}</p>
                                 </div>
-                                <div class="tab-pane" id="token">
+                                <div class="tab-pane" id="extra{{ loop.index }}">
+                                    <p class=" card-text">DECIDERE COSA METTERE</p>
+                                </div>
+                                <div class="tab-pane" id="token{{ loop.index }}">
                                     {% if current_user._role == "professor" %}
                                         <p class=" card-text">Token segreto per prof: </p>
                                         <p class=" card-text">{{ lesson._secret_token }}</p>
                                     {% endif %}
                                     {% if current_user._role == "user" %}
-                                        <button class="btn btn-primary" type="button" style="background: var(--bs-red);">Registra la tua presenza!</button> <!--implementare-->
+                                        <form action method="POST">
+                                            {{ form2.csrf_token }}
+                                            {{ form2.user(value=current_user._user_id) }}
+                                            {{ form2.id(value=lesson._lesson_id) }}
+                                            <div class="row">
+                                            <div class="col">
+                                                {{ form2.token(placeholder="Inserisci token",class_="form-control") }}
+                                            </div>
+                                            <div class="col">
+                                            {{ form2.submit2( class="btn btn-primary", type="submit", style="background: var(--bs-red);"  ) }}
+                                            </div>
+                                            </div>
+                                        </form>
                                     {% endif %}
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -237,6 +269,7 @@
                 </div>
                 {% endfor%}
                 {{ form.course(value=Course._name) }}
+                {{ form.submit1 }}
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" id="btninvio" class="btn btn-primary">Invio</button>
           </form>

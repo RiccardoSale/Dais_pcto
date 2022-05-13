@@ -6,6 +6,11 @@ user_course = db.Table('user_corse',
                        db.Column('course_id', db.Integer, db.ForeignKey('courses._course_id'))
                        )
 
+user_lesson = db.Table('user_lesson',
+                       db.Column('user_id', db.Integer, db.ForeignKey('users._user_id')),
+                       db.Column('lesson_id', db.Integer, db.ForeignKey('lessons._lesson_id'))
+                       )
+
 
 # tabella secondaria per relazione molti a molti tra utenti e corsi
 
@@ -26,15 +31,15 @@ class User(UserMixin, db.Model):
     _courses = db.relationship("Course", secondary=user_course,
                                back_populates="_users")  # necessaria per relazione molti a molti !
 
+    _lessons = db.relationship("Lesson", secondary=user_lesson,
+                               back_populates="_users")
+
     _school = db.Column(db.Integer, db.ForeignKey(
         'h_schools._hschool_id'))
 
     # uno a molti -> legata a chiave esterna professor
     _courses_prof = db.relationship('Course', backref='users', cascade="all, delete",
                                     passive_deletes=True)  # VALUTARE ON CASCADE DELETE
-
-    def __repr__(self):
-        return '<User %r>' % self.username
 
     def __init__(self, name, surname, email, password, role):
         self._name = name

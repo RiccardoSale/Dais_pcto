@@ -13,7 +13,8 @@ from dais_pcto.app import db
 from .forms import coursesForm
 from ..Auth.models import User
 from dais_pcto import Lessons
-from ..Lessons.forms import LessonsForm
+from ..Courses.forms import CourseSubscription
+from ..Lessons.forms import LessonsForm, TokenForm
 from ..Lessons.models import Lesson
 
 blueprint = Blueprint('courses', __name__, )
@@ -35,16 +36,14 @@ def courses():
 
 @blueprint.route('/<string:course>', methods=["GET", "POST"])
 @login_required
-def single_course(course):
+def single_course(course): #AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO per visualizzare lezioni nella route TODO
     form = LessonsForm()
+    form2 = TokenForm()
+    form3 = CourseSubscription()
     info_corso = db.session.query(Course).filter_by(_name=course).join(User).first_or_404()
     utenti_user_totali = db.session.query(func.count(User._user_id)).where(User._role == "user").scalar()
     course_lesson = info_corso._lessons
-    print("utenti user totali")
-    print(utenti_user_totali)
     count = len(info_corso._users)  ##len o query ???
-    print("utenti iscritti al corso")
-    print(count)
     progress_bar = 0
 
     numero_ore_fatte = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
@@ -62,9 +61,7 @@ def single_course(course):
     # print(progress_bar)
     attivo = course_open_or_closed(course, count, info_corso._max_student)
 
-    if form.validate_on_submit():
-        print(form.start_hour.data)
-
+    if form.submit1.data and form.validate_on_submit():
         new_lesson = Lesson(form.start_hour.data, form.end_hour.data, form.date.data, form.mode.data, form.link.data,
                             form.structure.data, form.description.data, info_corso._course_id, secrets.token_hex(16))
         db.session.add(new_lesson)
@@ -72,26 +69,21 @@ def single_course(course):
         flash("Lezione aggiunta", "success")
         return redirect(url_for('courses.single_course', course=course))
 
-    if current_user._role == "user":
-        q = Course.query.filter_by(_name=course).join(User).first_or_404()  # ORM
-        val = True
-        for test in current_user._courses:
-            if test._course_id == q._course_id:
-                val = False
-        if not val:
-            flash(f'Sei già iscritto a questo corso', "warning")
-        else:
-            if len(q._users) < q._max_student:  # Controllo se numero utenti al corso minore del numero massimo di studenti
-                current_user._courses.append(q)
-                db.session.commit()
-                flash(f"Subscribe succesfull", "success")
-            else:
-                flash(f'Non ci sono più posti disponibili', "warning")
+    if form2.submit2.data and form2.validate_on_submit():
+        l = db.session.query(Lesson).filter_by(_lesson_id=form2.id.data).first()
+        current_user._lessons.append(l)
+        db.session.commit()
+        flash("Hai registrato la tua presenza con successo")
 
-    # course_lesson = db.session.query(Lessons).filter_by(course=info_corso._name)
+    if form3.submit3.data and form3.validate_on_submit():
+        if current_user._role == "user":
+            q = Course.query.filter_by(_name=course).first_or_404()
+            current_user._courses.append(q)
+            db.session.commit()
+            flash(f"Subscribe succesfull", "success")
 
     return render_template('single_course.html', Course=info_corso, attivo=attivo, progress_bar=progress_bar,
-                           Lessons=course_lesson, form=form)
+                           Lessons=course_lesson, form=form, form2=form2, form3=form3)
 
 
 @blueprint.route('/buildcourse', methods=("GET", "POST"))

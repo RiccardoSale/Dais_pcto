@@ -1,23 +1,26 @@
 from datetime import datetime, time, timedelta, date
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, IntegerField, DateField, TimeField, HiddenField
+from markupsafe import Markup
+from wtforms import StringField, SelectField, IntegerField, DateField, TimeField, HiddenField, SubmitField
 from wtforms.validators import InputRequired, Length, Regexp, ValidationError
 
 from dais_pcto.Courses.models import Course
 from dais_pcto.Lessons.models import Lesson
+from dais_pcto.Auth.models import User
 from dais_pcto.module_extensions import db
 
-#start hour deve essere prima di end hour
-#date deve essere compresa tra il periodo del corso
-#date non puo essere precedente alla data di oggi perche se stiamo creando un corso non puo essere nel passato
 
-#le lezioni dello stesso giorno dello stesso corso non si sovrappongono
-#l'orario delle lezioni e compreso tra le 9 e le 20
+# start hour deve essere prima di end hour
+# date deve essere compresa tra il periodo del corso
+# date non puo essere precedente alla data di oggi perche se stiamo creando un corso non puo essere nel passato
+
+# le lezioni dello stesso giorno dello stesso corso non si sovrappongono
+# l'orario delle lezioni e compreso tra le 9 e le 20
 
 
-#SE una lezione è online il campo struttura va lasciato vuoto
-#se la lezione blended o in presenza il campo struttura va indicato e popolato
+# SE una lezione è online il campo struttura va lasciato vuoto
+# se la lezione blended o in presenza il campo struttura va indicato e popolato
 
 
 class LessonsForm(FlaskForm):
@@ -26,9 +29,10 @@ class LessonsForm(FlaskForm):
     date = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
     mode = SelectField('mode', choices=['presenza', 'online', 'blended'], validators=[InputRequired()])
     link = StringField(validators=[InputRequired()])
-    structure = StringField(     )  # Possibile campo choices
+    structure = StringField()  # Possibile campo choices
     description = StringField(validators=[InputRequired()])
     course = HiddenField(validators=[InputRequired()])
+    submit1 = SubmitField('submit')
 
     ## Le lezioni di un corso non si devono sovrappore ! -> TODO
 
@@ -66,7 +70,7 @@ class LessonsForm(FlaskForm):
         for x in lessons:
             if x._date == self.date.data:
                 if (self.start_hour.data < x._end_hour < self.end_hour.data) or \
-                        (x._start_hour <self.start_hour.data < x._end_hour ) or \
+                        (x._start_hour < self.start_hour.data < x._end_hour) or \
                         (self.start_hour.data < x._start_hour and self.end_hour.data > x._end_hour) or \
                         (self.start_hour.data < x._start_hour < self.end_hour.data < x._end_hour):
                     raise ValidationError(
@@ -95,10 +99,34 @@ class LessonsForm(FlaskForm):
         if str(self.date) <= str(datetime.now()):
             raise ValidationError("La data della lezione deve essere successiva a quella odierna")
 
-    def validate_mode(self,field):
-        if field.data=="online":
-            if self.structure.data !="":
+    def validate_mode(self, field):
+        if field.data == "online":
+            if self.structure.data != "":
                 raise ValidationError("Se la lezione è online non va indicata la struttura")
         else:
-            if self.structure.data =="":
-                raise ValidationError("Indica una struttura di riferimento! La lezione è in modalità  "+self.mode.data)
+            if self.structure.data == "":
+                raise ValidationError(
+                    "Indica una struttura di riferimento! La lezione è in modalità  " + self.mode.data)
+
+
+class TokenForm(FlaskForm):
+    token = StringField(validators=[InputRequired(), Length(1, 32, message="Please provide a valid token")])
+    id = HiddenField()
+    user = HiddenField()
+    submit2 = SubmitField("Registra la tua presenza")
+
+    def validate_token(self, field):
+        l = db.session.query(Lesson).filter_by(_lesson_id=self.id.data).first()
+        corso = db.session.query(User).join(Course._users).filter(User._user_id == self.user.data,
+                                                                  Course._course_id == l.course).first()
+        if not corso:
+            raise ValidationError("Per registrare la presenza a una lezione iscriviti prima al corso")
+
+        if self.token.data != l._secret_token:
+            raise ValidationError("token inserito non valido")
+        q = db.session.query(User).join(Lesson._users).filter(User._user_id == self.user.data,
+                                                              Lesson._lesson_id == self.id.data).first()
+        if q:
+            raise ValidationError("Sei già registrato a questa lezione")
+        else:
+            print("non trovato quindi registro la presenza")

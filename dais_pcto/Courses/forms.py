@@ -1,8 +1,12 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, IntegerField, DateField
+from wtforms import StringField, SelectField, IntegerField, DateField, SubmitField, HiddenField
 from wtforms.validators import InputRequired, Length, Regexp, ValidationError
+
+from dais_pcto.Auth.models import User
+from dais_pcto.Courses.models import Course
+from dais_pcto.module_extensions import db
 
 
 class coursesForm(FlaskForm):
@@ -32,3 +36,19 @@ class coursesForm(FlaskForm):
     def validate_min_student(self, field):
         if field.data < 10:
             raise ValidationError("Il numero di studenti minimi deve essere almeno 10")
+
+
+class CourseSubscription(FlaskForm):
+    id = HiddenField()
+    user = HiddenField()
+    submit3 = SubmitField('Iscriviti al corso')
+
+    def validate_id(self,data):
+        q = db.session.query(User).join(Course._users).filter(User._user_id ==self.user.data,Course._course_id==self.id.data ).first()
+        if q:
+            if q._role == "user":
+                raise ValidationError("Sei già registrato al corso")
+        else:
+            q2 = db.session.query(Course).filter_by(_course_id=self.id.data).join(User).first()
+            if len(q2._users) >= q2._max_student:
+                raise ValidationError("Il corso è chiuso non sono più disponibili posti")
