@@ -13,7 +13,7 @@ class Hschool(UserMixin, db.Model):
     _region = db.Column(db.String(20), nullable=False)
     _city = db.Column(db.String(40), nullable=False)
     _street = db.Column(db.String(64), nullable=False)
-    _number = db.Column(db.String(3), nullable=False)
+    _number = db.Column(db.String(6), nullable=False)
     _phone = db.Column(db.String(15),
                        nullable=False)  # Non vanno trattati come una sequenza numerica massimo 15 caratteri per numeri
 

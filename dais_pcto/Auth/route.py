@@ -9,6 +9,7 @@ from dais_pcto.Auth.models import User
 from dais_pcto.app import db
 from dais_pcto.module_extensions import bcrypt
 from .forms import LoginForm, SignupForm
+from ..module_extensions import CRUDMixin
 
 blueprint = Blueprint('Auth', __name__)
 
@@ -26,19 +27,16 @@ admin.description = "Admin's permissions"
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        try:
-            q = User.query.filter_by(_email=form.email.data).first()
-            if q is not None:
-                if check_password_hash(q._password, form.password.data):
-                    login_user(q)
-                    identity_changed.send(current_app._get_current_object(), identity=Identity(q._role))
-                    return redirect(url_for('BaseRoute.profile'))
-                else:
-                    flash("Invalid Username or password!", "danger")
+        q = User.query.filter_by(_email=form.email.data).first()
+        if q is not None:
+            if check_password_hash(q._password, form.password.data):
+                login_user(q)
+                identity_changed.send(current_app._get_current_object(), identity=Identity(q._role))
+                return redirect(url_for('BaseRoute.profile'))
             else:
                 flash("Invalid Username or password!", "danger")
-        except Exception as e:
-            flash(e, "danger")
+        else:
+            flash("Invalid Username or password!", "danger")
     return render_template("signup.html", form=form, text="Login", title="Login", btn_action="Login")
 
 
@@ -46,38 +44,18 @@ def login():
 def signup():
     form = SignupForm()
     if form.validate_on_submit():
-        try:
-            email = form.email.data
-            role = "user"
-            if "@unive.it" in email:
-                role = "professor"
-            if "@segunive.it" in email:
-                role = "admin"
-            new_user = User(form.name.data, form.surname.data, email,
-                            bcrypt.generate_password_hash(form.password.data).decode('utf8'),
-                            role)  # decode necessario altrimenti con postgres la password viene "hashata 2 volte"
-            db.session.add(new_user)
-            db.session.commit()
-            flash(f"Account Succesfully created", "success")
-            return redirect(url_for('Auth.login'))
+        email = form.email.data
+        role = "user"
+        if "@unive.it" in email:
+            role = "professor"
+        if "@segunive.it" in email:
+            role = "admin"
+        # decode necessario altrimenti con postgres la password viene "hashata 2 volte"
+        User(form.name.data, form.surname.data, email, bcrypt.generate_password_hash(form.password.data).decode('utf8'),
+             role).save()
+        flash(f"Account Succesfully created", "success")
+        return redirect(url_for('Auth.login'))
 
-        except InvalidRequestError:
-            db.session.rollback()
-            flash(f"Something went wrong!", "danger")
-        except IntegrityError:
-            db.session.rollback()
-            flash(f"User or email already exits!", "warning")
-        except DataError:
-            db.session.rollback()
-            flash(f"Invalid Entry", "warning")
-        except InterfaceError:
-            db.session.rollback()
-            flash(f"Error connecting to the database", "danger")
-            # db.session.rollback()
-            # flash(f"Error connecting to the database", "danger")
-        except BuildError:
-            db.session.rollback()
-            flash(f"An error occured !", "danger")
     return render_template("signup.html", form=form, text="Create account", title="Register",
                            btn_action="Register account")
 

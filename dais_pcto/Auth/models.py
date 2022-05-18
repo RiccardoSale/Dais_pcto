@@ -1,5 +1,6 @@
 from flask_login import UserMixin
 from dais_pcto.app import db
+from dais_pcto.module_extensions import bcrypt
 
 user_course = db.Table('user_corse',
                        db.Column('user_id', db.Integer, db.ForeignKey('users._user_id')),
@@ -38,8 +39,7 @@ class User(UserMixin, db.Model):
         'h_schools._hschool_id'))
 
     # uno a molti -> legata a chiave esterna professor
-    _courses_prof = db.relationship('Course', backref='users', cascade="all, delete",
-                                    passive_deletes=True)  # VALUTARE ON CASCADE DELETE
+    _courses_prof = db.relationship('Course', backref='users', cascade="all, delete")
 
     def __init__(self, name, surname, email, password, role):
         self._name = name
@@ -47,6 +47,32 @@ class User(UserMixin, db.Model):
         self._email = email
         self._password = password
         self._role = role
+
+    def subscribe_course(self, course):
+        if course:
+            self._courses.append(course)
+            db.session.commit()
+
+    def subscribe_lesson(self, lesson):
+        if lesson:
+            self._lessons.append(lesson)
+            db.session.commit()
+
+    def set_password(self, password):
+        if password != "":
+            self._password = bcrypt.generate_password_hash(password).decode('utf8')
+
+    def set_name(self, name):
+        if name != "":
+            self._name = name
+
+    def set_surname(self, surname):
+        if surname != "":
+            self._surname = surname
+
+    def set_email(self, email):
+        if email != "":
+            self._email = email
 
     def get_id(self):
         return self._user_id

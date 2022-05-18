@@ -25,14 +25,19 @@ class Course(UserMixin, db.Model):
 
     # NUMERO LEZIONI STABILITO A PRIORI -> PROGRAMMA SETTIMANA -> 2 LEZIONI NORMALI DA 1 ORA E MEZZA -> 1 LEZIONE SPECIALE DA 3 ORE
 
-    _lessons = db.relationship('Lesson', backref='courses')  # molti a uno dove uno è il corso
+    _lessons = db.relationship('Lesson', backref='courses', cascade="all, delete")  # molti a uno dove uno è il corso
+
     _professor = db.Column(db.Integer, db.ForeignKey(
-        'users._user_id',
-        ondelete="CASCADE"))  # Chiave esterna professore indica l'utente che è professore che ha creato il corso !
+        'users._user_id'))
+
+    # Chiave esterna professore indica l'utente che è professore che ha creato il corso !
     # ->chiave esterna a utente -> e poi vincolo trigger blocca inserimento e la modifica di un eventuale utente che non abbia ruolo professore
 
     _users = db.relationship("User", secondary=user_course,
-                             back_populates="_courses")  # collegamento molti a molti tra utenti e corsi per fattore iscrizione utente normale
+                             back_populates="_courses", )
+
+    # collegamento molti a molti tra utenti e corsi per fattore iscrizione utente normale
+    # Quando rimuovo rimosso collegamento in automatico
 
     def __repr__(self):
         return '<Course %r>' % self._name
@@ -48,3 +53,27 @@ class Course(UserMixin, db.Model):
         self._start_month = start_month
         self._end_month = end_month
         self._professor = professor
+
+    def set_name(self, name):
+        if name != "":
+            self._name = name
+
+    def set_description(self, description):
+        if description != "":
+            self._description = description
+
+    def set_max_student(self, max_student):
+        if max_student is not None:
+            self._max_student = max_student
+
+    def set_n_hour(self, n_hour):
+        if n_hour is not None:
+            self._n_hour = n_hour
+
+    def set_start_month(self, start_month):
+        if start_month is not None:
+            self._start_month = start_month
+
+    def set_end_month(self, end_month):
+        if end_month is not None:
+            self._end_month = end_month

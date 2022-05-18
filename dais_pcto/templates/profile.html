@@ -6,10 +6,10 @@
     <div class="container-fluid">
 
     <div class="row">
-        <div class="col" style="height: 300px;">
+        <div class="col" style="height: 400px;">
             <div class="mx-auto" style="width: 1400px;">
-            <div class="card shadow mb-4" style="width: 1300px;height: 280.172px;">
-                <div class="card-header py-3" style="width: 1300px;height: 55.1875px;">
+            <div class="card shadow mb-4" style="width: 1300px;height: 350px;">
+                <div class="card-header py-3" style="width: 1300px;height: 60px;">
                     <h6 class="text-primary fw-bold m-0">                                                                                                                       INFORMAZIONI DEL PROFILO</h6>
                 </div>
                 <div class="card-body" style="height: 250px;border-style: none;">
@@ -44,6 +44,17 @@
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
                                         Modifica i tuoi dati
                                     </button>
+                                     {% with messages = get_flashed_messages(with_categories=true) %}
+                                      <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
+                                      {% if messages %}
+                                          {% for category, message in messages %}
+                                              <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                                                  {{ message }}
+                                                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                              </div>
+                                          {% endfor %}
+                                      {% endif %}
+                                  {% endwith %}
                                  </div>
                             </div>
                         </div>
@@ -121,17 +132,6 @@
       <div class="modal-body">
           <form action method="POST" class="card-body">
               {{ form.csrf_token }}
-              {% with messages = get_flashed_messages(with_categories=true) %}
-                  <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
-                  {% if messages %}
-                      {% for category, message in messages %}
-                          <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
-                              {{ message }}
-                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                          </div>
-                      {% endfor %}
-                  {% endif %}
-              {% endwith %}
               <div class="row">
                   <div class="col">
                       <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> {{ form.name(class_="form-control",placeholder= current_user._name )}} </div>

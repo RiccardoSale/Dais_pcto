@@ -10,14 +10,10 @@ from dais_pcto import Lessons, Auth, Courses, BaseRoute, HSchool
 from dais_pcto.settings import ProdConfig, DevConfig
 from .Auth.models import User
 from .HSchool.models import Hschool
-from .Lessons.models import Lesson #NECESSARIO PER FAR VEDERE TABELLA ANCHE SE RISULTANO IMPORT INUSATI !!!!
+from .Lessons.models import Lesson  # NECESSARIO PER FAR VEDERE TABELLA ANCHE SE RISULTANO IMPORT INUSATI !!!!
 
 
 # from conduit.exceptions import InvalidUsage
-# comandi init db
-# from dais_pcto.app import create_app
-# from dais_pcto.module_extensions import db
-# db.create_all(app=create_app())
 def create_app(config_object=DevConfig):
     """An application factory, as explained here:
     http://flask.pocoo.org/docs/patterns/appfactories/.

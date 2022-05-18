@@ -5,6 +5,7 @@ from dais_pcto.HSchool.models import Hschool
 
 
 class SchoolForm(FlaskForm):
+
     name = StringField(validators=[InputRequired(), Length(3, 64, message="Indica un nome valido ")])
     region = SelectField('mode', choices=['Abruzzo', 'Basilicata', 'Calabria', 'Campania', 'Emilia-Romagna',
                                           'FriuliVeneziaGiulia', 'Lazio', 'Liguria', 'Lombardia', 'Marche', 'Molise',
@@ -15,6 +16,7 @@ class SchoolForm(FlaskForm):
     street = StringField(validators=[InputRequired(), Length(3, 64, message="Indica un indirizzo corretto ")])
     number = StringField(validators=[InputRequired(), Length(1, 5, message="Civico non valido")])
     phone = StringField(validators=[InputRequired(), Length(9, 10, message="Indica un numero di telefono valido")])
+    #tipo -> liceo / professionale / tecnico
     submit1 = SubmitField('submit')  # per identificare i due form presenti nella stessa pagina
 
     def validate_name(self, field):

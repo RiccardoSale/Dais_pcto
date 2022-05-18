@@ -16,12 +16,12 @@ class Lesson(UserMixin, db.Model):
     _description = db.Column(db.TEXT, nullable=False, default="Descrizione non ancora disponibile")
     _secret_token = db.Column(db.String(32), nullable=False)
 
-    # relazioni
     course = db.Column(db.Integer, db.ForeignKey(
         'courses._course_id'))
 
     _users = db.relationship("User", secondary=user_lesson,
                              back_populates="_lessons")
+
     # collegamento molti a molti tra utenti e lezioni per fattore partecipazione alla lezione
 
     # Costruttore oggetto
@@ -35,3 +35,33 @@ class Lesson(UserMixin, db.Model):
         self._description = description
         self.course = course
         self._secret_token = token
+
+    def set_start_hour(self, start_hour):
+        if start_hour is not None:
+            self._start_hour = start_hour
+
+    def set_end_hour(self, end_hour):
+        if end_hour is not None:
+            self._end_hour = end_hour
+
+    def set_mode(self, mode):
+        if mode is not None:
+            self._mode = mode
+
+    def set_link(self, link):
+        if link != "":
+            if link == "vuoto":
+                self._link = ""
+            else:
+                self._link = link
+
+    def set_structure(self, structure):
+        if structure != "":
+            if structure == "vuoto":
+                self._structure = ""
+            else:
+                self._structure = structure
+
+    def set_description(self, description):
+        if description != "":
+            self._description = description

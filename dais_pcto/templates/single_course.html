@@ -68,7 +68,7 @@
                                     </div>
                                     <div class="col">
                                         <form action method="POST" class="card-body">
-                                            {% for error in form4.id.errors %}
+                                            {% for error in certificate_form.id.errors %}
                                             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                                                 {{ error }}
                                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -76,10 +76,10 @@
                                             {% endfor%}
                                              {% if current_user.is_authenticated %}
                                                 {% if current_user._role=='user' %}
-                                                     {{ form4.csrf_token }}
-                                                     {{ form4.user(value=current_user._user_id) }}
-                                                     {{ form4.id(value=Course._course_id) }}
-                                                     {{ form4.submit4(type="submit",class="m-2 pb-1 btn btn-primary") }}
+                                                     {{ certificate_form.csrf_token }}
+                                                     {{ certificate_form.user(value=current_user._user_id) }}
+                                                     {{ certificate_form.id(value=Course._course_id) }}
+                                                     {{ certificate_form.submit_certificate(type="submit",class="m-2 pb-1 btn btn-primary") }}
                                                 {% endif %}
                                             {% endif %}
                                         </form>
@@ -93,13 +93,13 @@
 
 
           <form action method="POST" class="card-body">
-                {% for error in form3.id.errors %}
+                {% for error in course_subscription_form.id.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
-                {% for error in form2.token.errors %}
+                {% for error in token_form.token.errors %}
                                                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                                                     {{ error }}
                                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -118,12 +118,12 @@
                 {% endwith %}
                  {% if current_user.is_authenticated %}
                     {% if current_user._role=='user' %}
-                         {{ form3.csrf_token }}
-                         {{ form3.user(value=current_user._user_id) }}
-                         {{ form3.id(value=Course._course_id,class_='button is-block is-info is-large is-fullwidth',_type='submit') }}
+                         {{ course_subscription_form.csrf_token }}
+                         {{ course_subscription_form.user(value=current_user._user_id) }}
+                         {{ course_subscription_form.id(value=Course._course_id,class_='button is-block is-info is-large is-fullwidth',_type='submit') }}
                     <div class="text-center">
                         <div class="d-grid gap-2">
-                             {{ form3.submit3(type="submit",class="m-2 pb-1 btn btn-primary") }}
+                             {{ course_subscription_form.submit_subcription_course(type="submit",class="m-2 pb-1 btn btn-primary") }}
                         </div>
                     </div>
                     {% endif %}
@@ -135,9 +135,15 @@
         <div class="container-fluid">
         <h3 class="text-dark"></h3>
             {% if current_user._role == "professor" %}
-            <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
-                Aggiungi Lezione
-            </button>
+                <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
+                    Aggiungi Lezione
+                </button>
+                <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifica_corso">
+                    Modifica Corso
+                </button>
+                <button type="button" class="m-2 pb-1 btn btn-primary" style="background: var(--bs-red)" data-bs-toggle="modal" data-bs-target="#rimuovi_corso">
+                    Rimuovi Corso
+                </button>
             {% endif %}
         </div>
         <div class="container-fluid">
@@ -174,7 +180,16 @@
                                     <p class=" card-text">Ora Inizio : {{ lesson._start_hour }}   Fine : {{ lesson._end_hour }}</p>
                                 </div>
                                 <div class="tab-pane" id="extra{{ loop.index }}">
-                                    <p class=" card-text">DECIDERE COSA METTERE</p>
+                                    <p class=" card-text">
+                                        {% if current_user._role == "professor" %}
+                                            <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifica_lezione{{ loop.index }}">
+                                                Modifica Lezione
+                                            </button>
+                                            <button type="button" class="m-2 pb-1 btn btn-primary" style="background: var(--bs-red)" data-bs-toggle="modal" data-bs-target="#rimuovi_lezione{{ loop.index }}">
+                                                Rimuovi Lezione
+                                            </button>
+                                        {% endif %}
+                                    </p>
                                 </div>
                                 <div class="tab-pane" id="token{{ loop.index }}">
                                     {% if current_user._role == "professor" %}
@@ -183,15 +198,15 @@
                                     {% endif %}
                                     {% if current_user._role == "user" %}
                                         <form action method="POST">
-                                            {{ form2.csrf_token }}
-                                            {{ form2.user(value=current_user._user_id) }}
-                                            {{ form2.id(value=lesson._lesson_id) }}
+                                            {{ token_form.csrf_token }}
+                                            {{ token_form.user(value=current_user._user_id) }}
+                                            {{ token_form.id(value=lesson._lesson_id) }}
                                             <div class="row">
                                             <div class="col">
-                                                {{ form2.token(placeholder="Inserisci token",class_="form-control") }}
+                                                {{ token_form.token(placeholder="Inserisci token",class_="form-control") }}
                                             </div>
                                             <div class="col">
-                                            {{ form2.submit2( class="btn btn-primary", type="submit", style="background: var(--bs-red);"  ) }}
+                                            {{ token_form.submit2( class="m-2 pb-1 btn btn-primary", type="submit", style="background: var(--bs-red);"  ) }}
                                             </div>
                                             </div>
                                         </form>
@@ -203,6 +218,128 @@
                 </div>
             </div>
         </div>
+            <div class="modal fade" id="rimuovi_lezione{{ loop.index }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Rimuovi Lezione</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+            <div class="modal-body">
+                <form action method="POST" class="card-body">
+                    {{ remove_lesson_form.csrf_token }}
+                    <div class="form-group mb-3">
+                    {{ remove_lesson_form.password(class_="form-control",placeholder="password")}}
+                    </div>
+                    {% for error in remove_lesson_form.password.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                    {{ remove_lesson_form.id(value=lesson._lesson_id) }}
+                    {{ remove_lesson_form.user(value=current_user._user_id) }}
+                    {{ remove_lesson_form.submit_remove_lesson (class="btn btn-primary", type="submit", style="background: var(--bs-red);"  )}}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </form>
+            </div>
+            </div>
+        </div>
+      </div>
+
+
+            <div class="modal fade" id="modifica_lezione{{ loop.index }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modifica i dati della Lezione</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+            <div class="modal-body">
+                <form action method="POST" class="card-body">
+                        {{ modify_course_form.csrf_token }}
+                        <div class="form-group mb-3">
+                            {{ modify_lesson_form.start_hour(class_="form-control",placeholder="start_hour")}}
+                        </div>
+                        {% for error in modify_lesson_form.start_hour.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ modify_lesson_form.end_hour(class_="form-control",placeholder="end_hour")}}
+                        </div>
+                        {% for error in modify_lesson_form.end_hour.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ modify_lesson_form.date(class_="form-control",placeholder="Data")}}
+                        </div>
+                        {% for error in modify_lesson_form.date.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+
+                        {% if Course._mode == "blended" %}
+                        <div class="form-group mb-3">
+                            {{ modify_lesson_form.mode(class_="form-control",placeholder="modalità")}}
+                        </div>
+                        {% for error in modify_lesson_form.mode.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        {% endif %}
+                        {% if Course._mode != "presenza" %}
+                        <div class="form-group mb-3">
+                            {{ modify_lesson_form.link(class_="form-control",placeholder="Link")}}
+                        </div>
+                        {% for error in modify_lesson_form.link.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        {% endif %}
+                         <div class="form-group mb-3">
+                            {{ modify_lesson_form.structure(class_="form-control",placeholder="structure")}}
+                        </div>
+                        {% for error in modify_lesson_form.structure.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ modify_lesson_form.description(class_="form-control",placeholder="description")}}
+                        </div>
+                        {% for error in modify_lesson_form.description.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        {{ modify_lesson_form.lesson(value=lesson._lesson_id) }}
+                        {{ modify_lesson_form.course(value=Course._course_id) }}
+                        <div class="row">
+                            <div class="col">
+                                 <div class="mb-3">
+                                    {{ modify_lesson_form.submit_modify_lesson(class="m-2 pb-1 btn btn-primary")  }}
+                                 </div>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+        </div>
+      </div>
+    </div>
 {% endfor %}
 </div>
 
@@ -217,89 +354,189 @@
       </div>
       <div class="modal-body">
           <form action method="POST" class="card-body">
-                {{ form.csrf_token }}
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
+                {{ lesson_form.csrf_token }}
                 <div class="form-group mb-3">
-                    {{ form.start_hour(class_="form-control",placeholder="Ora Inizio")}}
+                    {{ lesson_form.start_hour(class_="form-control",placeholder="Ora Inizio")}}
                 </div>
-                {% for error in form.start_hour.errors %}
+                {% for error in lesson_form.start_hour.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
                 <div class="form-group mb-3">
-                    {{ form.end_hour(class_="form-control",placeholder="Ora Fine")}}
+                    {{ lesson_form.end_hour(class_="form-control",placeholder="Ora Fine")}}
                 </div>
-                {% for error in form.end_hour.errors %}
+                {% for error in lesson_form.end_hour.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
                 <div class="form-group mb-3">
-                    {{ form.date(class_="form-control",placeholder="Data Lezione")}}
+                    {{ lesson_form.date(class_="form-control",placeholder="Data Lezione")}}
                 </div>
-                {% for error in form.date.errors %}
+                {% for error in lesson_form.date.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
                 <div class="form-group mb-3">
-                    {{ form.mode(class_="form-control",placeholder="Modalità")}}
+                    {{ lesson_form.mode(class_="form-control",placeholder="Modalità")}}
                 </div>
-                {% for error in form.mode.errors %}
+                {% for error in lesson_form.mode.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
                 <div class="form-group mb-3">
-                    {{ form.link(class_="form-control",placeholder="Link")}}
+                    {{ lesson_form.link(class_="form-control",placeholder="Link")}}
                 </div>
-                {% for error in form.link.errors %}
+                {% for error in lesson_form.link.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
                 <div class="form-group mb-3">
-                    {{ form.structure(class_="form-control",placeholder="Struttura")}}
+                    {{ lesson_form.structure(class_="form-control",placeholder="Struttura")}}
                 </div>
-                {% for error in form.structure.errors %}
+                {% for error in lesson_form.structure.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
           <div class="form-group mb-3">
-                    {{ form.description(class_="form-control",placeholder="Descrizione / Argomenti")}}
+                    {{ lesson_form.description(class_="form-control",placeholder="Descrizione / Argomenti")}}
                 </div>
-                {% for error in form.description.errors %}
+                {% for error in lesson_form.description.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
-                {{ form.course(value=Course._name) }}
-                {{ form.submit1(type="submit",class="m-2 pb-1 btn btn-primary") }}
+                {{ lesson_form.course(value=Course._name) }}
+                {{ lesson_form.submit1(type="submit",class="m-2 pb-1 btn btn-primary") }}
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </form>
       </div>
       </div>
     </div>
   </div>
+
+    <div class="modal fade" id="modifica_corso" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modifica i dati del corso</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+            <div class="modal-body">
+                <form action method="POST" class="card-body">
+                        {{ modify_course_form.csrf_token }}
+                        <div class="form-group mb-3">
+                            {{ modify_course_form.name(class_="form-control",placeholder="Nome")}}
+                        </div>
+                        {% for error in modify_course_form.name.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ modify_course_form.description(class_="form-control",placeholder="Descrizione")}}
+                        </div>
+                        {% for error in modify_course_form.description.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ modify_course_form.max_student(class_="form-control",placeholder="Numero massimo studenti")}}
+                        </div>
+                        {% for error in modify_course_form.max_student.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ modify_course_form.n_hour(class_="form-control",placeholder="ore corso totali")}}
+                        </div>
+                        {% for error in modify_course_form.n_hour.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        <div class="form-group mb-3">
+                            {{ modify_course_form.start_month(class_="form-control",placeholder="Data di inizio")}}
+                        </div>
+                        {% for error in modify_course_form.start_month.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                         <div class="form-group mb-3">
+                            {{ modify_course_form.end_month(class_="form-control",placeholder="Data di fine")}}
+                        </div>
+                        {% for error in modify_course_form.end_month.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        {{ modify_course_form.course_id(value=Course._course_id) }}
+                        <div class="row">
+                            <div class="col">
+                                 <div class="mb-3">
+                                    {{modify_course_form.submit_modify_course(class="m-2 pb-1 btn btn-primary")  }}
+                                 </div>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="rimuovi_corso" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Rimuovi il corso</h5>
+          </div>
+            <div class="modal-body">
+                <form action method="POST" class="card-body">
+                    {{ remove_course_form.csrf_token }}
+                    <div class="form-group mb-3">
+                    {{ remove_course_form.password(class_="form-control",placeholder="password")}}
+                    </div>
+                    {% for error in remove_course_form.password.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                    {{ remove_course_form.id(value=Course._course_id) }}
+                    {{ remove_course_form.user(value=current_user._user_id) }}
+                    {{ remove_course_form.submit_remove_course( class="btn btn-primary", type="submit", style="background: var(--bs-red);"  ) }}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
 <script>
     var doc = new jsPDF();
     var elementHandler = {
