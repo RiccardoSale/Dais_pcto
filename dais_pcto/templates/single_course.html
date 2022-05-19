@@ -134,7 +134,7 @@
 
         <div class="container-fluid">
         <h3 class="text-dark"></h3>
-            {% if current_user._role == "professor" %}
+            {% if current_user._role == "professor" or current_user._role == "admin" %}
                 <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
                     Aggiungi Lezione
                 </button>
@@ -446,6 +446,21 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         {% endfor%}
+
+                        <!--SOLO LA SEGRETERIA PUO' MODIFICARE IL CAMPO PROFESSORE DELL'ENTITA' CORSO -->
+                        {% if current_user._role=="admin" %}
+                            <div class="form-group mb-3">
+                                {{ modify_course_form.professor(class_="form-control",placeholder="Professore")}}
+                            </div>
+                            {% for error in modify_course_form.professor.errors %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                {{ error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor%}
+                        {% endif %}
+
+
                         <div class="form-group mb-3">
                             {{ modify_course_form.description(class_="form-control",placeholder="Descrizione")}}
                         </div>

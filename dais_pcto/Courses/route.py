@@ -104,6 +104,7 @@ def single_course(
         print(modify_course_form.data)
         q = Course.query.filter_by(_course_id=modify_course_form.course_id.data).first()
         q.set_name(modify_course_form.name.data)
+        q.set_professor(modify_course_form.professor.data)
         q.set_description(modify_course_form.description.data)
         q.set_max_student(modify_course_form.max_student.data)
         q.set_n_hour(modify_course_form.n_hour.data)
