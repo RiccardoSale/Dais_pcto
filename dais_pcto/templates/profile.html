@@ -64,6 +64,7 @@
             </div>
         </div>
     </div>
+    {% if current_user._role!="admin" %}
     <div class="row">
         <div class="col">
             <div class="mx-auto" style="width: 1400px;">
@@ -119,6 +120,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 <!-- Modal -->

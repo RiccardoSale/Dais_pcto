@@ -165,9 +165,11 @@
                                     <li class="nav-item">
                                         <a class="nav-link" data-bs-toggle="tab" href="#extra{{ loop.index }}">extra</a>
                                     </li>
+                                    {% if current_user._role != "admin" %}
                                     <li class="nav-item">
                                         <a class="nav-link" data-bs-toggle="tab" href="#token{{ loop.index }}">Token Lezioni</a>
                                     </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                             <div class="card-body tab-content">
@@ -181,7 +183,7 @@
                                 </div>
                                 <div class="tab-pane" id="extra{{ loop.index }}">
                                     <p class=" card-text">
-                                        {% if current_user._role == "professor" %}
+                                        {% if current_user._role == "professor" or current_user._role=="admin" %}
                                             <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifica_lezione{{ loop.index }}">
                                                 Modifica Lezione
                                             </button>
@@ -418,7 +420,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor%}
-                {{ lesson_form.course(value=Course._name) }}
+                {{ lesson_form.course(value=Course._course_id) }}
                 {{ lesson_form.submit1(type="submit",class="m-2 pb-1 btn btn-primary") }}
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </form>

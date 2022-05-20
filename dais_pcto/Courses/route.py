@@ -92,8 +92,7 @@ def single_course(
         q = Course.query.filter_by(_course_id=remove_course_form.id.data).first()
         q.delete()
         all_course_prof = db.session.query(Course).join(User)
-        return render_template('courses.html',courses=all_course_prof)
-
+        return render_template('courses.html', courses=all_course_prof)
 
     if remove_lesson_form.submit_remove_lesson.data and remove_lesson_form.validate_on_submit():
         q = Lesson.query.filter_by(_lesson_id=remove_lesson_form.id.data).first()
@@ -104,7 +103,11 @@ def single_course(
         print(modify_course_form.data)
         q = Course.query.filter_by(_course_id=modify_course_form.course_id.data).first()
         q.set_name(modify_course_form.name.data)
-        q.set_professor(modify_course_form.professor.data)
+
+        if modify_course_form.professor.data is not None:
+            print(modify_course_form.professor.data)
+            prof = User.query.filter_by(_email=modify_course_form.professor.data).first()
+            prof.professor_course(q)
         q.set_description(modify_course_form.description.data)
         q.set_max_student(modify_course_form.max_student.data)
         q.set_n_hour(modify_course_form.n_hour.data)
@@ -125,7 +128,6 @@ def single_course(
         q.update()
         flash("Lezione aggiornata con successo!")
 
-
     return render_template('single_course.html', Course=info_corso, attivo=attivo, progress_bar=progress_bar,
                            Lessons=course_lesson, lesson_form=lesson_form, token_form=token_form,
                            course_subscription_form=course_subscription_form, certificate_form=certificate_form,
@@ -134,14 +136,20 @@ def single_course(
 
 
 @blueprint.route('/buildcourse', methods=("GET", "POST"))
-@professor.require()  # la creazione del coros richiede di essere almeno professor
+@professor.require(http_exception=403)  # la creazione del coros richiede di essere almeno professor
 @login_required
 def buildcourse():
     form = coursesForm()
     if form.validate_on_submit():
+        if form.professor.data is not None:
+            professor = User.query.filter_by(_email=form.professor.data).first()
+        else:
+            professor = current_user
+
         Course(form.name.data, form.mode.data, form.description.data, form.max_student.data,
                form.min_student.data, form.n_hour.data, form.start_month.data, form.end_month.data,
-               current_user._user_id).save()
+               professor._user_id).save()
+
         flash(f"Course created", "success")
         return redirect(url_for('courses.single_course', course=form.name.data))
 

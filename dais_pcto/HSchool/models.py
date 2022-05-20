@@ -6,9 +6,8 @@ from flask_login import UserMixin
 
 class Hschool(UserMixin, db.Model):
     __tablename__ = "h_schools"
-    __table_args__ = (UniqueConstraint("_name", "_region", "_city", "_street", "_number"),)
-    # AGGIUNGERE CHECK !
-    _hschool_id = db.Column(db.Integer, primary_key=True)
+
+    _hschool_code = db.Column(db.String(10), primary_key=True)
     _name = db.Column(db.String(64), nullable=False)
     _region = db.Column(db.String(20), nullable=False)
     _city = db.Column(db.String(40), nullable=False)
@@ -19,11 +18,20 @@ class Hschool(UserMixin, db.Model):
 
     r_users = db.relationship('User', backref='h_schools')
 
+    def __repr__(self):
+        return "Nome: " + self._name + " Regione:  " + self._region + " Telefono:" + self._phone
+
     # Costruttore oggetto
-    def __init__(self, name, region, city, street, number, phone):
+    def __init__(self, code, name, region, city, street, number, phone):
+        self._hschool_code = code
         self._name = name
         self._region = region
         self._city = city
         self._street = street
         self._number = number
         self._phone = phone
+
+    def add_student(self, user):
+        if user:
+            self.r_users.append(user)
+            db.session.commit()

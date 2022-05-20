@@ -42,8 +42,8 @@ class LessonsForm(FlaskForm):
     end_hour = TimeField(validators=[InputRequired()])
     date = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
     mode = SelectField('mode', choices=['presenza', 'online', 'blended'], validators=[InputRequired()])
-    link = StringField(validators=[InputRequired()])
-    structure = StringField()  # Possibile campo choices
+    link = StringField(validators=[Optional()])
+    structure = StringField(validators=[Optional()])  # Possibile campo choices
     description = StringField(validators=[InputRequired()])
     course = HiddenField(validators=[InputRequired()])
     submit1 = SubmitField('Aggiungi Lezione')
@@ -58,7 +58,7 @@ class LessonsForm(FlaskForm):
 
     def validate_end_hour(self, field):
         ####VALIDAZIONE NON POSSO SFORARE ORE TOTALI####
-        _course = db.session.query(Course).filter_by(_name=self.course.data).first()
+        _course = db.session.query(Course).filter_by(_course_id=self.course.data).first()
         total_hour = _course._n_hour
         lessons = _course._lessons
 
@@ -106,19 +106,19 @@ class LessonsForm(FlaskForm):
         if q._mode == "presenza":
             if field.data != "presenza":
                 raise ValidationError("La modalità della lezione non combacia con quella del corso")
-            if self.link != "":
+            if self.link.data != "":
                 raise ValidationError("Non bisogna inserire il link se la modalità è in presenza")
             if self.structure.data == "":
                 raise ValidationError("Bisogna indicare una struttura se la lezione è in presenza")
         if q._mode == "online":
             if field.data != "online":
                 raise ValidationError("La modalità della lezione non combacia con quella del corso")
-            if self.link == "":
+            if self.link.data == "":
                 raise ValidationError("Bisogna inserire il link se la modalità è online")
             if self.structure.data != "":
                 raise ValidationError("Non puoi indicare una struttura se la lezione è online")
         if q._mode == "blended":
-            if self.link == "":
+            if self.link.data == "":
                 raise ValidationError("Bisogna inserire il link se la modalità è blended")
             if self.structure.data != "":
                 raise ValidationError("Bisogna indicare una struttura se la lezione è blended")

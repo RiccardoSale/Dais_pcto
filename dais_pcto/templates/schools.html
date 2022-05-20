@@ -11,6 +11,7 @@
                         <table id="data" class="table table-striped">
                             <thead>
                             <tr>
+                                <th>Meccanografico</th>
                                 <th>Nome</th>
                                 <th>Regione</th>
                                 <th>Città</th>
@@ -23,6 +24,7 @@
                             <tbody>
                             {% for School in schools %} <!--prima tabella poi elemento query-->
                                 <tr>
+                                <td>{{ School._hschool_code }}</td>
                                     <td>{{ School._name }}</td>
                                     <td>{{ School._region }}</td>
                                     <td>{{ School._city }}</td>
@@ -32,7 +34,7 @@
                                     <td>
                                         <form action="" method="post">
                                             {{ form2.csrf_token }}
-                                            {{ form2.id(value=School._hschool_id) }}
+                                            {{ form2.id(value=School._hschool_code) }}
                                             {{ form2.submit2 }}
                                             <!--<button type="submit" class="button is-block is-info is-large is-fullwidth">Remove</button>-->
                                         </form>
@@ -41,6 +43,17 @@
                             {% endfor %}
                             </tbody>
                         </table>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
                 </div>
                 </div>
                 </div>
@@ -68,17 +81,15 @@
       <div class="modal-body">
           <form action method="POST" class="card-body">
                 {{ form.csrf_token }}
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
-                    {{ message }}
+                <div class="form-group mb-3">
+                    {{ form.code(class_="form-control",placeholder="Codice meccanografico")}}
+                </div>
+                {% for error in form.code.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor %}
-                {% endif %}
-                {% endwith %}
                 <div class="form-group mb-3">
                     {{ form.name(class_="form-control",placeholder="Name")}}
                 </div>

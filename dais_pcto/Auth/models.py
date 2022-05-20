@@ -35,8 +35,8 @@ class User(UserMixin, db.Model):
     _lessons = db.relationship("Lesson", secondary=user_lesson,
                                back_populates="_users")
 
-    _school = db.Column(db.Integer, db.ForeignKey(
-        'h_schools._hschool_id'))
+    _school = db.Column(db.String, db.ForeignKey(
+        'h_schools._hschool_code'))
 
     # uno a molti -> legata a chiave esterna professor
     _courses_prof = db.relationship('Course', backref='users', cascade="all, delete")
@@ -48,6 +48,9 @@ class User(UserMixin, db.Model):
         self._password = password
         self._role = role
 
+    def __repr__(self):
+        return self._email
+
     def subscribe_course(self, course):
         if course:
             self._courses.append(course)
@@ -56,6 +59,11 @@ class User(UserMixin, db.Model):
     def subscribe_lesson(self, lesson):
         if lesson:
             self._lessons.append(lesson)
+            db.session.commit()
+
+    def professor_course(self, course):
+        if course:
+            self._courses_prof.append(course)
             db.session.commit()
 
     def set_password(self, password):

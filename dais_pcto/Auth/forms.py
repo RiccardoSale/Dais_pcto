@@ -27,3 +27,6 @@ class SignupForm(FlaskForm):
     def validate_email(self, field):
         if User.query.filter_by(_email=field.data).first():
             raise ValidationError("Email già registrata!")
+
+
+

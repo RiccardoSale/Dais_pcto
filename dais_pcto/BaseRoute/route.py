@@ -11,9 +11,11 @@ from flask import make_response
 import pdfkit
 from dais_pcto.app import db
 
-from .forms import EditProfile
+from .forms import EditProfile, EditProfileSeg
 from ..Auth.models import User
+from ..Auth.route import login, admin
 from ..Courses.models import Course
+from ..HSchool.models import Hschool
 from ..Lessons.models import Lesson
 from ..module_extensions import bcrypt
 
@@ -64,3 +66,18 @@ def profile():
         else:
             flash("Controlla la password inserita!", "danger")
     return render_template('profile.html', form=form, courses=courses)
+
+
+@blueprint.route('/users', methods=("GET", "POST"))
+@admin.require(http_exception=403)
+@login_required
+def users():
+    form = EditProfileSeg()
+    all_users = db.session.query(User).filter_by(_role="user").outerjoin(Hschool)
+    if form.validate_on_submit():
+        list = form.school.data.split(":")
+        print(list)
+        print("hello")
+        db.session.query(Hschool).filter_by(_phone=list[-1]).first().add_student(  db.session.query(User).filter_by(_user_id=form.user.data).first() )
+        flash("Scuola assegnata con successo")
+    return render_template("users.html", users=all_users, form=form)

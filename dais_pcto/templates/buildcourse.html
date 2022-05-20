@@ -25,6 +25,17 @@
                         {% endwith %}
                         <!-- INIZIO GESTIONE AMMINISTRAZIONE (CREAZIONE CORSO ) -->
                         <div class="form-group mb-3">
+                            {{ form.professor(class_="form-control",placeholder="Professore")}}
+                        </div>
+                        {%  if current_user._role == "admin" %}
+                        {% for error in form.professor.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor%}
+                        {% endif %}
+                        <div class="form-group mb-3">
                             {{ form.name(class_="form-control",placeholder="Nome")}}
                         </div>
                         {% for error in form.name.errors %}

@@ -77,3 +77,5 @@ class Course(UserMixin, db.Model):
     def set_end_month(self, end_month):
         if end_month is not None:
             self._end_month = end_month
+
+

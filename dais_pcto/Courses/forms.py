@@ -12,6 +12,10 @@ from dais_pcto.Lessons.models import Lesson
 from dais_pcto.module_extensions import db
 
 
+def all_professor():
+    return db.session.query(User).filter_by(_role="professor")
+
+
 class coursesForm(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(1, 64),
                                    Regexp("^[A-Za-z][A-Za-z0-9_.]*$", 0, "Il nome del corso non è valido")])
@@ -23,6 +27,8 @@ class coursesForm(FlaskForm):
     n_hour = IntegerField(validators=[InputRequired()])
     start_month = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
     end_month = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
+
+    professor = SelectField(validators=[Optional()], choices=all_professor)
 
     def validate_end_month(self, field):
         if field.data < self.start_month.data:
@@ -91,7 +97,7 @@ class RemoveCourse(FlaskForm):  # Eliminarle anche se ci sono lezioni
 class ModifyCourse(FlaskForm):
     name = StringField(validators=[Length(1, 64),
                                    Regexp("^[A-Za-z][A-Za-z0-9_.]*$", 0, "Il nome del corso non è valido"), Optional()])
-    professor = StringField(validators=[Length(1, 64), Optional()])
+    professor = SelectField(validators=[Optional()], choices=all_professor)
     description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9]*$", 0, "Descrizione non valida"), Optional()])
     max_student = IntegerField(validators=[Optional()])
     n_hour = IntegerField(validators=[Optional()])
@@ -99,7 +105,6 @@ class ModifyCourse(FlaskForm):
     end_month = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
     course_id = HiddenField(validators=[InputRequired()])
     submit_modify_course = SubmitField('Modifica corso')
-
 
     def validate_end_month(self, field):
         if self.start_month.data is not None:
