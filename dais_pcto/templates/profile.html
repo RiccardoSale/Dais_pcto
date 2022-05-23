@@ -104,9 +104,8 @@
                                     <td> {{ Course._users|count }}</td>
                                     {% endif %}
                                     {% if current_user._role=='user' %}
-                                    <td>  {{ Course._lessons|count }} </td>
+                                    <td>  {{ list[loop.index0]|count }} </td>
                                     {% endif %}
-
                                   <td>{{ Course._start_month }}</td>
                                   <td>{{ Course._end_month }}</td>
                                     <td> <a href = "{{ url_for('courses.single_course',course= Course._name ) }}"> <img class="info" src="/static/info.jpg" style="width: 20px;"></a></a> </td> <!-- VALUTARE SE EFFETTUARE SU ID -->

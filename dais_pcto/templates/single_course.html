@@ -67,6 +67,7 @@
                                         <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Descrizione</strong></label><p class="text-muted">{{ Course._description }}</p></div>
                                     </div>
                                     <div class="col">
+                                    {%  if utente_iscritto!="noniscritto" %}
                                         <form action method="POST" class="card-body">
                                             {% for error in certificate_form.id.errors %}
                                             <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -83,6 +84,7 @@
                                                 {% endif %}
                                             {% endif %}
                                         </form>
+                                    {% endif %}
                                     </div>
                                 </div>
                         </div>
@@ -121,11 +123,21 @@
                          {{ course_subscription_form.csrf_token }}
                          {{ course_subscription_form.user(value=current_user._user_id) }}
                          {{ course_subscription_form.id(value=Course._course_id,class_='button is-block is-info is-large is-fullwidth',_type='submit') }}
+                        {% if utente_iscritto=="noniscritto" %}
                     <div class="text-center">
                         <div class="d-grid gap-2">
                              {{ course_subscription_form.submit_subcription_course(type="submit",class="m-2 pb-1 btn btn-primary") }}
                         </div>
                     </div>
+                        {% else %}
+                                <div class="text-center">
+                            <div class="d-grid gap-2">
+                                 {{ unsubscribe_course_form.csrf_token }}
+                                 {{ unsubscribe_course_form.user(value=current_user._user_id) }}
+                                 {{ unsubscribe_course_form.submit_unsub_course(type="submit",class="m-2 pb-1 btn btn-primary",style="background: var(--bs-red);") }}
+                            </div>
+                        </div>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
           </form>
@@ -208,7 +220,7 @@
                                                 {{ token_form.token(placeholder="Inserisci token",class_="form-control") }}
                                             </div>
                                             <div class="col">
-                                            {{ token_form.submit2( class="m-2 pb-1 btn btn-primary", type="submit", style="background: var(--bs-red);"  ) }}
+                                            {{ token_form.submit_token( class="m-2 pb-1 btn btn-primary", type="submit", style="background: var(--bs-red);"  ) }}
                                             </div>
                                             </div>
                                         </form>
@@ -540,7 +552,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endfor %}
-                    {{ remove_course_form.id(value=Course._course_id) }}
                     {{ remove_course_form.user(value=current_user._user_id) }}
                     {{ remove_course_form.submit_remove_course( class="btn btn-primary", type="submit", style="background: var(--bs-red);"  ) }}
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

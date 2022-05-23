@@ -56,6 +56,11 @@ class User(UserMixin, db.Model):
             self._courses.append(course)
             db.session.commit()
 
+    def unsubscribe_course(self, course):
+        if course:
+            self._courses.remove(course)
+            db.session.commit()
+
     def subscribe_lesson(self, lesson):
         if lesson:
             self._lessons.append(lesson)

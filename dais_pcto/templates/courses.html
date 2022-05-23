@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col" style="height: 800px;">
                 <div class="mx-auto" style="width: 1400px;">
-                <div class="card shadow mb-4" style="width: 1300px;height: 700px;">
+                <div class="card shadow mb-4" style="width: 1300px;height: 750px;">
                 <div class="card-header py-3">
                     <p class="text-primary m-0 fw-bold">Lista Corsi</p>
                     <table id="data" class="table table-striped">
@@ -44,7 +44,9 @@
     {% block scripts %}
         <script>
             $(document).ready(function () {
-              $('#data').DataTable();
+              $('#data').DataTable(  {  "scrollY": "600px",
+  "scrollCollapse": true,
+  "paging": false,  }    );
             });
         </script>
     {% endblock %}

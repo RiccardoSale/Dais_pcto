@@ -24,10 +24,11 @@
                             {% endif %}
                         {% endwith %}
                         <!-- INIZIO GESTIONE AMMINISTRAZIONE (CREAZIONE CORSO ) -->
+                        {%  if current_user._role == "admin" %}
                         <div class="form-group mb-3">
                             {{ form.professor(class_="form-control",placeholder="Professore")}}
                         </div>
-                        {%  if current_user._role == "admin" %}
+
                         {% for error in form.professor.errors %}
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                             {{ error }}

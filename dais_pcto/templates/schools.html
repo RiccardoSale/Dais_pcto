@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col" style="height: 800px;">
                 <div class="mx-auto" style="width: 1400px;">
-                <div class="card shadow mb-4" style="width: 1300px;height: 700px;">
+                <div class="card shadow mb-4" style="width: 1300px;height: 800px;">
                 <div class="card-header py-3">
                     <p class="text-primary m-0 fw-bold">Sezione scuole</p>
                     <button type="button" class="m-2 pb-1 btn btn-primary"  data-bs-toggle="modal" data-bs-target="#aggiungi">Aggiungi scuola</button>
@@ -18,7 +18,7 @@
                                 <th>Via</th>
                                 <th>Civico</th>
                                 <th>Telefono</th>
-                                <th></th>
+                                <th>Rimuovi Scuola</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -35,8 +35,7 @@
                                         <form action="" method="post">
                                             {{ form2.csrf_token }}
                                             {{ form2.id(value=School._hschool_code) }}
-                                            {{ form2.submit2 }}
-                                            <!--<button type="submit" class="button is-block is-info is-large is-fullwidth">Remove</button>-->
+                                            {{ form2.submit2(type="submit",class="m-2 pb-1 btn btn-primary",style="background: var(--bs-red);") }}
                                         </form>
                                     </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
                                 </tr>
@@ -63,7 +62,9 @@
     {% block scripts %}
         <script>
             $(document).ready(function () {
-              $('#data').DataTable();
+              $('#data').DataTable( {  "scrollY": "450px",
+  "scrollCollapse": true,
+  "paging": false,  }    );
             });
         </script>
     {% endblock %}
@@ -145,8 +146,7 @@
                 </div>
                 {% endfor%}
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                {{ form.submit1 }}
-                <button type="submit" id="btninvio" class="btn btn-primary">Invio</button>
+                {{ form.submit1 (type="submit", id="btninvio", class="btn btn-primary")}}
           </form>
       </div>
       </div>

@@ -47,7 +47,7 @@ class coursesForm(FlaskForm):
             raise ValidationError("Il numero di studenti minimi deve essere almeno 10")
 
 
-class CourseSubscription(FlaskForm):
+class CourseSubscription(FlaskForm):  # decidere se far iscrivere anche dopo la data di inizio
     id = HiddenField()
     user = HiddenField()
     submit_subcription_course = SubmitField('Iscriviti al corso')
@@ -83,7 +83,6 @@ class PartecipationCertificate(FlaskForm):
 
 
 class RemoveCourse(FlaskForm):  # Eliminarle anche se ci sono lezioni
-    id = HiddenField()
     user = HiddenField()
     password = PasswordField(validators=[InputRequired(), Length(8, 72)])
     submit_remove_course = SubmitField('Rimuovi corso')
@@ -92,6 +91,11 @@ class RemoveCourse(FlaskForm):  # Eliminarle anche se ci sono lezioni
         q = db.session.query(User).filter_by(_user_id=self.user.data).first()
         if not check_password_hash(q._password, field.data):
             raise ValidationError("Password non corretta")
+
+
+class UnsubscribeCourse(FlaskForm):
+    user = HiddenField(validators=[InputRequired()])
+    submit_unsub_course = SubmitField('Disiscriviti')
 
 
 class ModifyCourse(FlaskForm):

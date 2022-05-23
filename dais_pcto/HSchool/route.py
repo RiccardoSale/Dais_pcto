@@ -29,5 +29,6 @@ def schools():
     if form2.submit2.data and form2.validate_on_submit():
         rhschool = db.session.query(Hschool).filter_by(_hschool_code=form2.id.data).first()
         rhschool.delete()
+        return redirect(url_for('Hschool.schools'))
 
     return render_template('schools.html', form=form, form2=form2, schools=q)

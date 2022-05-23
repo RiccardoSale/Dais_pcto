@@ -10,7 +10,7 @@ from flask_login import login_required, logout_user, login_user, current_user
 from werkzeug.routing import BuildError
 from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceError, InvalidRequestError, )
 from dais_pcto.app import db
-from .forms import coursesForm, PartecipationCertificate
+from .forms import coursesForm, PartecipationCertificate, UnsubscribeCourse
 from ..Auth.models import User
 from dais_pcto import Lessons
 from ..BaseRoute.route import certificate
@@ -40,6 +40,8 @@ def courses():
 def single_course(
         course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO per visualizzare lezioni nella route TODO ??? da mettere
     # utenti_user_totali = db.session.query(func.count(User._user_id)).where(User._role == "user").scalar()
+
+    object_corse = db.session.query(Course).filter_by(_name=course).first()
     lesson_form = LessonsForm()
     token_form = TokenForm()
     course_subscription_form = CourseSubscription()
@@ -48,8 +50,16 @@ def single_course(
     remove_lesson_form = RemoveLesson()
     modify_course_form = ModifyCourse()
     modify_lesson_form = ModifyLesson()
+    unsubscribe_course_form = UnsubscribeCourse()
+
     info_corso = db.session.query(Course).filter_by(_name=course).join(User).first_or_404()
 
+    utente_iscritto = db.session.query(Course).join(User._courses).filter(User._user_id == current_user._user_id,
+                                                                          Course._name == course).first()
+
+    print(utente_iscritto)
+    if utente_iscritto is None:
+        utente_iscritto = "noniscritto"
     course_lesson = db.session.query(Lesson).join(Course).filter(Course._name == course).order_by(
         Lesson._date).order_by(Lesson._start_hour)
 
@@ -77,45 +87,42 @@ def single_course(
     if token_form.submit_token.data and token_form.validate_on_submit():
         l = db.session.query(Lesson).filter_by(_lesson_id=token_form.id.data).first()
         current_user.subscribe_lesson(l)
-        flash("Hai registrato la tua presenza con successo")
+        flash("Hai registrato la tua presenza con successo","success")
 
     if course_subscription_form.submit_subcription_course.data and course_subscription_form.validate_on_submit():
-        if current_user._role == "user":
-            q = Course.query.filter_by(_name=course).first_or_404()
-            current_user.subscribe_course(q)
-            flash(f"Subscribe succesfull", "success")
+        current_user.subscribe_course(object_corse)
+        flash(f"Subscribe succesfull", "success")
+        return redirect(url_for('courses.single_course', course=course))
 
     if certificate_form.submit_certificate.data and certificate_form.validate_on_submit():
         return certificate(course=info_corso._name, professor=info_corso._professor, ore=info_corso._n_hour)
 
     if remove_course_form.submit_remove_course.data and remove_course_form.validate_on_submit():
-        q = Course.query.filter_by(_course_id=remove_course_form.id.data).first()
-        q.delete()
+        object_corse.delete()
         all_course_prof = db.session.query(Course).join(User)
         return render_template('courses.html', courses=all_course_prof)
 
     if remove_lesson_form.submit_remove_lesson.data and remove_lesson_form.validate_on_submit():
-        q = Lesson.query.filter_by(_lesson_id=remove_lesson_form.id.data).first()
+        q = db.session.query(Lesson).filter_by(_lesson_id=remove_lesson_form.id.data).first()
         q.delete()
-        flash("lezione rimossa con successo")
+        flash("lezione rimossa con successo","success")
+        return redirect(url_for('courses.single_course', course=course))
 
     if modify_course_form.submit_modify_course.data and modify_course_form.validate_on_submit():
-        print(modify_course_form.data)
-        q = Course.query.filter_by(_course_id=modify_course_form.course_id.data).first()
-        q.set_name(modify_course_form.name.data)
+        object_corse.set_name(modify_course_form.name.data)
 
         if modify_course_form.professor.data is not None:
-            print(modify_course_form.professor.data)
-            prof = User.query.filter_by(_email=modify_course_form.professor.data).first()
-            prof.professor_course(q)
-        q.set_description(modify_course_form.description.data)
-        q.set_max_student(modify_course_form.max_student.data)
-        q.set_n_hour(modify_course_form.n_hour.data)
-        q.set_start_month(modify_course_form.start_month.data)
-        q.set_end_month(modify_course_form.end_month.data)
-        q.update()
-        flash("Corso aggiornato con successo!")
-        return redirect(url_for('courses.single_course', course=q._name))
+            prof = db.session(User).query.filter_by(_email=modify_course_form.professor.data).first()
+            prof.professor_course(object_corse)
+
+        object_corse.set_description(modify_course_form.description.data)
+        object_corse.set_max_student(modify_course_form.max_student.data)
+        object_corse.set_n_hour(modify_course_form.n_hour.data)
+        object_corse.set_start_month(modify_course_form.start_month.data)
+        object_corse.set_end_month(modify_course_form.end_month.data)
+        object_corse.update()
+        flash("Corso aggiornato con successo!","success")
+        return redirect(url_for('courses.single_course', course=course))
 
     if modify_lesson_form.submit_modify_lesson.data and modify_lesson_form.validate_on_submit():
         q = Lesson.query.filter_by(_lesson_id=modify_lesson_form.lesson.data).first()
@@ -126,13 +133,21 @@ def single_course(
         q.set_structure(modify_lesson_form.structure.data)
         q.set_description(modify_lesson_form.description.data)
         q.update()
-        flash("Lezione aggiornata con successo!")
+        flash("Lezione aggiornata con successo!", "success")
+
+    if unsubscribe_course_form.submit_unsub_course.data and unsubscribe_course_form.validate_on_submit():  # disiscrivo l utente
+        q = db.session.query(User).filter_by(_user_id=unsubscribe_course_form.user.data).first()
+        q.unsubscribe_course(object_corse)
+        flash("Disiscrizione effettuata!", "success")
+        return redirect(url_for('courses.single_course', course=object_corse._name))
 
     return render_template('single_course.html', Course=info_corso, attivo=attivo, progress_bar=progress_bar,
                            Lessons=course_lesson, lesson_form=lesson_form, token_form=token_form,
                            course_subscription_form=course_subscription_form, certificate_form=certificate_form,
                            remove_course_form=remove_course_form, remove_lesson_form=remove_lesson_form,
-                           modify_course_form=modify_course_form, modify_lesson_form=modify_lesson_form)
+                           modify_course_form=modify_course_form, modify_lesson_form=modify_lesson_form,
+                           utente_iscritto=utente_iscritto,
+                           unsubscribe_course_form=unsubscribe_course_form)
 
 
 @blueprint.route('/buildcourse', methods=("GET", "POST"))

@@ -46,10 +46,15 @@ def certificate(course, professor, ore):
 @login_required
 def profile():
     courses = ""
+    list = []
     if current_user._role == "professor":
-        courses = Course.query.filter_by(_professor=current_user._user_id)
+        print("professor")
+        courses = db.session.query(Course).filter_by(_professor=current_user._user_id)
     if current_user._role == "user":
-        courses = Course.query.join(User._courses).join(Lesson).filter(User._user_id == current_user._user_id).all()
+        courses = db.session.query(Course).join(User._courses).filter(User._user_id == current_user._user_id)
+        for c in courses:
+            list.append(db.session.query(Lesson).join(User._lessons).filter(User._user_id == current_user._user_id,
+                                                                            Lesson.course == c._course_id).all())
 
     form = EditProfile()
     if form.validate_on_submit():
@@ -62,10 +67,11 @@ def profile():
             q.update()
             flash("Modifica avvenuta con successo!", "success")
             return redirect(
-                url_for('BaseRoute.profile', form=form, courses=courses))  # redirect per resettare campi inseriti
+                url_for('BaseRoute.profile', form=form, courses=courses,
+                        list=list))  # redirect per resettare campi inseriti
         else:
             flash("Controlla la password inserita!", "danger")
-    return render_template('profile.html', form=form, courses=courses)
+    return render_template('profile.html', form=form, courses=courses, list=list)
 
 
 @blueprint.route('/users', methods=("GET", "POST"))
@@ -76,8 +82,7 @@ def users():
     all_users = db.session.query(User).filter_by(_role="user").outerjoin(Hschool)
     if form.validate_on_submit():
         list = form.school.data.split(":")
-        print(list)
-        print("hello")
-        db.session.query(Hschool).filter_by(_phone=list[-1]).first().add_student(  db.session.query(User).filter_by(_user_id=form.user.data).first() )
-        flash("Scuola assegnata con successo")
+        db.session.query(Hschool).filter_by(_phone=list[-1]).first().add_student(
+            db.session.query(User).filter_by(_user_id=form.user.data).first())
+        flash("Scuola assegnata con successo", "success")
     return render_template("users.html", users=all_users, form=form)
