@@ -14,9 +14,9 @@ with app.app_context():
        db.session.execute(
            """
            ALTER TABLE lessons
-            ADD CHECK((_mode = 'presenza' AND _structure <> 'vuoto' AND _link = 'vuoto') OR
-                (_mode = 'online' AND _structure = 'vuoto' AND _link <> 'vuoto') OR
-                (_mode = 'blended' AND _structure <> 'vuoto' AND _link <> 'vuoto'));
+            ADD CHECK((_mode = 'presenza' AND _structure <> '' AND _link = '') OR
+                (_mode = 'online' AND _structure = '' AND _link <> '') OR
+                (_mode = 'blended' AND _structure <> '' AND _link <> ''));
            """)
     
        #CHECK SU LESSONS
