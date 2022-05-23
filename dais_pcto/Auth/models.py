@@ -54,22 +54,22 @@ class User(UserMixin, db.Model):
     def subscribe_course(self, course):
         if course:
             self._courses.append(course)
-            db.session.commit()
+            self.update()
 
     def unsubscribe_course(self, course):
         if course:
             self._courses.remove(course)
-            db.session.commit()
+            self.update()
 
     def subscribe_lesson(self, lesson):
         if lesson:
             self._lessons.append(lesson)
-            db.session.commit()
+            self.update()
 
     def professor_course(self, course):
         if course:
             self._courses_prof.append(course)
-            db.session.commit()
+            self.update()
 
     def set_password(self, password):
         if password != "":
@@ -89,3 +89,6 @@ class User(UserMixin, db.Model):
 
     def get_id(self):
         return self._user_id
+
+
+

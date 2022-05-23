@@ -34,4 +34,4 @@ class Hschool(UserMixin, db.Model):
     def add_student(self, user):
         if user:
             self.r_users.append(user)
-            db.session.commit()
+            self.update()
