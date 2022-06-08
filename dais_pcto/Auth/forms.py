@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, IntegerField, DateField, PasswordField
 from wtforms.validators import InputRequired, Length, Regexp, Email, ValidationError, Optional
-from .models import User
+from .models import User, user_with_email
 
 
 class LoginForm(FlaskForm):
@@ -25,7 +25,7 @@ class SignupForm(FlaskForm):
         )])
 
     def validate_email(self, field):
-        if User.query.filter_by(_email=field.data).first():
+        if user_with_email(field.data).first():
             raise ValidationError("Email già registrata!")
 
 

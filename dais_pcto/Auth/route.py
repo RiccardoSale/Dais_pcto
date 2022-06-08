@@ -5,7 +5,7 @@ from flask_principal import Permission, RoleNeed, ActionNeed, identity_loaded, i
 from werkzeug.routing import BuildError, ValidationError
 from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
 from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceError, InvalidRequestError, )
-from dais_pcto.Auth.models import User
+from dais_pcto.Auth.models import User, user_with_email
 from dais_pcto.app import db
 from dais_pcto.module_extensions import bcrypt
 from .forms import LoginForm, SignupForm
@@ -27,7 +27,7 @@ admin.description = "Admin's permissions"
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        q = User.query.filter_by(_email=form.email.data).first()
+        q = user_with_email(form.email.data).first()
         if q is not None:
             if check_password_hash(q._password, form.password.data):
                 login_user(q)

@@ -9,7 +9,6 @@ from dais_pcto.module_extensions import db
 def all_schools():
     return db.session.query(Hschool)
 
-
 class EditProfile(FlaskForm):
     email = StringField(validators=[Email(), Length(1, 64), Optional()])
     new_password = PasswordField(validators=[Length(8, 72), Optional()])
@@ -42,3 +41,4 @@ class EditProfileSeg(FlaskForm):
         )])
     school = SelectField(validators=[Optional()], choices=all_schools)
     user = HiddenField(validators=[Optional()])
+

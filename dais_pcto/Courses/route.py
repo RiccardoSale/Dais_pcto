@@ -4,7 +4,7 @@ from datetime import datetime, date, timedelta
 from sqlalchemy import func, desc
 
 from dais_pcto.Auth.route import admin, professor
-from dais_pcto.Courses.models import Course
+from dais_pcto.Courses.models import *
 from flask import Blueprint, url_for, current_app, redirect, g, flash, render_template
 from flask_login import login_required, logout_user, login_user, current_user
 from werkzeug.routing import BuildError
@@ -41,7 +41,7 @@ def single_course(
         course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO per visualizzare lezioni nella route TODO ??? da mettere
     # utenti_user_totali = db.session.query(func.count(User._user_id)).where(User._role == "user").scalar()
 
-    object_corse = db.session.query(Course).filter_by(_name=course).first()
+    object_corse = courses_with_name(course).first()
     lesson_form = LessonsForm()
     token_form = TokenForm()
     course_subscription_form = CourseSubscription()
@@ -52,7 +52,7 @@ def single_course(
     modify_lesson_form = ModifyLesson()
     unsubscribe_course_form = UnsubscribeCourse()
 
-    info_corso = db.session.query(Course).filter_by(_name=course).join(User).first_or_404()
+    info_corso = courses_with_name(course).join(User).first_or_404()
 
     utente_iscritto = db.session.query(Course).join(User._courses).filter(User._user_id == current_user._user_id,
                                                                           Course._name == course).first()
@@ -85,7 +85,7 @@ def single_course(
         return redirect(url_for('courses.single_course', course=course))
 
     if token_form.submit_token.data and token_form.validate_on_submit():
-        l = db.session.query(Lesson).filter_by(_lesson_id=token_form.id.data).first()
+        l = lesson_with_id(token_form.id.data).first()
         current_user.subscribe_lesson(l)
         flash("Hai registrato la tua presenza con successo","success")
 
@@ -103,7 +103,7 @@ def single_course(
         return render_template('courses.html', courses=all_course_prof)
 
     if remove_lesson_form.submit_remove_lesson.data and remove_lesson_form.validate_on_submit():
-        q = db.session.query(Lesson).filter_by(_lesson_id=remove_lesson_form.id.data).first()
+        q = lesson_with_id(remove_lesson_form.id.data).first()
         q.delete()
         flash("lezione rimossa con successo","success")
         return redirect(url_for('courses.single_course', course=course))
@@ -112,7 +112,7 @@ def single_course(
         object_corse.set_name(modify_course_form.name.data)
 
         if modify_course_form.professor.data is not None:
-            prof = db.session(User).query.filter_by(_email=modify_course_form.professor.data).first()
+            prof = user_with_email(modify_course_form.professor.data).first()
             prof.professor_course(object_corse)
 
         object_corse.set_description(modify_course_form.description.data)
@@ -125,7 +125,7 @@ def single_course(
         return redirect(url_for('courses.single_course', course=course))
 
     if modify_lesson_form.submit_modify_lesson.data and modify_lesson_form.validate_on_submit():
-        q = Lesson.query.filter_by(_lesson_id=modify_lesson_form.lesson.data).first()
+        q = lesson_with_id(modify_lesson_form.lesson.data).first()
         q.set_start_hour(modify_lesson_form.start_hour.data)
         q.set_end_hour(modify_lesson_form.end_hour.data)
         q.set_mode(modify_lesson_form.mode.data)
@@ -136,7 +136,7 @@ def single_course(
         flash("Lezione aggiornata con successo!", "success")
 
     if unsubscribe_course_form.submit_unsub_course.data and unsubscribe_course_form.validate_on_submit():  # disiscrivo l utente
-        q = db.session.query(User).filter_by(_user_id=unsubscribe_course_form.user.data).first()
+        q = user_with_id(unsubscribe_course_form.user.data).first()
         q.unsubscribe_course(object_corse)
         flash("Disiscrizione effettuata!", "success")
         return redirect(url_for('courses.single_course', course=object_corse._name))
@@ -157,7 +157,7 @@ def buildcourse():
     form = coursesForm()
     if form.validate_on_submit():
         if form.professor.data is not None:
-            professor = User.query.filter_by(_email=form.professor.data).first()
+            professor = user_with_email(form.professor.data).first()
         else:
             professor = current_user
 

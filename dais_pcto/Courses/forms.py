@@ -7,14 +7,14 @@ from wtforms import StringField, SelectField, IntegerField, DateField, SubmitFie
 from wtforms.validators import InputRequired, Length, Regexp, ValidationError, Optional
 
 from dais_pcto.Auth.models import User
-from dais_pcto.Courses.models import Course
+from dais_pcto.Courses.models import *
 from dais_pcto.Lessons.models import Lesson
 from dais_pcto.module_extensions import db
 
 
+
 def all_professor():
     return db.session.query(User).filter_by(_role="professor")
-
 
 class coursesForm(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(1, 64),
@@ -59,7 +59,7 @@ class CourseSubscription(FlaskForm):  # decidere se far iscrivere anche dopo la 
             if q._role == "user":
                 raise ValidationError("Sei già registrato al corso")
         else:
-            q2 = db.session.query(Course).filter_by(_course_id=self.id.data).join(User).first()
+            q2 = course_with_id(self.id.data).join(User).first()
             if len(q2._users) >= q2._max_student:
                 raise ValidationError("Il corso è chiuso non sono più disponibili posti")
 
@@ -71,7 +71,7 @@ class PartecipationCertificate(FlaskForm):
 
     def validate_id(self, data):
         q = db.session.query(Lesson).join(Course).filter(Course._course_id == self.id.data).all()
-        # q= LEZIONI CHE FANNO PARTE DEL CORSO ATTUALE DA CONFRONTARE CON LE LEZIONI SEGUITE DALLO STUDENTE DI QUEL CORSO PARTICOLARE
+        #q = LEZIONI CHE FANNO PARTE DEL CORSO ATTUALE DA CONFRONTARE CON LE LEZIONI SEGUITE DALLO STUDENTE DI QUEL CORSO PARTICOLARE
 
         # Lezioni a cui l utente ha partecipato di quel particolare corso e di cui ha registrato la presenza
         subquery = db.session.query(Lesson).join(User._lessons).filter(User._user_id == self.user.data,
@@ -88,7 +88,7 @@ class RemoveCourse(FlaskForm):  # Eliminarle anche se ci sono lezioni
     submit_remove_course = SubmitField('Rimuovi corso')
 
     def validate_password(self, field):
-        q = db.session.query(User).filter_by(_user_id=self.user.data).first()
+        q = user_with_id(self.user.data).first()
         if not check_password_hash(q._password, field.data):
             raise ValidationError("Password non corretta")
 
@@ -117,7 +117,7 @@ class ModifyCourse(FlaskForm):
                 raise ValidationError("La data di fine del corso deve essere successiva alla data di inizio del corso")
         else:
             if field.data is not None:
-                q = db.session.query(Course).filter_by(_course_id=self.course_id.data).first()
+                q = course_with_id(self.course_id.data).first()
                 if field.data < q._start_month:
                     raise ValidationError(
                         "La data di fine del corso deve essere successiva alla data di inizio del corso")
@@ -142,13 +142,13 @@ class ModifyCourse(FlaskForm):
         if field.data is not None:
             print("bagigio")
             print(field.data)
-            q = db.session.query(Course).filter_by(_course_id=self.course_id.data).first()
+            q = course_with_id(self.course_id.data).first()
             if field.data < q._max_student:
                 flash("Controlla il form qualcosa è andato storto")
                 raise ValidationError("Puoi solo aumentare i posti disponibili")
 
     def validate_n_hour(self, field):
         if field.data is not None:
-            q = db.session.query(Course).filter_by(_course_id=self.course_id.data).first()
+            q = course_with_id(self.course_id.data).first()
             if q._n_hour > field.data:
                 raise ValidationError("Puoi solo aumentare le ore di lezione")
