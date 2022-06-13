@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, IntegerField, DateField, TimeField, HiddenField, SubmitField
 from wtforms.validators import InputRequired, Length, Regexp, NumberRange, ValidationError
-from dais_pcto.HSchool.models import Hschool
+from dais_pcto.HSchool.models import school_with_code
 from dais_pcto.module_extensions import db
 
 
@@ -27,7 +27,7 @@ class SchoolForm(FlaskForm):
     #                                      _street=self.street.data, _number=self.number.data).first()
 
     def validate_code(self, field):
-        school = db.session.query(Hschool).filter_by(_hschool_code=field.data).first()
+        school = school_with_code(field.data).first()
         if school is not None:
             raise ValidationError("La scuola inserita è già presente")
 

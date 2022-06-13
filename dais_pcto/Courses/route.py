@@ -11,12 +11,12 @@ from werkzeug.routing import BuildError
 from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceError, InvalidRequestError, )
 from dais_pcto.app import db
 from .forms import coursesForm, PartecipationCertificate, UnsubscribeCourse
-from ..Auth.models import User
+from ..Auth.models import User, user_with_email, user_with_id
 from dais_pcto import Lessons
 from ..BaseRoute.route import certificate
 from ..Courses.forms import CourseSubscription, RemoveCourse, ModifyCourse
 from ..Lessons.forms import LessonsForm, TokenForm, RemoveLesson, ModifyLesson
-from ..Lessons.models import Lesson
+from ..Lessons.models import Lesson, lesson_with_id
 
 blueprint = Blueprint('courses', __name__, )
 

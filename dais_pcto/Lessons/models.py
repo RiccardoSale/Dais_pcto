@@ -65,3 +65,6 @@ class Lesson(UserMixin, db.Model):
     def set_description(self, description):
         if description != "":
             self._description = description
+
+def lesson_with_id(id):
+    return db.session.query(Lesson).filter_by(_lesson_id=id)

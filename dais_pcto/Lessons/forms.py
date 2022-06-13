@@ -7,9 +7,9 @@ from wtforms import StringField, SelectField, IntegerField, DateField, TimeField
     PasswordField
 from wtforms.validators import InputRequired, Length, Regexp, ValidationError, Optional
 
-from dais_pcto.Courses.models import Course
-from dais_pcto.Lessons.models import Lesson
-from dais_pcto.Auth.models import User
+from dais_pcto.Courses.models import Course, course_with_id
+from dais_pcto.Lessons.models import *
+from dais_pcto.Auth.models import User, user_with_id
 from dais_pcto.module_extensions import db
 
 
@@ -58,7 +58,7 @@ class LessonsForm(FlaskForm):
 
     def validate_end_hour(self, field):
         ####VALIDAZIONE NON POSSO SFORARE ORE TOTALI####
-        _course = db.session.query(Course).filter_by(_course_id=self.course.data).first()
+        _course = course_with_id(self.course.data).first()
         total_hour = _course._n_hour
         lessons = _course._lessons
 
@@ -102,7 +102,7 @@ class LessonsForm(FlaskForm):
             raise ValidationError("La data della lezione deve essere successiva a quella odierna")
 
     def validate_mode(self, field):
-        q = db.session.query(Course).filter_by(_course_id=self.course.data).first()
+        q = course_with_id(self.course.data).first()
         if q._mode == "presenza":
             if field.data != "presenza":
                 raise ValidationError("La modalità della lezione non combacia con quella del corso")
@@ -131,7 +131,7 @@ class TokenForm(FlaskForm):
     submit_token = SubmitField("Registra la tua presenza")
 
     def validate_token(self, field):
-        l = db.session.query(Lesson).filter_by(_lesson_id=self.id.data).first()
+        l = lesson_with_id(self.id.data).first()
         corso = db.session.query(User).join(Course._users).filter(User._user_id == self.user.data,
                                                                   Course._course_id == l.course).first()
         if not corso:
@@ -154,7 +154,7 @@ class RemoveLesson(FlaskForm):
     submit_remove_lesson = SubmitField('Rimuovi Lezione')
 
     def validate_password(self, field):
-        q = db.session.query(User).filter_by(_user_id=self.user.data).first()
+        q = user_with_id(self.user.data).first()
         if not check_password_hash(q._password, field.data):
             raise ValidationError("Password non corretta")
 
@@ -175,7 +175,7 @@ class ModifyLesson(FlaskForm):
     submit_modify_lesson = SubmitField("Modifica Lezione")
 
     def validate_date(self, field):
-        q = Lesson.query.filter_by(_lesson_id=self.lesson.data).first()
+        q = lesson_with_id(self.lesson.data).first()
         if str(self.date) <= str(datetime.now()):
             raise ValidationError("La data della lezione deve essere successiva a quella odierna")
 
@@ -183,7 +183,7 @@ class ModifyLesson(FlaskForm):
             raise ValidationError("Non puoi modificare lezioni che sono già avvenute / completate")
 
     def validate_mode(self, field):
-        q = db.session.query(Course).filter_by(_course_id=self.course.data).first()
+        q = course_with_id(self.course.data).first()
 
         if field.data != "":
             if q._mode != "blended":
@@ -191,7 +191,7 @@ class ModifyLesson(FlaskForm):
                     "E' possibile modificare la modalità della lezione se e solo se la modalità del corso è blended")
 
     def validate_link(self, field):
-        q = Lesson.query.filter_by(_lesson_id=self.lesson.data).first()
+        q = lesson_with_id(self.lesson.data).first()
 
         if field.data != "":
             if (q._mode == "presenza" or self.mode.data == "presenza"):
@@ -201,7 +201,7 @@ class ModifyLesson(FlaskForm):
                 field.data = "vuoto"
 
     def validate_structure(self, field):
-        q = Lesson.query.filter_by(_lesson_id=self.lesson.data).first()
+        q = lesson_with_id(self.lesson.data).first()
 
         if field.data != "":
             if q._mode == "online" or self.mode.data == "online":
@@ -212,7 +212,7 @@ class ModifyLesson(FlaskForm):
 
     def validate_start_hour(self, field):
         if self.start_hour.data is not None:
-            q = Lesson.query.filter_by(_lesson_id=self.lesson.data).first()
+            q = lesson_with_id(self.lesson.data).first()
             if self.end_hour.data is None:
                 if self.start_hour.data > self.end_hour.data:
                     raise ValidationError(
@@ -228,8 +228,8 @@ class ModifyLesson(FlaskForm):
 
     def validate_end_hour(self, field):
         ####VALIDAZIONE NON POSSO SFORARE ORE TOTALI####
-        q = Lesson.query.filter_by(_lesson_id=self.lesson.data).first()
-        _course = db.session.query(Course).filter_by(_course_id=self.course.data).first()
+        q = lesson_with_id(self.lesson.data).first()
+        _course = course_with_id(self.course.data).first()
         total_hour = _course._n_hour
         lessons = _course._lessons
         if self.end_hour.data is None:

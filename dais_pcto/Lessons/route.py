@@ -1,5 +1,4 @@
 from dais_pcto.Auth.route import admin
-from dais_pcto.Courses.models import Course
 from flask import Blueprint, url_for, current_app, redirect, g, flash, render_template
 from flask_login import login_required, logout_user, login_user ,current_user
 from werkzeug.routing import BuildError

@@ -93,5 +93,11 @@ class User(UserMixin, db.Model):
 def user_with_email(email):
     return db.session.query(User).filter_by(_email=email)
 
+def user_with_id(id):
+    return db.session.query(User).filter_by(_user_id=id)
+
+def users_with_role(role):
+    return db.session.query(User).filter_by(_role=role)
+
 
 

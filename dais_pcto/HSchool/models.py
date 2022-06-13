@@ -35,3 +35,12 @@ class Hschool(UserMixin, db.Model):
         if user:
             self.r_users.append(user)
             self.update()
+
+def school_with_code(code):
+    return db.session.query(Hschool).filter_by(_hschool_code=code)
+
+def all_schools():
+    return db.session.query(Hschool)
+
+def school_with_phone(phone):
+    return db.session.query(Hschool).filter_by(_phone=phone)

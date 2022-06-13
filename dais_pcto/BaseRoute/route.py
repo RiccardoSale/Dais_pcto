@@ -12,26 +12,14 @@ import pdfkit
 from dais_pcto.app import db
 
 from .forms import EditProfile, EditProfileSeg
-from ..Auth.models import User
+from ..Auth.models import User, user_with_id, users_with_role
 from ..Auth.route import login, admin
-from ..Courses.models import Course
-from ..HSchool.models import Hschool
+from ..Courses.models import Course, courses_with_professor
+from ..HSchool.models import Hschool, school_with_phone
 from ..Lessons.models import Lesson
 from ..module_extensions import bcrypt
 
 blueprint = Blueprint('BaseRoute', __name__)
-
-def user_with_id(id):
-    return db.session.query(User).filter_by(_user_id=id)
-
-def courses_with_professor(professor):
-    return db.session.query(Course).filter_by(_professor=professor)
-
-def users_with_role(role):
-    return db.session.query(User).filter_by(_role=role)
-
-def school_with_phone(phone):
-    return db.session.query(Hschool).filter_by(_phone=phone)
 
 @blueprint.route('/')
 def index():

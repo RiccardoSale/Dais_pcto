@@ -2,12 +2,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, HiddenField
 from wtforms.validators import Length, Regexp, Email, InputRequired, Optional
 
-from dais_pcto.HSchool.models import Hschool
+from dais_pcto.HSchool.models import all_schools
 from dais_pcto.module_extensions import db
 
 
-def all_schools():
-    return db.session.query(Hschool)
 
 class EditProfile(FlaskForm):
     email = StringField(validators=[Email(), Length(1, 64), Optional()])

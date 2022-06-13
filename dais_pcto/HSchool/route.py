@@ -4,7 +4,7 @@ from werkzeug.routing import BuildError
 
 from dais_pcto.app import db
 from .forms import SchoolForm, DeleteSchoolForm
-from .models import Hschool
+from .models import Hschool, school_with_code, all_schools
 from sqlalchemy.exc import (IntegrityError, DataError, DatabaseError, InterfaceError, InvalidRequestError, )
 
 from ..Auth.route import admin
@@ -24,10 +24,10 @@ def schools():
         flash(f"Scuola inserita!", "success")
         return redirect(url_for('Hschool.schools'))
 
-    q = db.session.query(Hschool)
+    q = all_schools()
     form2 = DeleteSchoolForm()
     if form2.submit2.data and form2.validate_on_submit():
-        rhschool = db.session.query(Hschool).filter_by(_hschool_code=form2.id.data).first()
+        rhschool = school_with_code(form2.id.data).first()
         rhschool.delete()
         return redirect(url_for('Hschool.schools'))
 

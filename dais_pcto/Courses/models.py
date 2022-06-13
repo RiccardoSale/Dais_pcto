@@ -1,9 +1,8 @@
 from sqlalchemy import CheckConstraint
 
-from dais_pcto.Lessons.models import Lesson
 from dais_pcto.app import db
 from flask_login import UserMixin
-from dais_pcto.Auth.models import user_course, User
+from dais_pcto.Auth.models import user_course
 
 
 class Course(UserMixin, db.Model):
@@ -80,8 +79,6 @@ class Course(UserMixin, db.Model):
             self._end_month = end_month
 
 
-def user_with_id(id):
-    return db.session.query(User).filter_by(_user_id=id)
 
 def course_with_id(id):
     return db.session.query(Course).filter_by(_course_id=id)
@@ -89,8 +86,5 @@ def course_with_id(id):
 def courses_with_name(name):
     return db.session.query(Course).filter_by(_name=name)
 
-def lesson_with_id(id):
-    return db.session.query(Lesson).filter_by(_lesson_id=id)
-
-def user_with_email(email):
-    return db.session.query(User).filter_by(_email=email)
+def courses_with_professor(professor):
+    return db.session.query(Course).filter_by(_professor=professor)

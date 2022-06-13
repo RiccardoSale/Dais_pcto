@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, IntegerField, DateField, SubmitField, HiddenField, PasswordField
 from wtforms.validators import InputRequired, Length, Regexp, ValidationError, Optional
 
-from dais_pcto.Auth.models import User
+from dais_pcto.Auth.models import User, user_with_id, users_with_role
 from dais_pcto.Courses.models import *
 from dais_pcto.Lessons.models import Lesson
 from dais_pcto.module_extensions import db
@@ -14,7 +14,7 @@ from dais_pcto.module_extensions import db
 
 
 def all_professor():
-    return db.session.query(User).filter_by(_role="professor")
+    return users_with_role("professor")
 
 class coursesForm(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(1, 64),
