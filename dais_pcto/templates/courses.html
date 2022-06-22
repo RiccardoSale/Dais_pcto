@@ -27,8 +27,8 @@
                               <td>{{ Course._mode }}</td>
                                 <!--Bisogna usare il nome del backref e non della foreign key-->
                               <td>{{ Course.users._name +" "+Course.users._surname }}</td>
-                              <td>{{ Course._start_month }}</td>
-                              <td>{{ Course._end_month }}</td>
+                              <td>{{ Course._start_date }}</td>
+                              <td>{{ Course._end_date }}</td>
                               <td>{{ Course._n_hour }} h</td>
                                 <td> <a href = "{{ url_for('courses.single_course',course= Course._name ) }}"> <img class="info" src="/static/info.jpg" style="width: 20px;"></a></a> </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
                             </tr>

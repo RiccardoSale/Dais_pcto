@@ -2,7 +2,7 @@ from flask_login import UserMixin
 from dais_pcto.app import db
 from dais_pcto.module_extensions import bcrypt
 
-user_course = db.Table('user_corse',
+user_course = db.Table('user_course',
                        db.Column('user_id', db.Integer, db.ForeignKey('users._user_id')),
                        db.Column('course_id', db.Integer, db.ForeignKey('courses._course_id'))
                        )

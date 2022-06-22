@@ -62,7 +62,7 @@ class LessonsForm(FlaskForm):
         total_hour = _course._n_hour
         lessons = _course._lessons
 
-        if self.date.data < _course._start_month or self.date.data > _course._end_month:
+        if self.date.data < _course._start_date or self.date.data > _course._end_date:
             raise ValidationError("La data della lezione deve essere compresa nel periodo del corso")
 
         total_sum = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
@@ -239,7 +239,7 @@ class ModifyLesson(FlaskForm):
         if self.date.data is None:
             self.date.data = q._date
 
-        if self.date.data < _course._start_month or self.date.data > _course._end_month:
+        if self.date.data < _course._start_date or self.date.data > _course._end_date:
             raise ValidationError("La data della lezione deve essere compresa nel periodo del corso")
 
         total_sum = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)

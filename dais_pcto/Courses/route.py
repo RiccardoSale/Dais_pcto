@@ -118,8 +118,8 @@ def single_course(
         object_corse.set_description(modify_course_form.description.data)
         object_corse.set_max_student(modify_course_form.max_student.data)
         object_corse.set_n_hour(modify_course_form.n_hour.data)
-        object_corse.set_start_month(modify_course_form.start_month.data)
-        object_corse.set_end_month(modify_course_form.end_month.data)
+        object_corse.set_start_date(modify_course_form.start_date.data)
+        object_corse.set_end_date(modify_course_form.end_date.data)
         object_corse.update()
         flash("Corso aggiornato con successo!","success")
         return redirect(url_for('courses.single_course', course=course))
@@ -162,7 +162,7 @@ def buildcourse():
             professor = current_user
 
         Course(form.name.data, form.mode.data, form.description.data, form.max_student.data,
-               form.min_student.data, form.n_hour.data, form.start_month.data, form.end_month.data,
+               form.min_student.data, form.n_hour.data, form.start_date.data, form.end_date.data,
                professor._user_id).save()
 
         flash(f"Course created", "success")

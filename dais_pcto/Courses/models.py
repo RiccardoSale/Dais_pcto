@@ -18,9 +18,9 @@ class Course(UserMixin, db.Model):
                              nullable=False)
     _n_hour = db.Column(db.Integer, nullable=False)  # DIVENTA RICAVATO
 
-    _start_month = db.Column(db.DATE, CheckConstraint('str(end_month) > str(start_month)', name='start_month_costr'),
+    _start_date = db.Column(db.DATE, CheckConstraint('str(end_date) > str(start_date)', name='start_date_costr'),
                              nullable=False)
-    _end_month = db.Column(db.DATE, CheckConstraint('str(start_month) < str(end_month)', name='end_month_costr'),
+    _end_date = db.Column(db.DATE, CheckConstraint('str(start_date) < str(end_date)', name='end_date_costr'),
                            nullable=False)  # da start month o end month ricavo periodo
 
     # NUMERO LEZIONI STABILITO A PRIORI -> PROGRAMMA SETTIMANA -> 2 LEZIONI NORMALI DA 1 ORA E MEZZA -> 1 LEZIONE SPECIALE DA 3 ORE
@@ -43,15 +43,15 @@ class Course(UserMixin, db.Model):
         return '<Course %r>' % self._name
 
     # Costruttore oggetto
-    def __init__(self, name, mode, description, max_student, min_student, n_hour, start_month, end_month, professor):
+    def __init__(self, name, mode, description, max_student, min_student, n_hour, start_date, end_date, professor):
         self._name = name
         self._mode = mode
         self._description = description
         self._max_student = max_student
         self._min_student = min_student
         self._n_hour = n_hour
-        self._start_month = start_month
-        self._end_month = end_month
+        self._start_date = start_date
+        self._end_date = end_date
         self._professor = professor
 
     def set_name(self, name):
@@ -70,13 +70,13 @@ class Course(UserMixin, db.Model):
         if n_hour is not None:
             self._n_hour = n_hour
 
-    def set_start_month(self, start_month):
-        if start_month is not None:
-            self._start_month = start_month
+    def set_start_date(self, start_date):
+        if start_date is not None:
+            self._start_date = start_date
 
-    def set_end_month(self, end_month):
-        if end_month is not None:
-            self._end_month = end_month
+    def set_end_date(self, end_date):
+        if end_date is not None:
+            self._end_date = end_date
 
 
 

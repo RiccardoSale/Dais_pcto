@@ -91,18 +91,18 @@
                         </div>
                         {% endfor%}
                         <div class="form-group mb-3">
-                            {{ form.start_month(class_="form-control",placeholder="Data di inizio")}}
+                            {{ form.start_date(class_="form-control",placeholder="Data di inizio")}}
                         </div>
-                        {% for error in form.start_month.errors %}
+                        {% for error in form.start_date.errors %}
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                             {{ error }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         {% endfor%}
                          <div class="form-group mb-3">
-                            {{ form.end_month(class_="form-control",placeholder="Data di fine")}}
+                            {{ form.end_date(class_="form-control",placeholder="Data di fine")}}
                         </div>
-                        {% for error in form.end_month.errors %}
+                        {% for error in form.end_date.errors %}
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                             {{ error }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

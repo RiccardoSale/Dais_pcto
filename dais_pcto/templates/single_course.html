@@ -42,10 +42,10 @@
                                         <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Num minimo studenti</strong></label><p class="text-muted">{{ Course._min_student }}</p></div>
                                     </div>
                                     <div class="col">
-                                        <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Data Inizio</strong></label><p class="text-muted">{{ Course._start_month }}</p></div>
+                                        <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Data Inizio</strong></label><p class="text-muted">{{ Course._start_date }}</p></div>
                                     </div>
                                     <div class="col">
-                                        <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Data Fine</strong></label><p class="text-muted">{{ Course._end_month }}</p></div>
+                                        <div class="mb-3"><label class="form-label" for="last_name"><strong class="text-primary m-0 fw-bold">Data Fine</strong></label><p class="text-muted">{{ Course._end_date }}</p></div>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -502,18 +502,18 @@
                         </div>
                         {% endfor%}
                         <div class="form-group mb-3">
-                            {{ modify_course_form.start_month(class_="form-control",placeholder="Data di inizio")}}
+                            {{ modify_course_form.start_date(class_="form-control",placeholder="Data di inizio")}}
                         </div>
-                        {% for error in modify_course_form.start_month.errors %}
+                        {% for error in modify_course_form.start_date.errors %}
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                             {{ error }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         {% endfor%}
                          <div class="form-group mb-3">
-                            {{ modify_course_form.end_month(class_="form-control",placeholder="Data di fine")}}
+                            {{ modify_course_form.end_date(class_="form-control",placeholder="Data di fine")}}
                         </div>
-                        {% for error in modify_course_form.end_month.errors %}
+                        {% for error in modify_course_form.end_date.errors %}
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                             {{ error }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

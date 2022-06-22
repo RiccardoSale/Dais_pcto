@@ -25,16 +25,16 @@ class coursesForm(FlaskForm):
     min_student = IntegerField(
         validators=[InputRequired()])  # DEVE ESSERE MINORE DI MAX STUDENT DOVE METTO VINCOLO
     n_hour = IntegerField(validators=[InputRequired()])
-    start_month = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
-    end_month = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
+    start_date = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
+    end_date = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
 
     professor = SelectField(validators=[Optional()], choices=all_professor)
 
-    def validate_end_month(self, field):
-        if field.data < self.start_month.data:
+    def validate_end_date(self, field):
+        if field.data < self.start_date.data:
             raise ValidationError("La data di fine del corso deve essere successiva alla data di inizio del corso")
 
-    def validate_start_month(self, field):
+    def validate_start_date(self, field):
         if str(field.data) < str(datetime.now()):
             raise ValidationError("Inserisci come data di inizio posteriore alla data odierna")
 
@@ -78,8 +78,11 @@ class PartecipationCertificate(FlaskForm):
                                                                        Lesson.course == self.id.data).all()
 
         # DEVE AVER PARTECIPATO ALMENO AL 70 %
-        if len(subquery) / len(q) * 100 < 70:
-            raise ValidationError("Non hai attestato la partecipazione ad abbastanza lezioni")
+        if len(q) > 0:
+            if len(subquery) / len(q) * 100 < 70:
+                raise ValidationError("Non hai attestato la partecipazione ad abbastanza lezioni")
+        else:
+            flash("Non ci sonoo lezioni!")
 
 
 class RemoveCourse(FlaskForm):  # Eliminarle anche se ci sono lezioni
@@ -105,37 +108,37 @@ class ModifyCourse(FlaskForm):
     description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9]*$", 0, "Descrizione non valida"), Optional()])
     max_student = IntegerField(validators=[Optional()])
     n_hour = IntegerField(validators=[Optional()])
-    start_month = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
-    end_month = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
+    start_date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
+    end_date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
     course_id = HiddenField(validators=[InputRequired()])
     submit_modify_course = SubmitField('Modifica corso')
 
-    def validate_end_month(self, field):
-        if self.start_month.data is not None:
-            if field.data < self.start_month.data:
+    def validate_end_date(self, field):
+        if self.start_date.data is not None:
+            if field.data < self.start_date.data:
                 flash("Controlla il form qualcosa è andato storto")
                 raise ValidationError("La data di fine del corso deve essere successiva alla data di inizio del corso")
         else:
             if field.data is not None:
                 q = course_with_id(self.course_id.data).first()
-                if field.data < q._start_month:
+                if field.data < q._start_date:
                     raise ValidationError(
                         "La data di fine del corso deve essere successiva alla data di inizio del corso")
 
                 lessons = db.session.query(Lesson).join(Course).filter(
                     Course._course_id == self.course_id.data).order_by(
                     Lesson._date).all()
-                if lessons[-1]._date > self.end_month.data:
+                if lessons[-1]._date > self.end_date.data:
                     ValidationError("Ci sono delle lezioni prima della data di fine corso si sta cercando di inserire")
 
-    def validate_start_month(self, field):
+    def validate_start_date(self, field):
         if field.data is not None:
             if str(field.data) < str(datetime.now()):
                 raise ValidationError("Inserisci come data di inizio posteriore alla data odierna")
 
             lessons = db.session.query(Lesson).join(Course).filter(Course._course_id == self.course_id.data).order_by(
                 Lesson._date).all()
-            if lessons[0]._date < self.start_month.data:
+            if lessons[0]._date < self.start_date.data:
                 ValidationError("Ci sono delle lezioni prima della data di inizio corso che stai cercando di inserire")
 
     def validate_max_student(self, field):
