@@ -18,9 +18,9 @@ def all_professor():
 
 class coursesForm(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(1, 64),
-                                   Regexp("^[A-Za-z][A-Za-z0-9_.]*$", 0, "Il nome del corso non è valido")])
+                                   Regexp("^[A-Za-z][A-Za-z0-9_.' ]*$", 0, "Il nome del corso non è valido")])
     mode = SelectField('mode', choices=['presenza', 'online', 'blended'])
-    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9]*$", 0, "Descrizione non valida")])
+    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9' ]*$", 0, "Descrizione non valida")])
     max_student = IntegerField(validators=[InputRequired()])
     min_student = IntegerField(
         validators=[InputRequired()])  # DEVE ESSERE MINORE DI MAX STUDENT DOVE METTO VINCOLO
@@ -36,7 +36,7 @@ class coursesForm(FlaskForm):
 
     def validate_start_date(self, field):
         if str(field.data) < str(datetime.now()):
-            raise ValidationError("Inserisci come data di inizio posteriore alla data odierna")
+            raise ValidationError("Inserisci come data di inizio una data posteriore alla data odierna")
 
     def validate_max_student(self, field):
         if self.max_student.data < self.min_student.data:
@@ -103,9 +103,9 @@ class UnsubscribeCourse(FlaskForm):
 
 class ModifyCourse(FlaskForm):
     name = StringField(validators=[Length(1, 64),
-                                   Regexp("^[A-Za-z][A-Za-z0-9_.]*$", 0, "Il nome del corso non è valido"), Optional()])
+                                   Regexp("^[A-Za-z][A-Za-z0-9_.' ]*$", 0, "Il nome del corso non è valido"), Optional()])
     professor = SelectField(validators=[Optional()], choices=all_professor)
-    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9]*$", 0, "Descrizione non valida"), Optional()])
+    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9' ]*$", 0, "Descrizione non valida"), Optional()])
     max_student = IntegerField(validators=[Optional()])
     n_hour = IntegerField(validators=[Optional()])
     start_date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
@@ -134,7 +134,7 @@ class ModifyCourse(FlaskForm):
     def validate_start_date(self, field):
         if field.data is not None:
             if str(field.data) < str(datetime.now()):
-                raise ValidationError("Inserisci come data di inizio posteriore alla data odierna")
+                raise ValidationError("Inserisci come data di inizio una data posteriore alla data odierna")
 
             lessons = db.session.query(Lesson).join(Course).filter(Course._course_id == self.course_id.data).order_by(
                 Lesson._date).all()
@@ -147,7 +147,7 @@ class ModifyCourse(FlaskForm):
             print(field.data)
             q = course_with_id(self.course_id.data).first()
             if field.data < q._max_student:
-                flash("Controlla il form qualcosa è andato storto")
+                flash("Controlla il form qualcosa è andato storto", 'warning')
                 raise ValidationError("Puoi solo aumentare i posti disponibili")
 
     def validate_n_hour(self, field):

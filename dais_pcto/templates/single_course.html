@@ -28,7 +28,7 @@
                             {% endif %}
                                 <div class="row">
                                     <div class="col">
-                                        <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> <p class="text-muted">{{ Course._name }}</p></div>
+                                        <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> <p class="text-muted" style="text-transform: none;">{{ Course._name }}</p></div>
                                     </div>
                                     <div class="col">
                                         <div class="mb-3"><label class="form-label" for="mode"><strong class="text-primary m-0 fw-bold">Modalità</strong></label><p class="text-muted">{{ Course._mode }}</p></div>
@@ -62,7 +62,7 @@
                                 </div>
                                 <div class="row text-center">
                                     <div class="col">
-                                        <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Descrizione</strong></label><p class="text-muted">{{ Course._description }}</p></div>
+                                        <div class="mb-3"><label class="form-label" for="first_name"><strong class="text-primary m-0 fw-bold">Descrizione</strong></label><p class="text-muted" style="text-transform: none;">{{ Course._description }}</p></div>
                                     </div>
                                     <div class="col">
                                     {%  if utente_iscritto!="noniscritto" %}
@@ -433,6 +433,7 @@
                 {% endfor%}
                 {{ lesson_form.course(value=Course._course_id) }}
                 {{ lesson_form.submit1(type="submit",class="m-2 pb-1 btn btn-primary") }}
+
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </form>
       </div>

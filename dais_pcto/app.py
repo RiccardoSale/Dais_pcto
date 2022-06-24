@@ -9,6 +9,7 @@ from dais_pcto.module_extensions import bcrypt, db, migrate
 from dais_pcto import Lessons, Auth, Courses, BaseRoute, HSchool
 from dais_pcto.settings import ProdConfig, DevConfig
 from .Auth.models import User
+from .Errors.errors import forbidden, not_found
 from .HSchool.models import Hschool
 from .Lessons.models import Lesson  # NECESSARIO PER FAR VEDERE TABELLA ANCHE SE RISULTANO IMPORT INUSATI !!!!
 
@@ -35,6 +36,9 @@ def create_app(config_object=DevConfig):
     login_manager.login_message_category = "info"
     login_manager.login_view = 'Auth.login'
     login_manager.init_app(app)
+
+    app.register_error_handler(404, not_found)
+    app.register_error_handler(403, forbidden)
 
     # db.create_all()
     @login_manager.user_loader  # -> diciamo a flask login come trovare uno specifico utente dall id che e salvato nella loro sessione dei cookie
