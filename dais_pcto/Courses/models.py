@@ -34,7 +34,7 @@ class Course(UserMixin, db.Model):
     # ->chiave esterna a utente -> e poi vincolo trigger blocca inserimento e la modifica di un eventuale utente che non abbia ruolo professore
 
     _users = db.relationship("User", secondary=user_course,
-                             back_populates="_courses", )
+                             back_populates="_courses" )
 
     # collegamento molti a molti tra utenti e corsi per fattore iscrizione utente normale
     # Quando rimuovo rimosso collegamento in automatico

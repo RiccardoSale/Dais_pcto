@@ -1,5 +1,5 @@
 from datetime import datetime, time, timedelta, date
-
+from flask import flash
 from flask_bcrypt import check_password_hash
 from flask_wtf import FlaskForm
 from markupsafe import Markup
@@ -50,10 +50,12 @@ class LessonsForm(FlaskForm):
 
     def validate_start_hour(self, field):
         if self.start_hour.data > self.end_hour.data:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("L'orario di fine lezione deve essere successivo all'orario di inizio lezione")
 
         date_time_obj = datetime.strptime('09:00:00', '%H:%M:%S').time()
         if self.start_hour.data < date_time_obj:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("L'orario di inizio deve essere maggiore delle 09:00")
 
     def validate_end_hour(self, field):
@@ -63,6 +65,7 @@ class LessonsForm(FlaskForm):
         lessons = _course._lessons
 
         if self.date.data < _course._start_date or self.date.data > _course._end_date:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La data della lezione deve essere compresa nel periodo del corso")
 
         total_sum = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
@@ -74,6 +77,7 @@ class LessonsForm(FlaskForm):
         total_sum_in_hours = total_sum.days * 24 + total_sum.seconds / 3600.0  # per questo
 
         if total_sum_in_hours > total_hour:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("Non puoi più aggiungere lezioni oltre il numero totale delle ore corso")
 
         limit = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=6, weeks=0)
@@ -82,6 +86,7 @@ class LessonsForm(FlaskForm):
                                                                                       self.start_hour.data)
 
         if base > limit:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La lezione non può durare più di 6 ore")
 
         for x in lessons:
@@ -90,37 +95,48 @@ class LessonsForm(FlaskForm):
                         (x._start_hour < self.start_hour.data < x._end_hour) or \
                         (self.start_hour.data < x._start_hour and self.end_hour.data > x._end_hour) or \
                         (self.start_hour.data < x._start_hour < self.end_hour.data < x._end_hour):
+                    flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                     raise ValidationError(
                         "Lezione già esistente di nome :" + x._description + " nella fascia oraria inserita")
 
         date_time_obj = datetime.strptime('20:00:00', '%H:%M:%S').time()
         if self.end_hour.data > date_time_obj:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("L'orario di fine deve essere prima delle 20:00")
 
     def validate_date(self, field):
         if str(self.date) <= str(datetime.now()):
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La data della lezione deve essere successiva a quella odierna")
 
     def validate_mode(self, field):
         q = course_with_id(self.course.data).first()
         if q._mode == "presenza":
             if field.data != "presenza":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("La modalità della lezione non combacia con quella del corso")
             if self.link.data != "":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Non bisogna inserire il link se la modalità è in presenza")
             if self.structure.data == "":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Bisogna indicare una struttura se la lezione è in presenza")
         if q._mode == "online":
             if field.data != "online":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("La modalità della lezione non combacia con quella del corso")
             if self.link.data == "":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Bisogna inserire il link se la modalità è online")
             if self.structure.data != "":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Non puoi indicare una struttura se la lezione è online")
         if q._mode == "blended":
             if self.link.data == "":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Bisogna inserire il link se la modalità è blended")
-            if self.structure.data != "":
+            if self.structure.data == "":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Bisogna indicare una struttura se la lezione è blended")
 
 
@@ -156,6 +172,7 @@ class RemoveLesson(FlaskForm):
     def validate_password(self, field):
         q = user_with_id(self.user.data).first()
         if not check_password_hash(q._password, field.data):
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("Password non corretta")
 
 # COSA LASCIAMO MODIFICARE E COME DI UNA LEZIONE
@@ -177,9 +194,11 @@ class ModifyLesson(FlaskForm):
     def validate_date(self, field):
         q = lesson_with_id(self.lesson.data).first()
         if str(self.date) <= str(datetime.now()):
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La data della lezione deve essere successiva a quella odierna")
 
         if q._date <= date.today():  # vedere se aggiungere a template
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("Non puoi modificare lezioni che sono già avvenute / completate")
 
     def validate_mode(self, field):
@@ -187,6 +206,7 @@ class ModifyLesson(FlaskForm):
 
         if field.data != "":
             if q._mode != "blended":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError(
                     "E' possibile modificare la modalità della lezione se e solo se la modalità del corso è blended")
 
@@ -194,7 +214,8 @@ class ModifyLesson(FlaskForm):
         q = lesson_with_id(self.lesson.data).first()
 
         if field.data != "":
-            if (q._mode == "presenza" or self.mode.data == "presenza"):
+            if (self.mode.data == "presenza"):
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Se la modalità è in presenza non ci può essere un link")
         else:
             if self.mode.data == "presenza":
@@ -205,6 +226,7 @@ class ModifyLesson(FlaskForm):
 
         if field.data != "":
             if q._mode == "online" or self.mode.data == "online":
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Se la modalità è online non ci può essere una struttura")
         else:
             if self.mode.data == "online":
@@ -215,15 +237,18 @@ class ModifyLesson(FlaskForm):
             q = lesson_with_id(self.lesson.data).first()
             if self.end_hour.data is None:
                 if self.start_hour.data > self.end_hour.data:
+                    flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                     raise ValidationError(
                         "L'orario di fine lezione deve essere successivo all'orario di inizio lezione")
             else:
                 if self.start_hour.data > q._end_hour:
+                    flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                     raise ValidationError(
                         "L'orario di fine lezione deve essere successivo all'orario di inizio lezione")
 
             date_time_obj = datetime.strptime('09:00:00', '%H:%M:%S').time()
             if self.start_hour.data < date_time_obj:
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("L'orario di inizio deve essere maggiore delle 09:00")
 
     def validate_end_hour(self, field):
@@ -240,6 +265,7 @@ class ModifyLesson(FlaskForm):
             self.date.data = q._date
 
         if self.date.data < _course._start_date or self.date.data > _course._end_date:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La data della lezione deve essere compresa nel periodo del corso")
 
         total_sum = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
@@ -251,6 +277,7 @@ class ModifyLesson(FlaskForm):
         total_sum_in_hours = total_sum.days * 24 + total_sum.seconds / 3600.0  # per questo
 
         if total_sum_in_hours > total_hour:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("Non puoi più aggiungere lezioni oltre il numero totale delle ore corso")
 
         limit = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=6, weeks=0)
@@ -259,6 +286,7 @@ class ModifyLesson(FlaskForm):
                                                                                       self.start_hour.data)
 
         if base > limit:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La lezione non può durare più di 6 ore")
 
         for x in lessons:
@@ -267,9 +295,11 @@ class ModifyLesson(FlaskForm):
                         (x._start_hour < self.start_hour.data < x._end_hour) or \
                         (self.start_hour.data < x._start_hour and self.end_hour.data > x._end_hour) or \
                         (self.start_hour.data < x._start_hour < self.end_hour.data < x._end_hour):
+                    flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                     raise ValidationError(
                         "Lezione già esistente di nome :" + x._description + " nella fascia oraria inserita")
 
         date_time_obj = datetime.strptime('20:00:00', '%H:%M:%S').time()
         if self.end_hour.data > date_time_obj:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("L'orario di fine deve essere prima delle 20:00")

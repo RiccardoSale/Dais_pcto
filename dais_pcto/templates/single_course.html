@@ -185,7 +185,7 @@
                             <div class="card-body tab-content">
                                 <div class="tab-pane active" id="info{{ loop.index }}">
                                     <p class="card-text">Modalità della lezione: {{ lesson._mode  }}.</p>
-                                    <p class="card-text">Descrizione: {{ lesson._description  }}.</p>
+                                    <p class="card-text" style="text-transform: none;">Descrizione: {{ lesson._description  }}.</p>
                                     <a class="card-link" href={{ lesson._link }}> Link Lezione</a>
                                 </div>
                                 <div class="tab-pane" id="date{{ loop.index }}">

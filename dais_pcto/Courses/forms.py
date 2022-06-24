@@ -82,7 +82,7 @@ class PartecipationCertificate(FlaskForm):
             if len(subquery) / len(q) * 100 < 70:
                 raise ValidationError("Non hai attestato la partecipazione ad abbastanza lezioni")
         else:
-            flash("Non ci sonoo lezioni!")
+            flash("Non ci sono lezioni!")
 
 
 class RemoveCourse(FlaskForm):  # Eliminarle anche se ci sono lezioni
@@ -93,6 +93,7 @@ class RemoveCourse(FlaskForm):  # Eliminarle anche se ci sono lezioni
     def validate_password(self, field):
         q = user_with_id(self.user.data).first()
         if not check_password_hash(q._password, field.data):
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("Password non corretta")
 
 
@@ -116,12 +117,13 @@ class ModifyCourse(FlaskForm):
     def validate_end_date(self, field):
         if self.start_date.data is not None:
             if field.data < self.start_date.data:
-                flash("Controlla il form qualcosa è andato storto")
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("La data di fine del corso deve essere successiva alla data di inizio del corso")
         else:
             if field.data is not None:
                 q = course_with_id(self.course_id.data).first()
                 if field.data < q._start_date:
+                    flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                     raise ValidationError(
                         "La data di fine del corso deve essere successiva alla data di inizio del corso")
 
@@ -129,29 +131,31 @@ class ModifyCourse(FlaskForm):
                     Course._course_id == self.course_id.data).order_by(
                     Lesson._date).all()
                 if lessons[-1]._date > self.end_date.data:
-                    ValidationError("Ci sono delle lezioni prima della data di fine corso si sta cercando di inserire")
+                    flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
+                    raise ValidationError("Ci sono delle lezioni prima della data di fine corso si sta cercando di inserire")
 
     def validate_start_date(self, field):
         if field.data is not None:
             if str(field.data) < str(datetime.now()):
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Inserisci come data di inizio una data posteriore alla data odierna")
 
             lessons = db.session.query(Lesson).join(Course).filter(Course._course_id == self.course_id.data).order_by(
                 Lesson._date).all()
-            if lessons[0]._date < self.start_date.data:
+            if lessons and lessons[0]._date < self.start_date.data:
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 ValidationError("Ci sono delle lezioni prima della data di inizio corso che stai cercando di inserire")
 
     def validate_max_student(self, field):
         if field.data is not None:
-            print("bagigio")
-            print(field.data)
             q = course_with_id(self.course_id.data).first()
             if field.data < q._max_student:
-                flash("Controlla il form qualcosa è andato storto", 'warning')
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Puoi solo aumentare i posti disponibili")
 
     def validate_n_hour(self, field):
         if field.data is not None:
             q = course_with_id(self.course_id.data).first()
             if q._n_hour > field.data:
+                flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
                 raise ValidationError("Puoi solo aumentare le ore di lezione")
