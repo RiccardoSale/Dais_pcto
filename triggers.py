@@ -4,95 +4,102 @@ from dais_pcto.settings import DevConfig
 
 db.session.close
 
-
-#app.config.from_object(DevConfig)
+# app.config.from_object(DevConfig)
 with app.app_context():
     with db.engine.connect() as con:
+        # CHECK
 
-       #CHECK SU LESSONS
-       #Correttezza delle modalità e dei campi rispettivi
-       db.session.execute(
-           """
-           ALTER TABLE lessons
-            ADD CHECK((_mode = 'presenza' AND _structure <> '' AND _link = '') OR
-                (_mode = 'online' AND _structure = '' AND _link <> '') OR
-                (_mode = 'blended' AND _structure <> '' AND _link <> ''));
-           """)
-    
-       #CHECK SU LESSONS
-       #Correttezza delle ore di inizio e di fine
-        db.session.execute(
+        # LESSONS
+
+        # check sull’orario
+        db.sessione.execute(
             """
             ALTER TABLE lessons
-                ADD CHECK((_start_hour >= '09:00' AND _start_hour <= '20:00') 
-                        AND (_end_hour >= '09:00' AND _end_hour <= '20:00') 
-                        AND (_end_hour > _start_hour));
+            ADD CONSTRAINT check_hour_lessons
+            CHECK((_start_hour >= '09:00' AND _start_hour <= '20:00') 
+                    AND (_end_hour >= '09:00' AND _end_hour <= '20:00') 
+                    AND (_end_hour > _start_hour));
             """)
-        
-        #CHECK SU LESSONS
-        #_mode può assumere solo 3 possibili valori
-        db.session.execute(
+
+        # check sui possibili valori di '_mode'
+        db.sessione.execute(
             """
             ALTER TABLE lessons
-                ADD CHECK(_mode = 'presenza' OR _mode = 'online' OR _mode = 'blended');
+            ADD CONSTRAINT check_mode_lessons
+            CHECK(_mode = 'presenza' OR _mode = 'online' OR _mode = 'blended');
             """)
-        
-        #CHECK SU LESSONS
-        #Correttezza della data rispetto alla data odierna
-        db.session.execute(
-            """
-            ALTER TABLE lessons
-                ADD CHECK(_date > current_date);
-            """)
-        
-        #CHECK SU USERS
-        #_role può assumere solo 3 possibili valori
-        db.session.execute(
+
+        # USERS
+
+        # check sui possibili valori di '_role'
+        db.sessione.execute(
             """
             ALTER TABLE users
-                ADD CHECK (_role = 'user' OR _role = 'professor' OR _role = 'admin');
+            ADD CONSTRAINT check_role_users
+            CHECK (_role = 'user' OR _role = 'professor' OR _role = 'admin');
             """)
-        
-        #CHECK SU COURSES
-        #Correttezza del mese di inzio e fine
-        db.session.execute(
+
+        # _role = 'professor' → _email = @unive.it
+        db.sessione.execute(
+            """
+            ALTER TABLE users
+            ADD CONSTRAINT check_role_professor_email_users
+            CHECK (NOT(_role = 'professor') OR (_email LIKE '%@unive.it'));
+            """)
+
+        # _role = 'admin' → _email = @segunive.it
+        db.sessione.execute(
+            """
+            ALTER TABLE users
+            ADD CONSTRAINT ckeck_role_admin_email_users
+            CHECK (NOT(_role = 'admin') OR (_email LIKE '%@segunive.it'));
+            """)
+
+        # COURSES
+
+        # check sulla data di inizio e fine
+        db.sessione.execute(
             """
             ALTER TABLE courses
-                ADD CHECK(_start_month < _end_month AND _start_month > current_date);
+            ADD CONSTRAINT check_date_courses
+            CHECK(_start_date < _end_date);
             """)
-        
-        #CHECK SU COURSES
-        #_mode può assumere solo 3 possibili valori
-        db.session.execute(
+
+        # check sui possibili valori di '_mode'
+        db.sessione.execute(
             """
             ALTER TABLE courses
-                ADD CHECK(_mode = 'presenza' OR _mode = 'blended' OR _mode = 'online');
+            ADD CONSTRAINT check_mode_courses
+            CHECK(_mode = 'presenza' OR _mode = 'blended' OR _mode = 'online');
             """)
-        
-        #CHECK SU COURSES
-        #Correttezza del numero minimo e massimo di studenti
-        db.session.execute(
+
+        # check sul numero di studenti
+        db.sessione.execute(
             """
             ALTER TABLE courses
-                ADD CHECK(_max_student > _min_student AND _min_student >= '10');
+            ADD CONSTRAINT check_num_student_courses
+            CHECK(_max_student > _min_student AND _min_student >= '10');
             """)
-        
-        #TRIGGER SU USER_CORSE E USER_LESSON
-        #Lo user_id deve essere asscociato solamente a studenti (_role = user)
-        db.session.execute(
+
+        # TRIGGERS
+
+        # USER_COURSE & USER_LESSON
+
+        # In user_course e user_lesson sono ammessi solo studenti (_role = 'user')
+        db.sessione.execute(
             """
             CREATE FUNCTION only_user() RETURNS trigger AS $$
-             BEGIN
-                IF(NEW.user_id NOT IN 
-                (SELECT _user_id FROM users WHERE _role = 'user')) THEN
-                    RETURN NULL;
-                END IF;
-                RETURN NEW;
-              END;
-              $$ LANGUAGE plpgsql;
+            BEGIN
+            IF(NEW.user_id NOT IN 
+            (SELECT _user_id FROM users WHERE _role = 'user')) THEN
+                RETURN NULL;
+            END IF;
+            RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
 
                 CREATE TRIGGER OnlyUserCourse
-                BEFORE INSERT OR UPDATE ON user_corse
+                BEFORE INSERT OR UPDATE ON user_course
                 FOR EACH ROW 
                 EXECUTE FUNCTION only_user();
 
@@ -101,59 +108,61 @@ with app.app_context():
                 FOR EACH ROW 
                 EXECUTE FUNCTION only_user();
             """)
-        
-        #TRIGGER SU USER_LESSON
-        #Non ci possono essere studenti in lezioni di corsi che non frequentano
-        db.session.execute(
-            """
-            CREATE FUNCTION no_user_in_course() RETURNS trigger AS $$
-            BEGIN
-                IF( (SELECT course
-                   FROM lessons
-                   WHERE _lesson_id = NEW.lesson_id) NOT IN (SELECT course_id
-                                                            FROM user_corse
-                                                            WHERE user_id = NEW.user_id)) THEN
-                    RETURN NULL;
-                END IF;
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER NoUserInCourse
-            BEFORE INSERT OR UPDATE ON user_lesson
-            FOR EACH ROW
-            EXECUTE FUNCTION no_user_in_course();
-            """)
-        
-        #TRIGGER SU USER_CORSE
-        #Non si può superare il massimo numero di studenti di un corso
-        db.session.execute(
+        # USER_COURSE
+
+        # Controllare che non si superi il massimo numero di studenti
+        db.sessione.execute(
             """
             CREATE FUNCTION no_over_max() RETURNS trigger AS $$
             BEGIN
                 IF((SELECT _max_student
                   FROM courses
                   WHERE _course_id = NEW.course_id)
-                  <
+                  <=
                   (SELECT count(*)
-                  FROM user_corse
+                  FROM user_course
                   WHERE course_id = NEW.course_id)) THEN
-                  DELETE FROM user_corse 
-                  WHERE NEW.course_id = course_id AND NEW.user_id = user_id;
+            RETURN NULL;
                 END IF;
-                RETURN NULL;
+                RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER NoOverMax
-            BEFORE INSERT ON user_corse
-            FOR EACH ROW
-            EXECUTE FUNCTION no_over_max();
+                CREATE TRIGGER NoOverMax
+                BEFORE INSERT ON user_course
+                FOR EACH ROW
+                EXECUTE FUNCTION no_over_max();
             """)
-        
-        #TRIGGER SU LESSONS
-        #Non si possono aggiungere lezioni se si sta superando l’ammontare di ore prestabilito
-        db.session.execute(
+
+        # USER_LESSON
+
+        # Non ci possono essere studenti in lezioni di corsi che non frequentano
+        db.sessione.execute(
+            """
+            CREATE FUNCTION no_user_in_course() RETURNS trigger AS $$
+            BEGIN
+                IF( (SELECT course
+                   FROM lessons
+                   WHERE _lesson_id = NEW.lesson_id) NOT IN (SELECT course_id
+            FROM user_course
+            WHERE user_id = NEW.user_id)) THEN
+                    RETURN NULL;
+                END IF;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+
+                CREATE TRIGGER NoUserInCourse
+                BEFORE INSERT ON user_lesson
+                FOR EACH ROW
+                EXECUTE FUNCTION no_user_in_course();
+            """)
+
+        # LESSONS
+
+        # Non si possono aggiungere lezioni se si sta superando l’ammontare di ore prestabilito
+        db.sessione.execute(
             """
             CREATE FUNCTION no_lesson_over() RETURNS trigger AS $$
             BEGIN
@@ -170,17 +179,16 @@ with app.app_context():
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER NoLessonOver
-            AFTER INSERT ON lessons
-            FOR EACH ROW
-            EXECUTE FUNCTION no_lesson_over();
+                CREATE TRIGGER NoLessonOver
+                AFTER INSERT ON lessons
+                FOR EACH ROW
+                EXECUTE FUNCTION no_lesson_over();
             """)
-        
-        #TRIGGER SU LESSONS
-        #Non si può modificare l'ora di inzio delle lezioni se si sta superando l’ammontare di ore prestabilito
-        db.session.execute(
+
+        # Non si possono modificare gli orari delle lezioni se si sta superando l’ammontare di ore prestabilito
+        db.sessione.execute(
             """
-            CREATE FUNCTION no_start_lesson_over_m() RETURNS trigger AS $$
+            CREATE FUNCTION no_lesson_over_m() RETURNS trigger AS $$
             BEGIN
                 IF((select sum(l._end_hour-l._start_hour) 
                    from lessons as l 
@@ -189,96 +197,72 @@ with app.app_context():
                    (select make_interval(hours => co._n_hour) 
                    from courses as co 
                    where co._course_id = NEW.course)) THEN
+                    IF(NEW._start_hour <> OLD._start_hour) THEN
                     UPDATE lessons
                     SET _start_hour = OLD._start_hour
                     WHERE _lesson_id = NEW._lesson_id;
                 END IF;
-                RETURN NULL;
-            END;
-            $$ LANGUAGE plpgsql;
-
-            CREATE TRIGGER nostartlessonoverm
-            AFTER UPDATE OF _start_hour
-            ON lessons
-            FOR EACH ROW
-            EXECUTE FUNCTION no_start_lesson_over_m();
-            """)
-
-        #TRIGGER SU LESSONS
-        #Non si può modificare l'ora di fine delle lezioni se si sta superando l’ammontare di ore prestabilito
-        db.session.execute(
-            """
-            CREATE FUNCTION no_end_lesson_over_m() RETURNS trigger AS $$
-            BEGIN
-                IF((select sum(l._end_hour-l._start_hour) 
-                   from lessons as l 
-                   where l.course = NEW.course)
-                   > 
-                   (select make_interval(hours => co._n_hour) 
-                   from courses as co 
-                   where co._course_id = NEW.course)) THEN
+                IF(NEW._end_hour <> OLD._end_hour) THEN
                     UPDATE lessons
-                    SET _end_hour = OLD._end_hour
-                    WHERE _lesson_id = NEW._lesson_id;
+                        SET _end_hour = OLD._end_hour
+                        WHERE _lesson_id = NEW._lesson_id;
+                END IF;
                 END IF;
                 RETURN NULL;
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER noendlessonoverm
-            AFTER UPDATE OF _end_hour
-            ON lessons
-            FOR EACH ROW
-            EXECUTE FUNCTION no_end_lesson_over_m();
+                CREATE TRIGGER NoLessonOverM
+                AFTER UPDATE ON lessons
+                FOR EACH ROW
+                EXECUTE FUNCTION no_lesson_over_m();
             """)
-        
-        #TRIGGER SU LESSONS
-        #La data della lezione deve essere dopo il mese di inizio e prima del mese di fine del corso a cui si riferisce
-        db.session.execute(
+
+        # La data della lezione deve essere dopo la data di inizio e prima della data di fine corso
+        db.sessione.execute(
             """
             CREATE FUNCTION correct_dates() RETURNS trigger AS $$
             BEGIN
-                IF(NEW._date < (SELECT _start_month FROM courses WHERE NEW.course = _course_id) OR 
-                   NEW._date > (SELECT _end_month FROM courses WHERE NEW.course = _course_id)) THEN
+                IF(NEW._date < (SELECT _start_date FROM courses WHERE NEW.course = _course_id) OR 
+                   NEW._date > (SELECT _end_date FROM courses WHERE NEW.course = _course_id) OR
+            NEW._date <= current_date) THEN
                     RETURN NULL;
                 END IF;
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER correctdates
-            BEFORE INSERT ON lessons
-            FOR EACH ROW
-            EXECUTE FUNCTION correct_dates();
+                CREATE TRIGGER CorrectDates
+                BEFORE INSERT OR UPDATE ON lessons
+                FOR EACH ROW
+                EXECUTE FUNCTION correct_dates();
             """)
-        
-        #TRIGGER SU LESSONS
-        #Non ci possono essere lezioni sovrapposte
-        db.session.execute(
+
+        # Non ci possono essere lezioni sovrapposte
+        db.sessione.execute(
             """
             CREATE FUNCTION no_lessons_overlying() RETURNS trigger AS $$
             BEGIN
                 IF(NEW._date = ANY (SELECT _date
-                                    FROM lessons
-                                    WHERE (NEW._start_hour <= _start_hour AND NEW._end_hour <= _end_hour) OR
-                                    (NEW._start_hour >= _start_hour AND NEW._end_hour >= _end_hour) OR
-                                    (NEW._start_hour >= _start_hour AND NEW._end_hour <= _end_hour) OR
-                                    (NEW._start_hour <= _start_hour AND NEW._end_hour >= _end_hour))) THEN
+                                     FROM lessons
+                                     WHERE (NEW._start_hour <= _start_hour AND NEW._end_hour <= _end_hour AND NEW._end_hour >= _start_hour) OR
+                                     (NEW._start_hour >= _start_hour AND NEW._start_hour <= _end_hour AND NEW._end_hour >= _end_hour) OR
+                                     (NEW._start_hour >= _start_hour AND NEW._end_hour <= _end_hour) OR
+                                     (NEW._start_hour <= _start_hour AND NEW._end_hour >= _end_hour))) THEN
                     RETURN NULL;
-                 END IF;
-                 RETURN NEW;
+                END IF;
+                RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER NoLessonsOverlying
-            BEFORE INSERT OR UPDATE ON lessons
-            FOR EACH ROW
-            EXECUTE FUNCTION no_lessons_overlying();
+                CREATE TRIGGER NoLessonsOverlying
+                BEFORE INSERT ON lessons
+                FOR EACH ROW
+                EXECUTE FUNCTION no_lessons_overlying();
             """)
-            
-        #TRIGGER SU LESSONS
-        #Una lezione non può superare le 6 ore
-        db.session.execute(
+
+        # Una lezione non può superare le 6 ore
+        db.sessione.execute(
             """
             CREATE FUNCTION limit_hours() RETURNS trigger AS $$
             BEGIN
@@ -289,45 +273,86 @@ with app.app_context():
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER LimitHours
-            BEFORE INSERT OR UPDATE ON lessons
-            FOR EACH ROW
-            EXECUTE FUNCTION limit_hours();
+                CREATE TRIGGER LimitHours
+                BEFORE INSERT OR UPDATE ON lessons
+                FOR EACH ROW
+                EXECUTE FUNCTION limit_hours();
             """)
-            
-        #TRIGGER SU LESSONS
-        #La lezione non può essere modificata se:
-            #è già avvenuta
-            #si vuole modificare il suo id
-            #si vuole modificare il corso a cui si riferisce
-        db.session.execute(
+
+        # Una lezione deve durare almeno un’ora
+        db.sessione.execute(
             """
-            CREATE FUNCTION modify_lesson() RETURNS trigger AS $$
+            CREATE FUNCTION limit_min_hours() RETURNS trigger AS $$
             BEGIN
-                IF(NEW._date <= current_date OR 
-                   NEW._date < (SELECT _start_month
-                                FROM courses
-                                WHERE _course_id = NEW.course) OR 
-                   NEW._date > (SELECT _end_month
-                                FROM courses
-                                WHERE _course_id = NEW.course) OR 
-                   NEW._lesson_id <> OLD._lesson_id OR 
-                   NEW.course <> OLD.course) THEN
-                        RETURN NULL;
-                 END IF;
-                 RETURN NEW;
+                IF(NEW._end_hour - NEW._start_hour < '01:00') THEN
+                    RETURN NULL;
+                END IF;
+                RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER ModifyLesson
-            BEFORE UPDATE ON lessons
+            CREATE TRIGGER LimitMinHours
+            BEFORE INSERT OR UPDATE ON lessons
             FOR EACH ROW
-            EXECUTE FUNCTION modify_lesson();
+            EXECUTE FUNCTION limit_min_hours();
             """)
-           
-        #TRIGGER SU COURSES
-        #L’utente associato può essere solo un professore
-        db.session.execute(
+
+        # La modifica non è valida se almeno una delle condizioni seguenti è vera
+        db.sessione.execute(
+            """
+            CREATE FUNCTION lesson_update() RETURNS trigger AS $$
+            BEGIN
+                IF(((NEW._mode <> 'presenza' OR NEW._link <> '' OR NEW._structure = '') AND 
+                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'presenza'))
+                  OR
+                  ((NEW._mode <> 'online' OR NEW._link = '' OR NEW._structure <> '') AND 
+                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'online'))
+                  OR
+                  (NEW._mode = 'blended' AND (NEW._link = '' OR NEW._structure = '') AND 
+                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended'))
+                  OR
+                  (NEW._mode = 'presenza' AND (NEW._link <> '' OR NEW._structure = '') AND 
+                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended'))
+                  OR
+                  (NEW._mode = 'online' AND (NEW._link = '' OR NEW._structure <> '') AND 
+                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended'))
+                  OR 
+                  OLD._date <= current_date
+                  OR
+                  NEW._date <= current_date
+                  OR
+                  NEW._date < (SELECT _start_date
+                              FROM courses
+                              WHERE _course_id = NEW.course)
+                   OR
+                  NEW._date > (SELECT _end_date
+                              FROM courses
+                              WHERE _course_id = NEW.course)
+                  OR
+                  NEW._date IN (SELECT _date
+                                     FROM lessons AS l
+                                     WHERE NEW._lesson_id <> l._lesson_id AND
+                                    ((NEW._start_hour <= l._start_hour AND NEW._end_hour <= l._end_hour AND NEW._end_hour >= l._start_hour) OR
+                                     (NEW._start_hour >= l._start_hour AND NEW._start_hour <= l._end_hour AND NEW._end_hour >= l._end_hour) OR
+                                     (NEW._start_hour >= l._start_hour AND NEW._end_hour <= l._end_hour) OR
+                                     (NEW._start_hour <= l._start_hour AND NEW._end_hour >= l._end_hour))))THEN
+                    RETURN NULL;
+                END IF;
+                RETURN NEW;
+            END;
+
+            $$ LANGUAGE plpgsql;
+
+                CREATE TRIGGER LessonUpdate
+                BEFORE UPDATE ON lessons
+                FOR EACH ROW
+                EXECUTE FUNCTION lesson_update();
+                """)
+
+        # COURSES
+
+        # L’utente associato può essere solo un professore
+        db.sessione.execute(
             """
             CREATE FUNCTION only_professor() RETURNS trigger AS $$
             BEGIN
@@ -338,22 +363,21 @@ with app.app_context():
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER onlyprofessor
+            CREATE TRIGGER OnlyProfessor
             BEFORE INSERT OR UPDATE ON courses
             FOR EACH ROW
             EXECUTE FUNCTION only_professor();
             """)
-            
-        #TRIGGER SU COURSES
-        #Il numero massimo di studenti si può solo aumentare
-        db.session.execute(
+
+        # Il numero massimo di studenti si può solo aumentare
+        db.sessione.execute(
             """
             CREATE FUNCTION max_student_sup() RETURNS trigger AS $$
             BEGIN
-                 IF(NEW._max_student < OLD._max_student) THEN
+                IF(NEW._max_student < OLD._max_student) THEN
                     RETURN NULL;
-                 END IF;
-                 RETURN NEW;
+                END IF;
+                RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
@@ -362,17 +386,16 @@ with app.app_context():
             FOR EACH ROW
             EXECUTE FUNCTION max_student_sup();
             """)
-            
-        #TRIGGER SU COURSES
-        #Le ore del corso si possono solo aumentare
-        db.session.execute(
+
+        # Le ore del corso si possono solo aumentare
+        db.sessione.execute(
             """
             CREATE FUNCTION n_hour_sup() RETURNS trigger AS $$
             BEGIN
-                  IF(NEW._n_hour < OLD._n_hour) THEN
-                      RETURN NULL;
-                  END IF;
-                  RETURN NEW;
+                IF(NEW._n_hour < OLD._n_hour) THEN
+                    RETURN NULL;
+                END IF;
+                RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
@@ -381,17 +404,16 @@ with app.app_context():
             FOR EACH ROW
             EXECUTE FUNCTION n_hour_sup();
             """)
-            
-        #TRIGGER SU COURSES
-        #La modalità di un corso non si può cambiare
-        db.session.execute(
+
+        # La modalità di un corso non si può cambiare
+        db.sessione.execute(
             """
             CREATE FUNCTION no_modify_mode_course() RETURNS trigger AS $$
             BEGIN
-                  IF(OLD._mode <> NEW._mode) THEN
-                     RETURN NULL;
-                  END IF;
-                  RETURN NEW;
+                IF(OLD._mode <> NEW._mode) THEN
+                    RETURN NULL;
+                END IF;
+                RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
@@ -400,24 +422,48 @@ with app.app_context():
             FOR EACH ROW
             EXECUTE FUNCTION no_modify_mode_course();
             """)
-            
-        #TRIGGER SU COURSES
-        #Non è possibile modificare il mese di inizio o di fine se lo si vuole mettere prima o uguale alla data di oggi
-        db.session.execute(
+
+        # Non è possibile porre la data di inizio del corso prima della data di oggi
+        db.sessione.execute(
             """
-            CREATE FUNCTION modify_months() RETURNS trigger AS $$
+            CREATE FUNCTION insert_dates() RETURNS trigger AS $$
             BEGIN
-                IF(NEW._start_month <= current_date OR NEW._end_month <= current_date)THEN
+                IF(NEW._start_date <= current_date)THEN
+                RETURN NULL;
+                END IF;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+
+            CREATE TRIGGER InsertDates
+            BEFORE INSERT ON courses
+            FOR EACH ROW
+            EXECUTE FUNCTION insert_dates();
+            """)
+
+        # Si modifica la data di inizio o di fine solo se non è già passato e se va bene
+        db.sessione.execute(
+            """
+            CREATE FUNCTION modify_dates_update() RETURNS trigger AS $$
+            BEGIN
+                IF(OLD._start_date <= current_date OR OLD._end_date <= current_date
+                OR NEW._start_date <= current_date OR NEW._end_date <= current_date
+                OR NEW._start_date > (SELECT min(_date)
+                                      FROM lessons
+                                      WHERE course = NEW._course_id)
+                OR NEW._end_date < (SELECT max(_date)
+                                    FROM lessons
+                                    WHERE course = NEW._course_id)) THEN
                     RETURN NULL;
                 END IF;
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER ModifyMonths
-            BEFORE UPDATE ON courses
-            FOR EACH ROW
-            EXECUTE FUNCTION modify_months();
+               CREATE TRIGGER ModifyDatesUpdate
+               BEFORE UPDATE ON courses
+               FOR EACH ROW
+               EXECUTE FUNCTION modify_dates_update();
             """)
-            
+
         db.session.commit()

@@ -70,7 +70,7 @@ def single_course(
     numero_ore_fatte = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
     zero = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
     for x in course_lesson:
-        if x._date < date.today():
+        if x._date <= date.today():
             numero_ore_fatte += datetime.combine(date.today(), x._end_hour) - datetime.combine(date.today(),
                                                                                                x._start_hour)
     if numero_ore_fatte > zero:
