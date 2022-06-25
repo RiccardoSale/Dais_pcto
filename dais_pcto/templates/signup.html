@@ -2,72 +2,67 @@
 {% block title%} {{ title }} {% endblock %}
 {% block content%}
     <section class="login-dark">
-    <form method="post">
-        {{ form.csrf_token }}
-        {{ form.csrf_token }}
-        {% with messages = get_flashed_messages(with_categories=true) %}<!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <h2 class="visually-hidden">Login Form</h2>
-        <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
-
-
-        <!--INIZIO CAMPI REGISTRAZIONE -->
-        {% if request.path == '/signup' %}
-            <div class="mb-3">{{ form.name(class_="form-control",placeholder="Name")}}</div>
-
-            {% for errors in form.name.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        {{ error }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor%}
-
-            <div class="mb-3">{{ form.surname(class_="form-control",placeholder="Surname")}}</div>
-            {% for error in form.surname.errors %}
+        <form method="post">
+            {{ form.csrf_token }}
+            {{ form.csrf_token }}
+            {% with messages = get_flashed_messages(with_categories=true) %}<!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <h2 class="visually-hidden">Login Form</h2>
+            <div class="illustration">
+                <i class="icon ion-ios-locked-outline"></i>
+            </div>
+            <!--INIZIO CAMPI REGISTRAZIONE -->
+            {% if request.path == '/signup' %}
+                <div class="mb-3">{{ form.name(class_="form-control",placeholder="Name")}}</div>
+                {% for errors in form.name.errors %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor%}
+                <div class="mb-3">{{ form.surname(class_="form-control",placeholder="Surname")}}</div>
+                {% for error in form.surname.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                {% endfor%}
+            {% endif%}
+            <!--INIZIO CAMPI IN COMUNE REGISTRAZIONE E LOGIN ! -->
+            {%  if request.path != '/administration' %}
+                <div class="mb-3">{{ form.email(class_="form-control",placeholder="Email")}}</div>
+                {% for error in form.email.errors %}
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         {{ error }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-            {% endfor%}
-        {% endif%}
-
-        <!--INIZIO CAMPI IN COMUNE REGISTRAZIONE E LOGIN ! -->
-        {%  if request.path != '/administration' %}
-            <div class="mb-3">{{ form.email(class_="form-control",placeholder="Email")}}</div>
-
-            {% for error in form.email.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor%}
-
-            <div class="mb-3">{{ form.password(class_="form-control",placeholder="Password")}}</div>
-
-            {% for error in form.password.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor%}
-        {% endif %}
-
-        <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit">{{ btn_action }}</button></div>
-        <a class="forgot" href="#">Forgot your email or password?</a>
-        {% if request.path =='/login' %}
-            <a class="forgot" href="{{url_for('Auth.signup')}}">New here create an account!</a>
-        {% endif %}
-        {% if request.path == '/signup' %}
-            <a class="forgot" href="{{url_for('Auth.login')}}"> Already have an account? Login</a>
-        {% endif %}
-    </form>
+                {% endfor%}
+                <div class="mb-3">{{ form.password(class_="form-control",placeholder="Password")}}</div>
+                {% for error in form.password.errors %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor%}
+            {% endif %}
+            <div class="mb-3">
+                <button class="btn btn-primary d-block w-100" type="submit">{{ btn_action }}</button>
+            </div>
+            <a class="forgot" href="#">Forgot your email or password?</a>
+            {% if request.path =='/login' %}
+                <a class="forgot" href="{{url_for('Auth.signup')}}">New here create an account!</a>
+            {% endif %}
+            {% if request.path == '/signup' %}
+                <a class="forgot" href="{{url_for('Auth.login')}}"> Already have an account? Login</a>
+            {% endif %}
+        </form>
     </section>
 {% endblock %}

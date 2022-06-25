@@ -99,12 +99,12 @@ with app.app_context():
             $$ LANGUAGE plpgsql;
 
                 CREATE TRIGGER OnlyUserCourse
-                BEFORE INSERT OR UPDATE ON user_course
+                BEFORE INSERT ON user_course
                 FOR EACH ROW 
                 EXECUTE FUNCTION only_user();
 
                 CREATE TRIGGER OnlyUserLesson
-                BEFORE INSERT OR UPDATE ON user_lesson
+                BEFORE INSERT ON user_lesson
                 FOR EACH ROW 
                 EXECUTE FUNCTION only_user();
             """)
@@ -233,7 +233,7 @@ with app.app_context():
             $$ LANGUAGE plpgsql;
 
                 CREATE TRIGGER CorrectDates
-                BEFORE INSERT OR UPDATE ON lessons
+                BEFORE INSERT ON lessons
                 FOR EACH ROW
                 EXECUTE FUNCTION correct_dates();
             """)
@@ -245,8 +245,10 @@ with app.app_context():
             BEGIN
                 IF(NEW._date = ANY (SELECT _date
                                      FROM lessons
-                                     WHERE (NEW._start_hour <= _start_hour AND NEW._end_hour <= _end_hour AND NEW._end_hour >= _start_hour) OR
-                                     (NEW._start_hour >= _start_hour AND NEW._start_hour <= _end_hour AND NEW._end_hour >= _end_hour) OR
+                                     WHERE (NEW._start_hour <= _start_hour 
+                                     AND NEW._end_hour <= _end_hour AND NEW._end_hour >= _start_hour) OR
+                                     (NEW._start_hour >= _start_hour AND NEW._start_hour <= _end_hour 
+                                     AND NEW._end_hour >= _end_hour) OR
                                      (NEW._start_hour >= _start_hour AND NEW._end_hour <= _end_hour) OR
                                      (NEW._start_hour <= _start_hour AND NEW._end_hour >= _end_hour))) THEN
                     RETURN NULL;
@@ -332,15 +334,16 @@ with app.app_context():
                   NEW._date IN (SELECT _date
                                      FROM lessons AS l
                                      WHERE NEW._lesson_id <> l._lesson_id AND
-                                    ((NEW._start_hour <= l._start_hour AND NEW._end_hour <= l._end_hour AND NEW._end_hour >= l._start_hour) OR
-                                     (NEW._start_hour >= l._start_hour AND NEW._start_hour <= l._end_hour AND NEW._end_hour >= l._end_hour) OR
+                                    ((NEW._start_hour <= l._start_hour AND NEW._end_hour <= l._end_hour 
+                                    AND NEW._end_hour >= l._start_hour) OR
+                                     (NEW._start_hour >= l._start_hour AND NEW._start_hour <= l._end_hour 
+                                     AND NEW._end_hour >= l._end_hour) OR
                                      (NEW._start_hour >= l._start_hour AND NEW._end_hour <= l._end_hour) OR
                                      (NEW._start_hour <= l._start_hour AND NEW._end_hour >= l._end_hour))))THEN
                     RETURN NULL;
                 END IF;
                 RETURN NEW;
             END;
-
             $$ LANGUAGE plpgsql;
 
                 CREATE TRIGGER LessonUpdate

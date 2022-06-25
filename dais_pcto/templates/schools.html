@@ -4,153 +4,152 @@
         <div class="row">
             <div class="col" style="height: 800px;">
                 <div class="mx-auto" style="width: 1400px;">
-                <div class="card shadow mb-4" style="width: 1300px;height: 800px;">
-                <div class="card-header py-3">
-                    <p class="text-primary m-0 fw-bold">Sezione scuole</p>
-                    <button type="button" class="m-2 pb-1 btn btn-primary"  data-bs-toggle="modal" data-bs-target="#aggiungi">Aggiungi scuola</button>
-                        <table id="data" class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>Meccanografico</th>
-                                <th>Nome</th>
-                                <th>Regione</th>
-                                <th>Città</th>
-                                <th>Via</th>
-                                <th>Civico</th>
-                                <th>Telefono</th>
-                                <th>Rimuovi Scuola</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for School in schools %} <!--prima tabella poi elemento query-->
-                                <tr>
-                                <td>{{ School._hschool_code }}</td>
-                                    <td>{{ School._name }}</td>
-                                    <td>{{ School._region }}</td>
-                                    <td>{{ School._city }}</td>
-                                    <td>{{ School._street }}</td>
-                                    <td>{{ School._number }}</td>
-                                    <td>{{ School._phone }}</td>
-                                    <td>
-                                        <form action="" method="post">
-                                            {{ form2.csrf_token }}
-                                            {{ form2.id(value=School._hschool_code) }}
-                                            {{ form2.submit2(type="submit",class="m-2 pb-1 btn btn-primary",style="background: var(--bs-red);") }}
-                                        </form>
-                                    </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
-                </div>
-                </div>
+                    <div class="card shadow mb-4" style="width: 1300px;height: 800px;">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Sezione scuole</p>
+                            <button type="button" class="m-2 pb-1 btn btn-primary"  data-bs-toggle="modal" data-bs-target="#aggiungi">Aggiungi scuola</button>
+                            <table id="data" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Meccanografico</th>
+                                        <th>Nome</th>
+                                        <th>Regione</th>
+                                        <th>Città</th>
+                                        <th>Via</th>
+                                        <th>Civico</th>
+                                        <th>Telefono</th>
+                                        <th>Rimuovi Scuola</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for School in schools %} <!--prima tabella poi elemento query-->
+                                    <tr>
+                                        <td>{{ School._hschool_code }}</td>
+                                        <td>{{ School._name }}</td>
+                                        <td>{{ School._region }}</td>
+                                        <td>{{ School._city }}</td>
+                                        <td>{{ School._street }}</td>
+                                        <td>{{ School._number }}</td>
+                                        <td>{{ School._phone }}</td>
+                                        <td>
+                                            <form action="" method="post">
+                                                {{ form2.csrf_token }}
+                                                {{ form2.id(value=School._hschool_code) }}
+                                                {{ form2.submit2(type="submit",class="m-2 pb-1 btn btn-primary",style="background: var(--bs-red);") }}
+                                            </form>
+                                        </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                            <!-- Categorie: success (green), info (blue), warning (yellow), danger (red) -->
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     {% block scripts %}
-        <script>
-            $(document).ready(function () {
-              $('#data').DataTable( {  "scrollY": "450px",
-  "scrollCollapse": true,
-  "paging": false,  }    );
-            });
-        </script>
+    <script>
+        $(document).ready(function () {
+        $('#data').DataTable( {  "scrollY": "450px",
+                "scrollCollapse": true,
+                "paging": false,
+                });
+        });
+    </script>
     {% endblock %}
 
-
-
-<!-- Modal -->
-<div class="modal fade" id="aggiungi" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Aggiungi Scuola</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-          <form action method="POST" class="card-body">
-                {{ form.csrf_token }}
-                <div class="form-group mb-3">
-                    {{ form.code(class_="form-control",placeholder="Codice meccanografico")}}
-                </div>
-                {% for error in form.code.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-                <div class="form-group mb-3">
-                    {{ form.name(class_="form-control",placeholder="Name")}}
-                </div>
-                {% for error in form.name.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.region(class_="form-control",placeholder="Regione")}}
-                </div>
-                {% for error in form.region.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.city(class_="form-control",placeholder="Città")}}
-                </div>
-                {% for error in form.city.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.street(class_="form-control",placeholder="Indirizzo")}}
-                </div>
-                {% for error in form.street.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.number(class_="form-control",placeholder="Civico")}}
-                </div>
-                {% for error in form.number.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.phone(class_="form-control",placeholder="Telefono")}}
-                </div>
-                {% for error in form.phone.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                {{ form.submit1 (type="submit", id="btninvio", class="btn btn-primary")}}
-          </form>
-      </div>
+    <!-- Modal -->
+    <div class="modal fade" id="aggiungi" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Aggiungi Scuola</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form action method="POST" class="card-body">
+                  {{ form.csrf_token }}
+                      <div class="form-group mb-3">
+                          {{ form.code(class_="form-control",placeholder="Codice meccanografico")}}
+                      </div>
+                      {% for error in form.code.errors %}
+                          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                              {{ error }}
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          </div>
+                      {% endfor %}
+                      <div class="form-group mb-3">
+                          {{ form.name(class_="form-control",placeholder="Name")}}
+                      </div>
+                      {% for error in form.name.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                      {% endfor%}
+                      <div class="form-group mb-3">
+                          {{ form.region(class_="form-control",placeholder="Regione")}}
+                      </div>
+                      {% for error in form.region.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                      {% endfor%}
+                      <div class="form-group mb-3">
+                          {{ form.city(class_="form-control",placeholder="Città")}}
+                      </div>
+                      {% for error in form.city.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                      {% endfor%}
+                      <div class="form-group mb-3">
+                          {{ form.street(class_="form-control",placeholder="Indirizzo")}}
+                      </div>
+                      {% for error in form.street.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                      {% endfor%}
+                      <div class="form-group mb-3">
+                        {{ form.number(class_="form-control",placeholder="Civico")}}
+                      </div>
+                      {% for error in form.number.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                      {% endfor%}
+                      <div class="form-group mb-3">
+                          {{ form.phone(class_="form-control",placeholder="Telefono")}}
+                      </div>
+                      {% for error in form.phone.errors %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                      {% endfor%}
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  {{ form.submit1 (type="submit", id="btninvio", class="btn btn-primary")}}
+              </form>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 {% endblock %}
 
