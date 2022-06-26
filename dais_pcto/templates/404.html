@@ -1,42 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="page_404">
+	<style>
+  		/*======================
+    	404 page
+		=======================*/
 
-  <style>
-		/*======================
-		404 page
-	=======================*/
+		.page_404{
+			padding:40px 0; background:#fff; font-family: 'Arvo', serif;
+		}
 
+		.page_404  img{ width:100%;}
 
-	.page_404{ padding:40px 0; background:#fff; font-family: 'Arvo', serif;
-	}
+		.four_zero_four_bg{
 
-	.page_404  img{ width:100%;}
+ 		background-image: url(https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif);
+    		height: 400px;
+    		background-position: center;
+ 		}
 
-	.four_zero_four_bg{
+		 .four_zero_four_bg h1{
+		 	font-size:80px;
+		 }
 
-	 background-image: url(https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif);
-		height: 400px;
-		background-position: center;
-	 }
+  		.four_zero_four_bg h3{
+			 font-size:80px;
+		}
 
-
-	 .four_zero_four_bg h1{
-	 font-size:80px;
-	 }
-
-	  .four_zero_four_bg h3{
-				 font-size:80px;
-				 }
-
-				 .link_404{
-		color: #fff!important;
-		padding: 10px 20px;
-		background: #39ac31;
-		margin: 20px 0;
-		display: inline-block;}
-		.contant_box_404{ margin-top:-50px;}
-  </style>
+		.link_404{
+			color: #fff!important;
+			padding: 10px 20px;
+			background: #39ac31;
+			margin: 20px 0;
+			display: inline-block;}
+			.contant_box_404{ margin-top:-50px;
+		}
+  	</style>
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12 ">
@@ -48,7 +47,7 @@
 						<h3 class="h2">
 							Look like you're lost
 						</h3>
-					<p>the page you are looking for not avaible!</p>
+						<p>the page you are looking for not avaible!</p>
 						<a href="/profile" class="link_404">Go to your profile</a>
 					</div>
 				</div>

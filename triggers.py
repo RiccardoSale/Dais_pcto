@@ -12,7 +12,7 @@ with app.app_context():
         # LESSONS
 
         # check sull’orario
-        db.sessione.execute(
+        db.session.execute(
             """
             ALTER TABLE lessons
             ADD CONSTRAINT check_hour_lessons
@@ -22,7 +22,7 @@ with app.app_context():
             """)
 
         # check sui possibili valori di '_mode'
-        db.sessione.execute(
+        db.session.execute(
             """
             ALTER TABLE lessons
             ADD CONSTRAINT check_mode_lessons
@@ -32,7 +32,7 @@ with app.app_context():
         # USERS
 
         # check sui possibili valori di '_role'
-        db.sessione.execute(
+        db.session.execute(
             """
             ALTER TABLE users
             ADD CONSTRAINT check_role_users
@@ -40,7 +40,7 @@ with app.app_context():
             """)
 
         # _role = 'professor' → _email = @unive.it
-        db.sessione.execute(
+        db.session.execute(
             """
             ALTER TABLE users
             ADD CONSTRAINT check_role_professor_email_users
@@ -48,7 +48,7 @@ with app.app_context():
             """)
 
         # _role = 'admin' → _email = @segunive.it
-        db.sessione.execute(
+        db.session.execute(
             """
             ALTER TABLE users
             ADD CONSTRAINT ckeck_role_admin_email_users
@@ -58,7 +58,7 @@ with app.app_context():
         # COURSES
 
         # check sulla data di inizio e fine
-        db.sessione.execute(
+        db.session.execute(
             """
             ALTER TABLE courses
             ADD CONSTRAINT check_date_courses
@@ -66,7 +66,7 @@ with app.app_context():
             """)
 
         # check sui possibili valori di '_mode'
-        db.sessione.execute(
+        db.session.execute(
             """
             ALTER TABLE courses
             ADD CONSTRAINT check_mode_courses
@@ -74,7 +74,7 @@ with app.app_context():
             """)
 
         # check sul numero di studenti
-        db.sessione.execute(
+        db.session.execute(
             """
             ALTER TABLE courses
             ADD CONSTRAINT check_num_student_courses
@@ -86,7 +86,7 @@ with app.app_context():
         # USER_COURSE & USER_LESSON
 
         # In user_course e user_lesson sono ammessi solo studenti (_role = 'user')
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION only_user() RETURNS trigger AS $$
             BEGIN
@@ -112,7 +112,7 @@ with app.app_context():
         # USER_COURSE
 
         # Controllare che non si superi il massimo numero di studenti
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION no_over_max() RETURNS trigger AS $$
             BEGIN
@@ -138,7 +138,7 @@ with app.app_context():
         # USER_LESSON
 
         # Non ci possono essere studenti in lezioni di corsi che non frequentano
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION no_user_in_course() RETURNS trigger AS $$
             BEGIN
@@ -162,7 +162,7 @@ with app.app_context():
         # LESSONS
 
         # Non si possono aggiungere lezioni se si sta superando l’ammontare di ore prestabilito
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION no_lesson_over() RETURNS trigger AS $$
             BEGIN
@@ -186,7 +186,7 @@ with app.app_context():
             """)
 
         # Non si possono modificare gli orari delle lezioni se si sta superando l’ammontare di ore prestabilito
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION no_lesson_over_m() RETURNS trigger AS $$
             BEGIN
@@ -219,7 +219,7 @@ with app.app_context():
             """)
 
         # La data della lezione deve essere dopo la data di inizio e prima della data di fine corso
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION correct_dates() RETURNS trigger AS $$
             BEGIN
@@ -239,7 +239,7 @@ with app.app_context():
             """)
 
         # Non ci possono essere lezioni sovrapposte
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION no_lessons_overlying() RETURNS trigger AS $$
             BEGIN
@@ -264,7 +264,7 @@ with app.app_context():
             """)
 
         # Una lezione non può superare le 6 ore
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION limit_hours() RETURNS trigger AS $$
             BEGIN
@@ -282,7 +282,7 @@ with app.app_context():
             """)
 
         # Una lezione deve durare almeno un’ora
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION limit_min_hours() RETURNS trigger AS $$
             BEGIN
@@ -300,7 +300,7 @@ with app.app_context():
             """)
 
         # La modifica non è valida se almeno una delle condizioni seguenti è vera
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION lesson_update() RETURNS trigger AS $$
             BEGIN
@@ -355,7 +355,7 @@ with app.app_context():
         # COURSES
 
         # L’utente associato può essere solo un professore
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION only_professor() RETURNS trigger AS $$
             BEGIN
@@ -373,7 +373,7 @@ with app.app_context():
             """)
 
         # Il numero massimo di studenti si può solo aumentare
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION max_student_sup() RETURNS trigger AS $$
             BEGIN
@@ -391,7 +391,7 @@ with app.app_context():
             """)
 
         # Le ore del corso si possono solo aumentare
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION n_hour_sup() RETURNS trigger AS $$
             BEGIN
@@ -409,7 +409,7 @@ with app.app_context():
             """)
 
         # La modalità di un corso non si può cambiare
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION no_modify_mode_course() RETURNS trigger AS $$
             BEGIN
@@ -427,7 +427,7 @@ with app.app_context():
             """)
 
         # Non è possibile porre la data di inizio del corso prima della data di oggi
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION insert_dates() RETURNS trigger AS $$
             BEGIN
@@ -445,7 +445,7 @@ with app.app_context():
             """)
 
         # Si modifica la data di inizio o di fine solo se non è già passato e se va bene
-        db.sessione.execute(
+        db.session.execute(
             """
             CREATE FUNCTION modify_dates_update() RETURNS trigger AS $$
             BEGIN

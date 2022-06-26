@@ -1,62 +1,59 @@
 {% extends "base.html" %}
-    {% block content %}
+{% block content %}
 
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col" style="height: 800px;">
-                    <div class="mx-auto" style="width: 1400px;">
-                        <div class="card shadow mb-4" style="width: 1300px;height: 750px;">
-                            <div class="card-header py-3">
-                                <p class="text-primary m-0 fw-bold">Lista Corsi</p>
-                                <table id="data" class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                          <th>Nome</th>
-                                          <th>Modalità</th>
-                                          <th>Professor</th>
-                                          <th>Inizio Lezioni</th>
-                                          <th>Fine Lezioni</th>
-                                          <th>Numero ore</th>
-                                          <th>Pagina corso</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for Course in courses %} <!--prima tabella poi elemento query-->
-                                        <tr>
-                                          <td>{{ Course._name }}</td>
-                                          <td>{{ Course._mode }}</td>
-                                            <!--Bisogna usare il nome del backref e non della foreign key-->
-                                          <td>{{ Course.users._name +" "+Course.users._surname }}</td>
-                                          <td>{{ Course._start_date }}</td>
-                                          <td>{{ Course._end_date }}</td>
-                                          <td>{{ Course._n_hour }} h</td>
-                                          <td>
-                                              <a href = "{{ url_for('courses.single_course',course= Course._name ) }}"> <img class="info" src="/static/info.jpg" style="width: 20px;">
-                                              </a>
-                                          </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col" style="height: 800px;">
+            <div class="mx-auto" style="width: 1400px;">
+                <div class="card shadow mb-4" style="width: 1300px;height: 750px;">
+                    <div class="card-header py-3">
+                        <p class="text-primary m-0 fw-bold">Lista Corsi</p>
+                        <table id="data" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Modalità</th>
+                                    <th>Professor</th>
+                                    <th>Inizio Lezioni</th>
+                                    <th>Fine Lezioni</th>
+                                    <th>Numero ore</th>
+                                    <th>Pagina corso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for Course in courses %}
+                                <!--prima tabella poi elemento query-->
+                                <tr>
+                                    <td>{{ Course._name }}</td>
+                                    <td>{{ Course._mode }}</td>
+                                    <!--Bisogna usare il nome del backref e non della foreign key-->
+                                    <td>{{ Course.users._name +" "+Course.users._surname }}</td>
+                                    <td>{{ Course._start_date }}</td>
+                                    <td>{{ Course._end_date }}</td>
+                                    <td>{{ Course._n_hour }} h</td>
+                                    <td>
+                                        <a href="{{ url_for('courses.single_course',course= Course._name ) }}"> <img class="info" src="/static/info.jpg" style="width: 20px;">
+                                        </a>
+                                    </td> <!-- VALUTARE SE EFFETTUARE SU ID -->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        {% block scripts %}
-            <script>
-                $(document).ready(function () {
-                    $('#data').DataTable(  {  "scrollY": "600px",
-                        "scrollCollapse": true,
-                        "paging": false,
-                        });
-                });
-            </script>
-    {% endblock %}
+    </div>
+</div>
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#data').DataTable({
+            "scrollY": "600px",
+            "scrollCollapse": true,
+            "paging": false,
+        });
+    });
+</script>
 {% endblock %}
-
-
-
-
-
+{% endblock %}
