@@ -134,10 +134,10 @@ class LessonsForm(FlaskForm):
         if q._mode == "blended":
             if self.link.data == "":
                 flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
-                raise ValidationError("Bisogna inserire il link se la modalità è blended")
+                raise ValidationError("Poichè il corso è in modalità blended bisogna inserire il link")
             if self.structure.data == "":
                 flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
-                raise ValidationError("Bisogna indicare una struttura se la lezione è blended")
+                raise ValidationError("Poichè il corso è in modalità blended bisogna indicare una struttura")
 
 
 class TokenForm(FlaskForm):

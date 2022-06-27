@@ -68,3 +68,4 @@ class Lesson(UserMixin, db.Model):
 
 def lesson_with_id(id):
     return db.session.query(Lesson).filter_by(_lesson_id=id)
+

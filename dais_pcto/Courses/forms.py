@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from flask import flash
 from flask_bcrypt import check_password_hash
@@ -18,9 +18,9 @@ def all_professor():
 
 class coursesForm(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(1, 64),
-                                   Regexp("^[A-Za-z][A-Za-z0-9_.' ]*$", 0, "Il nome del corso non è valido")])
+                                   Regexp("^[A-Za-z][A-Za-z0-9_.'àèìòù ]*$", 0, "Il nome del corso non è valido")])
     mode = SelectField('mode', choices=['presenza', 'online', 'blended'])
-    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9' ]*$", 0, "Descrizione non valida")])
+    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9'àèìòù ]*$", 0, "Descrizione non valida")])
     max_student = IntegerField(validators=[InputRequired()])
     min_student = IntegerField(
         validators=[InputRequired()])  # DEVE ESSERE MINORE DI MAX STUDENT DOVE METTO VINCOLO
@@ -77,10 +77,18 @@ class PartecipationCertificate(FlaskForm):
         subquery = db.session.query(Lesson).join(User._lessons).filter(User._user_id == self.user.data,
                                                                        Lesson.course == self.id.data).all()
 
+        lessons = db.session.query(Lesson).join(Course).filter(
+            Course._course_id == self.id.data).order_by(
+            Lesson._date).all()
+
+
         # DEVE AVER PARTECIPATO ALMENO AL 70 %
         if len(q) > 0:
-            if len(subquery) / len(q) * 100 < 70:
-                raise ValidationError("Non hai attestato la partecipazione ad abbastanza lezioni")
+            if str(course_with_id(self.id.data).first()._end_date) >= str(datetime.now()):
+                raise ValidationError("Il corso non è ancora finito!")
+            else:
+                if len(subquery) / len(q) * 100 < 70:
+                    raise ValidationError("Non hai attestato la partecipazione ad abbastanza lezioni")
         else:
             flash("Non ci sono lezioni!")
 
@@ -104,9 +112,9 @@ class UnsubscribeCourse(FlaskForm):
 
 class ModifyCourse(FlaskForm):
     name = StringField(validators=[Length(1, 64),
-                                   Regexp("^[A-Za-z][A-Za-z0-9_.' ]*$", 0, "Il nome del corso non è valido"), Optional()])
+                                   Regexp("^[A-Za-z][A-Za-z0-9_.'àèìòù ]*$", 0, "Il nome del corso non è valido"), Optional()])
     professor = SelectField(validators=[Optional()], choices=all_professor)
-    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9' ]*$", 0, "Descrizione non valida"), Optional()])
+    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9'àèìòù ]*$", 0, "Descrizione non valida"), Optional()])
     max_student = IntegerField(validators=[Optional()])
     n_hour = IntegerField(validators=[Optional()])
     start_date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])

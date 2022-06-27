@@ -20,7 +20,7 @@ class SchoolForm(FlaskForm):
     number = StringField(validators=[InputRequired(), Length(1, 5, message="Civico non valido")])
     phone = StringField(validators=[InputRequired(), Length(9, 10, message="Indica un numero di telefono valido")])
     # tipo -> liceo / professionale / tecnico
-    submit1 = SubmitField('submit')  # per identificare i due form presenti nella stessa pagina
+    submit1 = SubmitField('Invia')  # per identificare i due form presenti nella stessa pagina
 
     # def validate_name(self, field):
     #     school = Hschool.query.filter_by(_name=field.data, _region=self.region.data, _city=self.city.data,
@@ -34,4 +34,4 @@ class SchoolForm(FlaskForm):
 
 class DeleteSchoolForm(FlaskForm):
     id = HiddenField()
-    submit2 = SubmitField('submit')
+    submit2 = SubmitField('Elimina')

@@ -1,4 +1,41 @@
 {%  extends "base.html" %}
 {% block content %}
+    <style>
+        img{
+          display:block;
+          width:100%;
+          height:100%;
+          object-fit: cover;
+        }
+
+        .header{
+            height: 100%;
+            width: 100%;
+            background-image: url('static/assets/img/sfondo.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .header h1{
+            font-size: 200px;
+            font-weight: 700;
+            margin-top: 50%;
+            color: #ffffff;
+        }
+
+    </style>
+
+    <div class="header">
+        <div class="container">
+            <div class="row text center">
+                <div class="col-lg-12">
+                    <div class="d-flex align-items-center justify-content-center" style="height: 50%">
+                       <h1> Benvenuti </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

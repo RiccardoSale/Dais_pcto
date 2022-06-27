@@ -122,7 +122,7 @@ def single_course(
         object_corse.set_end_date(modify_course_form.end_date.data)
         object_corse.update()
         flash("Corso aggiornato con successo!","success")
-        return redirect(url_for('courses.single_course', course=course))
+        return redirect(url_for('courses.single_course', course=modify_course_form.name.data))
 
     if modify_lesson_form.submit_modify_lesson.data and modify_lesson_form.validate_on_submit():
         q = lesson_with_id(modify_lesson_form.lesson.data).first()

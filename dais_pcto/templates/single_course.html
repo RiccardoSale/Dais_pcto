@@ -131,6 +131,7 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                         </div>
                                     {% endfor%}
+
                                     {% if current_user.is_authenticated %}
                                         {% if current_user._role=='user' %}
                                             {{ certificate_form.csrf_token }}
@@ -219,7 +220,7 @@
         <div class="mt-5 row">
             <div class="col">
                 <div class="mx-auto" style="width: 1800px;">
-                    <div class="card shadow tb-4 mb-1" style="width: 1650px;height: 200px;">
+                    <div class="card shadow tb-4 mb-1" style="width: 1645px;height: 100%;">
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="card-title">Lezione n-{{ loop.index }}</h5>
