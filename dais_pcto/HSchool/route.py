@@ -16,16 +16,20 @@ blueprint = Blueprint('Hschool', __name__)
 @blueprint.route('/schools', methods=("GET", "POST"))
 @admin.require(http_exception=404)
 @login_required
+# Funzione per inserire o rimuovere una scuola
 def schools():
+    # Recupero dei dati richiesti
     form = SchoolForm()
+    # Inserimento
     if form.submit1.data and form.validate_on_submit():
         Hschool(form.code.data, form.name.data, form.region.data, form.city.data, form.street.data, form.number.data,
                 form.phone.data).save()
-        flash(f"Scuola inserita!", "success")
+        flash("La scuola è stata inserita con successo!", "success")
         return redirect(url_for('Hschool.schools'))
 
     q = all_schools()
     form2 = DeleteSchoolForm()
+    # Rimozione
     if form2.submit2.data and form2.validate_on_submit():
         rhschool = school_with_code(form2.id.data).first()
         rhschool.delete()
