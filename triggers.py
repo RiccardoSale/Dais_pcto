@@ -16,9 +16,8 @@ with app.app_context():
             """
             ALTER TABLE lessons
             ADD CONSTRAINT check_hour_lessons
-            CHECK((_start_hour >= '09:00' AND _start_hour <= '20:00') 
-                    AND (_end_hour >= '09:00' AND _end_hour <= '20:00') 
-                    AND (_end_hour > _start_hour));
+            CHECK(_start_hour >= '09:00' AND _end_hour <= '20:00') 
+                    AND _end_hour > _start_hour);
             """)
 
         # check sui possibili valori di '_mode'
@@ -310,15 +309,9 @@ with app.app_context():
                   ((NEW._mode <> 'online' OR NEW._link = '' OR NEW._structure <> '') AND 
                     NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'online'))
                   OR
-                  (NEW._mode = 'blended' AND (NEW._link = '' OR NEW._structure = '') AND 
+                  ((NEW._mode <> ' blended' OR NEW._link = '' OR NEW._structure = '') AND 
                     NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended'))
-                  OR
-                  (NEW._mode = 'presenza' AND (NEW._link <> '' OR NEW._structure = '') AND 
-                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended'))
-                  OR
-                  (NEW._mode = 'online' AND (NEW._link = '' OR NEW._structure <> '') AND 
-                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended'))
-                  OR 
+		          OR
                   OLD._date <= current_date
                   OR
                   NEW._date <= current_date
@@ -351,6 +344,32 @@ with app.app_context():
                 FOR EACH ROW
                 EXECUTE FUNCTION lesson_update();
                 """)
+
+        # L'inserimento è bloccato se una di queste condizioni è vera
+        db.session.execute(
+            """
+             CREATE FUNCTION lesson_mode() RETURNS trigger AS $$
+            BEGIN
+                IF(((NEW._mode <> 'presenza' OR NEW._link <> '' OR NEW._structure = '') AND 
+                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'presenza'))
+                  OR
+                  ((NEW._mode <> 'online' OR NEW._link = '' OR NEW._structure <> '') AND 
+                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'online'))
+                  OR
+                  ((NEW._mode <> ' blended' OR NEW._link = '' OR NEW._structure = '') AND 
+                    NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended')))THEN
+                    RETURN NULL;
+                END IF;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+
+                CREATE TRIGGER LessonMode
+                BEFORE INSERT ON lessons
+                FOR EACH ROW
+                EXECUTE FUNCTION lesson_mode();
+            """
+        )
 
         # COURSES
 

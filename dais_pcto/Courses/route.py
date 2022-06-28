@@ -116,7 +116,7 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
     if remove_lesson_form.submit_remove_lesson.data and remove_lesson_form.validate_on_submit():
         q = lesson_with_id(remove_lesson_form.id.data).first()
         q.delete()
-        flash("lezione rimossa con successo","success")
+        flash("lezione rimossa con successo", "success")
         return redirect(url_for('courses.single_course', course=course))
 
     # Modifica di un corso
@@ -134,7 +134,7 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
         object_corse.set_start_date(modify_course_form.start_date.data)
         object_corse.set_end_date(modify_course_form.end_date.data)
         object_corse.update()
-        flash("I dati del corso sono stati aggiornati con successo!","success")
+        flash("I dati del corso sono stati aggiornati con successo!", "success")
         return redirect(url_for('courses.single_course', course=modify_course_form.name.data))
 
     # Modifica di una lezione
@@ -147,7 +147,7 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
         q.set_structure(modify_lesson_form.structure.data)
         q.set_description(modify_lesson_form.description.data)
         q.update()
-        flash("La lezione è stat aggiornata con successo!", "success")
+        flash("La lezione è stata aggiornata con successo!", "success")
 
     # Disiscrizione da un corso
     if unsubscribe_course_form.submit_unsub_course.data and unsubscribe_course_form.validate_on_submit():  # disiscrivo l utente
@@ -168,7 +168,7 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
 @blueprint.route('/buildcourse', methods=("GET", "POST"))
 @professor.require(http_exception=403)  # la creazione del coros richiede di essere almeno professor
 @login_required
-# Crweazione di un corso
+# Creazione di un corso
 def buildcourse():
     # Recupero dei dati necessari
     form = coursesForm()

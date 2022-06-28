@@ -133,10 +133,10 @@ class LessonsForm(FlaskForm):
             # Se non è presente un link allora non c'è corrispondenza corso-lezione
             if self.link.data == "":
                 flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
-                raise ValidationError("Necessario inserire il link se la modalità è blended!")
+                raise ValidationError("Poichè il corso è in modalità blended bisogna inserire il link!")
             if self.structure.data == "":
                 flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
-                raise ValidationError("Necessario indicare una struttura se la lezione è blended!")
+                raise ValidationError("Poichè il corso è in modalità blended bisogna inserire una struttura!")
 
 # Token segreto per registrare la presenza a una lezione
 class TokenForm(FlaskForm):
