@@ -80,14 +80,19 @@ class LessonsForm(FlaskForm):
             flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("Non puoi più aggiungere lezioni oltre il numero totale delle ore corso")
 
-        limit = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=6, weeks=0)
+        upper_limit = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=6, weeks=0)
+        lower_limit = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=6, weeks=0)
         base = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
         base += datetime.combine(date.today(), self.end_hour.data) - datetime.combine(date.today(),
                                                                                       self.start_hour.data)
 
-        if base > limit:
+        if base > upper_limit:
             flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La lezione non può durare più di 6 ore")
+
+        if base < lower_limit:
+            flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
+            raise ValidationError("La lezione non può durare meno di 1 ora")
 
         for x in lessons:
             if x._date == self.date.data:
