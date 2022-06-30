@@ -13,6 +13,9 @@ from dais_pcto.Auth.models import User, user_with_id
 from dais_pcto.module_extensions import db
 
 # Dati richiesti per una singola lezione
+
+
+
 class LessonsForm(FlaskForm):
     start_hour = TimeField(validators=[InputRequired()])
     end_hour = TimeField(validators=[InputRequired()])
@@ -63,7 +66,7 @@ class LessonsForm(FlaskForm):
             raise ValidationError("Non si possono aggiungere lezioni oltre il numero totale delle ore specificate dal corso!")
 
         upper_limit = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=6, weeks=0)
-        lower_limit = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=6, weeks=0)
+        lower_limit = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=1, weeks=0)
         base = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
         base += datetime.combine(date.today(), self.end_hour.data) - datetime.combine(date.today(), self.start_hour.data)
 
