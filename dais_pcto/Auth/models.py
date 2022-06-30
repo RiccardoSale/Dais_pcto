@@ -97,7 +97,7 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return self._user_id
 
-# Ritorno uìdell'utente con una determinata email
+# Ritorno di un utente con una determinata email
 def user_with_email(email):
     return db.session.query(User).filter_by(_email=email)
 
