@@ -21,7 +21,6 @@ class User(UserMixin, db.Model):
     _name = db.Column(db.String(64), unique=False, nullable=False)
     _surname = db.Column(db.String(64), unique=False, nullable=False)
     _email = db.Column(db.String(60), unique=True, nullable=False, index=True)
-    _password = db.Column(db.String(128), nullable=False)
     _password = db.Column(db.String(128),
                           nullable=False)
     # Campo per l'identificazione del ruolo dell'utente
