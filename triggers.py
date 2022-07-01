@@ -16,7 +16,7 @@ with app.app_context():
             """
             ALTER TABLE lessons
             ADD CONSTRAINT check_hour_lessons
-            CHECK(_start_hour >= '09:00' AND _end_hour <= '20:00') 
+            CHECK(_start_hour >= '09:00' AND _end_hour <= '20:00' 
                     AND _end_hour > _start_hour);
             """)
 
