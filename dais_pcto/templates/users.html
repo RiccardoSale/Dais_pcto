@@ -22,18 +22,18 @@
                             <tbody>
                                 {% for user in users %}
                                 <!--prima tabella poi elemento query-->
-                                    <tr>
-                                        <td>{{ user._name }}</td>
-                                        <td>{{ user._surname }}</td>
-                                        <td  style="text-transform: none;" >{{ user._email}}</td>
-                                        <td>{{ user._user_id}}</td>
-                                        <td>{{ user._school }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
-                                                Modifica
-                                            </button>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td>{{ user._name }}</td>
+                                            <td>{{ user._surname }}</td>
+                                            <td  style="text-transform: none;" >{{ user._email}}</td>
+                                            <td>{{ user._user_id}}</td>
+                                            <td>{{ user._school }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
+                                                    Modifica
+                                                </button>
+                                            </td>
+                                        </tr>
 
 
                                     <div class="modal fade" id="aggiungi" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -48,7 +48,7 @@
                                                         {{ form.csrf_token }}
                                                         <div class="row">
                                                             <div class="col">
-                                                                <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> {{ form.name(class_="form-control",placeholder= current_user._name )}} </div>
+                                                                <div class="mb-3"><label class="form-label" for="name"><strong class="text-primary m-0 fw-bold">Nome</strong></label> {{ form.name(class_="form-control",placeholder= "Inserire nome" )}} </div>
                                                             </div>
                                                             {% for error in form.name.errors %}
                                                                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -56,7 +56,7 @@
                                                                 </div>
                                                             {% endfor%}
                                                             <div class="col">
-                                                                <div class="mb-3"><label class="form-label" for="surname"><strong class="text-primary m-0 fw-bold">Cognome</strong></label> {{ form.surname(class_="form-control",placeholder= current_user._surname )}} </div>
+                                                                <div class="mb-3"><label class="form-label" for="surname"><strong class="text-primary m-0 fw-bold">Cognome</strong></label> {{ form.surname(class_="form-control",placeholder= "Inserire congnome" )}} </div>
                                                             </div>
                                                             {% for error in form.surname.errors %}
                                                                 <div class="alert alert-warning alert-dismissible fade show" role="alert">

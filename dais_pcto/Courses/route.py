@@ -20,6 +20,7 @@ from ..Lessons.models import Lesson, lesson_with_id
 
 blueprint = Blueprint('courses', __name__, )
 
+
 # Funzione per capire se si è raggiunto il numero massimo di studenti consentiti o no
 def course_open_or_closed(count, max):
     if count < max:
@@ -37,7 +38,7 @@ def courses():
 
 @blueprint.route('/<string:course>', methods=["GET", "POST"])
 @login_required
-def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO per visualizzare lezioni nella route TODO ??? da mettere
+def single_course(course):
     object_corse = courses_with_name(course).first()
     # Possibili form utilizzabili su un singolo corso
     lesson_form = LessonsForm()
@@ -53,8 +54,10 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
     # Utente iscritto al corso interessato
     utente_iscritto = db.session.query(Course).join(User._courses).filter(User._user_id == current_user._user_id,
                                                                           Course._name == course).first()
+    owner_of_course = False
+    if object_corse._professor == current_user._user_id:
+        owner_of_course = True
 
-    print(utente_iscritto)
     # Se l'utente non è presente allora significa che non è iscritto
     if utente_iscritto is None:
         utente_iscritto = "noniscritto"
@@ -75,7 +78,8 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
     for x in course_lesson:
         # Se la data della lezione precede o è uguale a quella di oggi, il numero di ore fatte incrementa
         if x._date <= date.today():
-            numero_ore_fatte += datetime.combine(date.today(), x._end_hour) - datetime.combine(date.today(), x._start_hour)
+            numero_ore_fatte += datetime.combine(date.today(), x._end_hour) - datetime.combine(date.today(),
+                                                                                               x._start_hour)
 
     # Se il numero di ore supera 0 allora la barra di progresso del corso sarà proprozionale al numero di ore di lezione sostenute
     if numero_ore_fatte > zero:
@@ -94,7 +98,7 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
     if token_form.submit_token.data and token_form.validate_on_submit():
         l = lesson_with_id(token_form.id.data).first()
         current_user.subscribe_lesson(l)
-        flash("La presenza è stata registrata con successo!","success")
+        flash("La presenza è stata registrata con successo!", "success")
 
     # Iscrizione a un corso
     if course_subscription_form.submit_subcription_course.data and course_subscription_form.validate_on_submit():
@@ -162,7 +166,8 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
                            remove_course_form=remove_course_form, remove_lesson_form=remove_lesson_form,
                            modify_course_form=modify_course_form, modify_lesson_form=modify_lesson_form,
                            utente_iscritto=utente_iscritto,
-                           unsubscribe_course_form=unsubscribe_course_form)
+                           unsubscribe_course_form=unsubscribe_course_form,
+                           owner_of_course=owner_of_course)
 
 
 @blueprint.route('/buildcourse', methods=("GET", "POST"))
