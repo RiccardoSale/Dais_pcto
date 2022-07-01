@@ -5,5 +5,5 @@ Flask-Migrate==3.1.0
 Flask-Principal==0.4.0
 Flask-SQLAlchemy==2.5.1
 Flask-WTF==1.0.1
-psycopg2==2.9.3
 WTForms==3.0.1
+alembic==1.7.7
