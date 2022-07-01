@@ -21,13 +21,9 @@ class User(UserMixin, db.Model):
     _name = db.Column(db.String(64), unique=False, nullable=False)
     _surname = db.Column(db.String(64), unique=False, nullable=False)
     _email = db.Column(db.String(60), unique=True, nullable=False, index=True)
-<<<<<<< HEAD
     _password = db.Column(db.String(128), nullable=False)
-=======
     _password = db.Column(db.String(128),
-                          nullable=False)  # lunghezza dopo hashing CONTROLLARE DOPO AVER LIMITATO PASSWORD A TOT CARATTERI
-    # cambiare form iscrizione aggiungendo campo choice -> con scuole !!!
->>>>>>> 71a3375246de192c4c3965b18b8b7d86a4c7b9e0
+                          nullable=False)
     # Campo per l'identificazione del ruolo dell'utente
     _role = db.Column(db.String(10), nullable=False,
                       default="user")
@@ -53,10 +49,7 @@ class User(UserMixin, db.Model):
         self._password = password
         self._role = role
 
-<<<<<<< HEAD
     # Ritorno dell'email
-=======
->>>>>>> 71a3375246de192c4c3965b18b8b7d86a4c7b9e0
     def __repr__(self):
         return self._email
 
