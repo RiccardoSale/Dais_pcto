@@ -14,13 +14,20 @@ user_lesson = db.Table('user_lesson',
                        db.Column('lesson_id', db.Integer, db.ForeignKey('lessons._lesson_id'))
                        )
 
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     _user_id = db.Column(db.Integer, primary_key=True)
     _name = db.Column(db.String(64), unique=False, nullable=False)
     _surname = db.Column(db.String(64), unique=False, nullable=False)
     _email = db.Column(db.String(60), unique=True, nullable=False, index=True)
+<<<<<<< HEAD
     _password = db.Column(db.String(128), nullable=False)
+=======
+    _password = db.Column(db.String(128),
+                          nullable=False)  # lunghezza dopo hashing CONTROLLARE DOPO AVER LIMITATO PASSWORD A TOT CARATTERI
+    # cambiare form iscrizione aggiungendo campo choice -> con scuole !!!
+>>>>>>> 71a3375246de192c4c3965b18b8b7d86a4c7b9e0
     # Campo per l'identificazione del ruolo dell'utente
     _role = db.Column(db.String(10), nullable=False,
                       default="user")
@@ -46,7 +53,10 @@ class User(UserMixin, db.Model):
         self._password = password
         self._role = role
 
+<<<<<<< HEAD
     # Ritorno dell'email
+=======
+>>>>>>> 71a3375246de192c4c3965b18b8b7d86a4c7b9e0
     def __repr__(self):
         return self._email
 
@@ -98,17 +108,17 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return self._user_id
 
+
 # Ritorno di un utente con una determinata email
 def user_with_email(email):
     return db.session.query(User).filter_by(_email=email)
+
 
 # Ritorno di un utente con un determinato id
 def user_with_id(id):
     return db.session.query(User).filter_by(_user_id=id)
 
+
 # Ritorno di un utente con un determinato ruolo
 def users_with_role(role):
     return db.session.query(User).filter_by(_role=role)
-
-
-

@@ -203,7 +203,7 @@
 
 <div class="container-fluid">
     <h3 class="text-dark"></h3>
-    {% if current_user._role == "professor" or current_user._role == "admin" %}
+    {% if current_user._role == "professor" and owner_of_course == True or current_user._role == "admin" %}
         <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#aggiungi">
             Aggiungi Lezione
         </button>
@@ -253,7 +253,7 @@
                                 </div>
                                 <div class="tab-pane" id="extra{{ loop.index }}">
                                     <p class=" card-text">
-                                        {% if current_user._role == "professor" or current_user._role=="admin" %}
+                                        {% if current_user._role == "professor" and owner_of_course == True or current_user._role == "admin" %}
                                             <button type="button" class="m-2 pb-1 btn btn-primary" data-bs-toggle="modal" data-bs-target="#modifica_lezione{{ loop.index }}">
                                                 Modifica Lezione
                                             </button>

@@ -95,9 +95,12 @@ def users():
     all_users = users_with_role("user").outerjoin(Hschool)
     # Se i dati inseriti sono validi
     if form.validate_on_submit():
+        q = user_with_id(form.user.data).first()
+        q.set_name(form.name.data)
+        q.set_surname(form.surname.data)
+        q.update()
         list = form.school.data.split(":")
         # Si associa l'utente alla scuola dichiarata
-        school_with_phone(list[-1]).first().add_student(
-            user_with_id(form.user.data).first())
+        school_with_phone(list[-1]).first().add_student(q)
         flash("La scuola è assegnata con successo!", "success")
     return render_template("users.html", users=all_users, form=form)
