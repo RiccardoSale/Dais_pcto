@@ -50,7 +50,7 @@ with app.app_context():
         db.session.execute(
             """
             ALTER TABLE users
-            ADD CONSTRAINT ckeck_role_admin_email_users
+            ADD CONSTRAINT check_role_admin_email_users
             CHECK (NOT(_role = 'admin') OR (_email LIKE '%@segunive.it'));
             """)
 
@@ -122,7 +122,7 @@ with app.app_context():
                   (SELECT count(*)
                   FROM user_course
                   WHERE course_id = NEW.course_id)) THEN
-            RETURN NULL;
+                    RETURN NULL;
                 END IF;
                 RETURN NEW;
             END;
@@ -143,10 +143,12 @@ with app.app_context():
             BEGIN
                 IF( (SELECT course
                    FROM lessons
-                   WHERE _lesson_id = NEW.lesson_id) NOT IN (SELECT course_id
-            FROM user_course
-            WHERE user_id = NEW.user_id)) THEN
-                    RETURN NULL;
+                   WHERE _lesson_id = NEW.lesson_id) 
+                   NOT IN 
+                   (SELECT course_id
+                    FROM user_course
+                    WHERE user_id = NEW.user_id)) THEN
+                        RETURN NULL;
                 END IF;
                 RETURN NEW;
             END;
@@ -165,13 +167,13 @@ with app.app_context():
             """
             CREATE FUNCTION no_lesson_over() RETURNS trigger AS $$
             BEGIN
-                IF((select sum(l._end_hour-l._start_hour) 
-                   from lessons as l 
-                   where l.course = NEW.course)
+                IF((SELECT sum(l._end_hour-l._start_hour) 
+                   FROM lessons as l 
+                   WHERE l.course = NEW.course)
                    > 
-                   (select make_interval(hours => co._n_hour) 
-                   from courses as co 
-                   where co._course_id = NEW.course)) THEN
+                   (SELECT make_interval(hours => co._n_hour) 
+                   FROM courses as co 
+                   WHERE co._course_id = NEW.course)) THEN
                     DELETE FROM lessons WHERE _lesson_id = NEW._lesson_id;
                 END IF;
                 RETURN NEW;
@@ -189,23 +191,23 @@ with app.app_context():
             """
             CREATE FUNCTION no_lesson_over_m() RETURNS trigger AS $$
             BEGIN
-                IF((select sum(l._end_hour-l._start_hour) 
-                   from lessons as l 
-                   where l.course = NEW.course)
+                IF((SELECT sum(l._end_hour-l._start_hour) 
+                   FROM lessons as l 
+                   WHERE l.course = NEW.course)
                    > 
-                   (select make_interval(hours => co._n_hour) 
-                   from courses as co 
-                   where co._course_id = NEW.course)) THEN
+                   (SELECT make_interval(hours => co._n_hour) 
+                   FROM courses as co 
+                   WHERE co._course_id = NEW.course)) THEN
                     IF(NEW._start_hour <> OLD._start_hour) THEN
-                    UPDATE lessons
-                    SET _start_hour = OLD._start_hour
-                    WHERE _lesson_id = NEW._lesson_id;
-                END IF;
-                IF(NEW._end_hour <> OLD._end_hour) THEN
-                    UPDATE lessons
+                        UPDATE lessons
+                        SET _start_hour = OLD._start_hour
+                        WHERE _lesson_id = NEW._lesson_id;
+                    END IF;
+                    IF(NEW._end_hour <> OLD._end_hour) THEN
+                        UPDATE lessons
                         SET _end_hour = OLD._end_hour
                         WHERE _lesson_id = NEW._lesson_id;
-                END IF;
+                    END IF;
                 END IF;
                 RETURN NULL;
             END;
@@ -224,7 +226,7 @@ with app.app_context():
             BEGIN
                 IF(NEW._date < (SELECT _start_date FROM courses WHERE NEW.course = _course_id) OR 
                    NEW._date > (SELECT _end_date FROM courses WHERE NEW.course = _course_id) OR
-            NEW._date <= current_date) THEN
+                    NEW._date <= current_date) THEN
                     RETURN NULL;
                 END IF;
                 RETURN NEW;
@@ -242,14 +244,15 @@ with app.app_context():
             """
             CREATE FUNCTION no_lessons_overlying() RETURNS trigger AS $$
             BEGIN
-                IF(NEW._date = ANY (SELECT _date
-                                     FROM lessons
-                                     WHERE (NEW._start_hour <= _start_hour 
-                                     AND NEW._end_hour <= _end_hour AND NEW._end_hour >= _start_hour) OR
-                                     (NEW._start_hour >= _start_hour AND NEW._start_hour <= _end_hour 
-                                     AND NEW._end_hour >= _end_hour) OR
-                                     (NEW._start_hour >= _start_hour AND NEW._end_hour <= _end_hour) OR
-                                     (NEW._start_hour <= _start_hour AND NEW._end_hour >= _end_hour))) THEN
+                IF(NEW._date IN (SELECT _date
+                                 FROM lessons as l
+                                 WHERE l.course = NEW.course AND
+                                    ((NEW._start_hour <= l._start_hour 
+                                    AND NEW._end_hour <= l._end_hour AND NEW._end_hour >= l._start_hour) OR
+                                    (NEW._start_hour >= l._start_hour AND NEW._start_hour <= l._end_hour 
+                                    AND NEW._end_hour >= l._end_hour) OR
+                                    (NEW._start_hour >= l._start_hour AND NEW._end_hour <= l._end_hour) OR
+                                    (NEW._start_hour <= l._start_hour AND NEW._end_hour >= l._end_hour)))) THEN
                     RETURN NULL;
                 END IF;
                 RETURN NEW;
@@ -319,20 +322,21 @@ with app.app_context():
                   NEW._date < (SELECT _start_date
                               FROM courses
                               WHERE _course_id = NEW.course)
-                   OR
+                  OR
                   NEW._date > (SELECT _end_date
                               FROM courses
                               WHERE _course_id = NEW.course)
                   OR
                   NEW._date IN (SELECT _date
-                                     FROM lessons AS l
-                                     WHERE NEW._lesson_id <> l._lesson_id AND
+                                FROM lessons AS l
+                                WHERE NEW._lesson_id <> l._lesson_id AND
+                                    NEW.course = l.course AND
                                     ((NEW._start_hour <= l._start_hour AND NEW._end_hour <= l._end_hour 
                                     AND NEW._end_hour >= l._start_hour) OR
-                                     (NEW._start_hour >= l._start_hour AND NEW._start_hour <= l._end_hour 
-                                     AND NEW._end_hour >= l._end_hour) OR
-                                     (NEW._start_hour >= l._start_hour AND NEW._end_hour <= l._end_hour) OR
-                                     (NEW._start_hour <= l._start_hour AND NEW._end_hour >= l._end_hour))))THEN
+                                    (NEW._start_hour >= l._start_hour AND NEW._start_hour <= l._end_hour 
+                                    AND NEW._end_hour >= l._end_hour) OR
+                                    (NEW._start_hour >= l._start_hour AND NEW._end_hour <= l._end_hour) OR
+                                    (NEW._start_hour <= l._start_hour AND NEW._end_hour >= l._end_hour))))THEN
                     RETURN NULL;
                 END IF;
                 RETURN NEW;
@@ -451,7 +455,7 @@ with app.app_context():
             CREATE FUNCTION insert_dates() RETURNS trigger AS $$
             BEGIN
                 IF(NEW._start_date <= current_date)THEN
-                RETURN NULL;
+                    RETURN NULL;
                 END IF;
                 RETURN NEW;
             END;
@@ -463,29 +467,48 @@ with app.app_context():
             EXECUTE FUNCTION insert_dates();
             """)
 
-        # Si modifica la data di inizio o di fine solo se non è già passato e se va bene
+        # Si modifica la data di inizio solo se risulta corretta
         db.session.execute(
             """
-            CREATE FUNCTION modify_dates_update() RETURNS trigger AS $$
+            CREATE FUNCTION modify_start_date_update() RETURNS trigger AS $$
             BEGIN
-                IF(OLD._start_date <= current_date OR OLD._end_date <= current_date
-                OR NEW._start_date <= current_date OR NEW._end_date <= current_date
+                IF(OLD._start_date <= current_date 
+                OR NEW._start_date <= current_date 
                 OR NEW._start_date > (SELECT min(_date)
                                       FROM lessons
-                                      WHERE course = NEW._course_id)
-                OR NEW._end_date < (SELECT max(_date)
-                                    FROM lessons
-                                    WHERE course = NEW._course_id)) THEN
+                                      WHERE course = NEW._course_id)) THEN
                     RETURN NULL;
                 END IF;
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
-               CREATE TRIGGER ModifyDatesUpdate
-               BEFORE UPDATE ON courses
+               CREATE TRIGGER ModifyStartDateUpdate
+               BEFORE UPDATE OF _start_date ON courses
                FOR EACH ROW
-               EXECUTE FUNCTION modify_dates_update();
+               EXECUTE FUNCTION modify_start_date_update();
+            """)
+
+        # Si modifica la data di fine solo se risulta corretta
+        db.session.execute(
+            """
+            CREATE FUNCTION modify_end_date_update() RETURNS trigger AS $$
+            BEGIN
+                IF(OLD._end_date <= current_date
+                    OR NEW._end_date <= current_date
+                    OR NEW._end_date < (SELECT max(_date)
+                                        FROM lessons
+                                        WHERE course = NEW._course_id)) THEN
+                        RETURN NULL;
+                END IF;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+    
+                CREATE TRIGGER ModifyEndDateUpdate
+                BEFORE UPDATE OF _end_date ON courses
+                FOR EACH ROW
+                EXECUTE FUNCTION modify_end_date_update();
             """)
 
         db.session.commit()
