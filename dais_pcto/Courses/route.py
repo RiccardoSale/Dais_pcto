@@ -37,7 +37,7 @@ def courses():
 
 @blueprint.route('/<string:course>', methods=["GET", "POST"])
 @login_required
-def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO per visualizzare lezioni nella route TODO ??? da mettere
+def single_course(course):
     object_corse = courses_with_name(course).first()
     # Possibili form utilizzabili su un singolo corso
     lesson_form = LessonsForm()
@@ -116,7 +116,7 @@ def single_course(course):  # AGGIUNGERE CHE PRIMA DEVI ESSERE ISCRITTO AL CORSO
     if remove_lesson_form.submit_remove_lesson.data and remove_lesson_form.validate_on_submit():
         q = lesson_with_id(remove_lesson_form.id.data).first()
         q.delete()
-        flash("lezione rimossa con successo", "success")
+        flash("La lezione è stata rimossa con successo!", "success")
         return redirect(url_for('courses.single_course', course=course))
 
     # Modifica di un corso

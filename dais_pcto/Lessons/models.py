@@ -16,6 +16,7 @@ class Lesson(UserMixin, db.Model):
     _secret_token = db.Column(db.String(32), nullable=False)
 
     # Chiave esterna derivata dalla relazione uno a molti con lezioni
+    # Una lezione è associata a un corso, un corso ha associate più lezioni
     course = db.Column(db.Integer, db.ForeignKey(
         'courses._course_id'))
 

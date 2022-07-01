@@ -26,7 +26,7 @@ blueprint = Blueprint('BaseRoute', __name__)
 def index():
     return render_template('index.html')
 
-# Funzione per il certificato del corso
+# Funzione per il certificato di partecipazione al corso
 def certificate(course, professor, ore):
     professor = user_with_id(professor).first()
     date = str(datetime.now())
@@ -89,7 +89,7 @@ def profile():
 @blueprint.route('/users', methods=("GET", "POST"))
 @admin.require(http_exception=403)
 @login_required
-# Funzione per assegnare a un utente con suolo 'user' la scuola di provenienza
+# Funzione per assegnare a un utente con ruolo 'user' la scuola di provenienza
 def users():
     form = EditProfileSeg()
     all_users = users_with_role("user").outerjoin(Hschool)

@@ -13,9 +13,6 @@ from dais_pcto.Auth.models import User, user_with_id
 from dais_pcto.module_extensions import db
 
 # Dati richiesti per una singola lezione
-
-
-
 class LessonsForm(FlaskForm):
     start_hour = TimeField(validators=[InputRequired()])
     end_hour = TimeField(validators=[InputRequired()])
@@ -70,14 +67,17 @@ class LessonsForm(FlaskForm):
         base = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
         base += datetime.combine(date.today(), self.end_hour.data) - datetime.combine(date.today(), self.start_hour.data)
 
+        # Una lezione può durare al massimo 6 ore
         if base > upper_limit:
             flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La lezione non può durare più di 6 ore")
 
+        # Una lezione può durare al minimo un'ora
         if base < lower_limit:
             flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore", 'warning')
             raise ValidationError("La lezione non può durare meno di 1 ora")
 
+        # Per ogni lezione si controlla che la lezione che si sta inserendo non si accavalli con altre lezioni
         for x in lessons:
             if x._date == self.date.data:
                 if (self.start_hour.data < x._end_hour < self.end_hour.data) or \
@@ -139,6 +139,7 @@ class LessonsForm(FlaskForm):
             if self.link.data == "":
                 flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
                 raise ValidationError("Poichè il corso è in modalità blended bisogna inserire il link!")
+            # Se non è presente una struttura allora non c'è corrispondenza corso-lezione
             if self.structure.data == "":
                 flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
                 raise ValidationError("Poichè il corso è in modalità blended bisogna inserire una struttura!")
@@ -161,7 +162,7 @@ class TokenForm(FlaskForm):
         if not corso:
             raise ValidationError("Per registrare la presenza a una lezione è necessario iscriversi prima al corso!")
 
-        # Verifica se il token corrisponde
+        # Verifica del token
         if self.token.data != l._secret_token:
             raise ValidationError("Il token inserito non risulta valido!")
         # Individuazione delle lezioni a cui l'utente ha già dichiarato la presenza
@@ -191,7 +192,6 @@ class ModifyLesson(FlaskForm):
     start_hour = TimeField(validators=[Optional()])
     end_hour = TimeField(validators=[Optional()])
     date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
-    # La modalità compare solo se il corso è blended
     mode = SelectField('mode', choices=['presenza', 'online', 'blended'], validators=[Optional()])
     link = StringField(validators=[Optional()])
     structure = StringField(validators=[Optional()])
@@ -209,7 +209,7 @@ class ModifyLesson(FlaskForm):
             raise ValidationError("La data della lezione deve essere successiva a quella odierna!")
 
         # Se la vecchia data è già passata allora non è possibile modificarla
-        if q._date <= date.today():  # vedere se aggiungere a template
+        if q._date <= date.today():
             flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
             raise ValidationError("Non si possono modificare lezioni già avvenute!")
 
@@ -330,9 +330,8 @@ class ModifyLesson(FlaskForm):
                     raise ValidationError(
                         "Esiste già una lezione di nome :" + x._description + " nella fascia oraria inserita!")
 
-
-        date_time_obj = datetime.strptime('20:00:00', '%H:%M:%S').time()
         # Le lezioni non possono terminare dopo le 20:00
+        date_time_obj = datetime.strptime('20:00:00', '%H:%M:%S').time()
         if self.end_hour.data > date_time_obj:
             flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
             raise ValidationError("Le lezioni non possono terminare dopo le 20:00!")

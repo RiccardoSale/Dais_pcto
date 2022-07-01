@@ -50,13 +50,14 @@ class coursesForm(FlaskForm):
             raise ValidationError("Il numero di studenti minimi deve essere almeno 10!")
 
 # Dati richiesti per l'iscrizione a un corso da parte di un utente con ruolo 'user'
-class CourseSubscription(FlaskForm):  # decidere se far iscrivere anche dopo la data di inizio
+class CourseSubscription(FlaskForm):
     id = HiddenField()
     user = HiddenField()
     submit_subcription_course = SubmitField('Iscriviti al corso!')
 
     # Controllo per verificare che l'utente non sia già iscritto
     def validate_id(self, data):
+        # q = corsi a cui l'utente si è iscritto
         q = db.session.query(User).join(Course._users).filter(User._user_id == self.user.data,
                                                               Course._course_id == self.id.data).first()
         if q:
@@ -88,7 +89,6 @@ class PartecipationCertificate(FlaskForm):
             Course._course_id == self.id.data).order_by(
             Lesson._date).all()
 
-
         # Si è deciso che il certificato viene generato solo se l'utente ha partecipato ad almeno il 70 % delle lezioni
         # Se sono presenti lezioni
         if len(q) > 0:
@@ -96,7 +96,7 @@ class PartecipationCertificate(FlaskForm):
             if str(course_with_id(self.id.data).first()._end_date) >= str(datetime.now()):
                 raise ValidationError("Il corso non è ancora finito!")
             else:
-                # Controllo sul almeno il 70% delle presenze
+                # Per generare il certificato è necessario che l'utente abbia registrato almeno il 70% delle presenze
                 if len(subquery) / len(q) * 100 < 70:
                     raise ValidationError("Non hai attestato la partecipazione ad almeno il 70% delle lezioni!")
         else:
@@ -169,7 +169,7 @@ class ModifyCourse(FlaskForm):
             # lessons = Lezioni che si riferiscono al corso interessato
             lessons = db.session.query(Lesson).join(Course).filter(Course._course_id == self.course_id.data).order_by(
                 Lesson._date).all()
-            # Se c'è una lezione dopo della nuova data di inizio corso inserita allora la modifica non è concessa
+            # Se c'è una lezione prima della nuova data di inizio corso inserita allora la modifica non è concessa
             if lessons and lessons[0]._date < self.start_date.data:
                 flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
                 ValidationError("Ci sono delle lezioni prima della data di inizio corso che si sta cercando di inserire!")

@@ -31,7 +31,7 @@ def login():
     # Se i dati inseriti sono validi per il login
     if form.validate_on_submit():
         q = user_with_email(form.email.data).first()
-        # Controllo sulla corrispondenza dei dati con un eventuale utente
+        # Controllo della corrispondenza dei dati con un eventuale utente
         if q is not None:
             # Controllo della password inserita
             if check_password_hash(q._password, form.password.data):

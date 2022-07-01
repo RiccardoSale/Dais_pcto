@@ -21,7 +21,8 @@ class Course(UserMixin, db.Model):
     _end_date = db.Column(db.DATE, CheckConstraint('str(start_date) < str(end_date)', name='end_date_costr'),
                            nullable=False)
 
-    # Campo derivato dalla relazione molti a uno, dove uno si riferisce al corso
+    # Campo derivato dalla relazione molti a uno con lessons
+    # Una lezione è associata a un corso, un corso può essere associato a più lezioni
     _lessons = db.relationship('Lesson', backref='courses', cascade="all, delete")
 
     # Chiave esterna relativa al professore associato al corso
@@ -31,7 +32,7 @@ class Course(UserMixin, db.Model):
     _users = db.relationship("User", secondary=user_course,
                              back_populates="_courses")
 
-
+    # Ritorno del nome del corso
     def __repr__(self):
         return '<Course %r>' % self._name
 
@@ -62,7 +63,7 @@ class Course(UserMixin, db.Model):
         if max_student is not None:
             self._max_student = max_student
 
-    # Settaggio del numero  di ore del corso
+    # Settaggio del numero di ore del corso
     def set_n_hour(self, n_hour):
         if n_hour is not None:
             self._n_hour = n_hour

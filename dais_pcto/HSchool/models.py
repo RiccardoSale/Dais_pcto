@@ -36,7 +36,7 @@ class Hschool(UserMixin, db.Model):
             self.r_users.append(user)
             self.update()
 
-# Ritorno di una scuola dato il codice
+# Ritorno di una scuola dato il codice meccanografico
 def school_with_code(code):
     return db.session.query(Hschool).filter_by(_hschool_code=code)
 

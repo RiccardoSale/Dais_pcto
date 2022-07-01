@@ -20,8 +20,7 @@ class User(UserMixin, db.Model):
     _name = db.Column(db.String(64), unique=False, nullable=False)
     _surname = db.Column(db.String(64), unique=False, nullable=False)
     _email = db.Column(db.String(60), unique=True, nullable=False, index=True)
-    _password = db.Column(db.String(128), nullable=False)  # lunghezza dopo hashing CONTROLLARE DOPO AVER LIMITATO PASSWORD A TOT CARATTERI
-    # cambiare form iscrizione aggiungendo campo choice -> con scuole !!!
+    _password = db.Column(db.String(128), nullable=False)
     # Campo per l'identificazione del ruolo dell'utente
     _role = db.Column(db.String(10), nullable=False,
                       default="user")
@@ -31,10 +30,12 @@ class User(UserMixin, db.Model):
     # Campo nato dalla relazione molti a molti con la tabella 'lessons'
     _lessons = db.relationship("Lesson", secondary=user_lesson,
                                back_populates="_users")
-    # Campo nato dalla relazioni uno a molti con la tabella 'h_schools'
+    # Campo nato dalla relazione uno a molti con la tabella 'h_schools'
+    # Un utente è associato a una sola scuola, una scuola può essere associata a più utenti
     _school = db.Column(db.String, db.ForeignKey(
         'h_schools._hschool_code'))
     # Campo nato dalla relazione uno a molti con la tabella 'courses' (solo per gli utenti con ruolo '_professor')
+    # Un corso ha associato un professore, un professore può aver associati più corsi
     _courses_prof = db.relationship('Course', backref='users', cascade="all, delete")
 
     # Inizializzazione
@@ -45,7 +46,7 @@ class User(UserMixin, db.Model):
         self._password = password
         self._role = role
 
-
+    # Ritorno dell'email
     def __repr__(self):
         return self._email
 
