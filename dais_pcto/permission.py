@@ -4,10 +4,6 @@ from dais_pcto.module_extensions import db
 
 with db.engine.connect() as con:
     try:
-        print("CREAZIONE SCHEMA 'Palestra' : ")
-        db.session.execute('CREATE SCHEMA "Palestra";') #todo vedere come fare
-        db.session.commit()
-
         print("CREAZIONE TABELLE : ")
         db.create_all()
 
@@ -37,7 +33,7 @@ with db.engine.connect() as con:
 
         db.session.execute('GRANT DELETE, SELECT, INSERT, UPDATE ON TABLE "Pcto".courses TO segreteria;')
 
-        db.session.execute(' GRANT DELETE, SELECT, INSERT, UPDATE ON TABLE "Palestra".time_slots TO professor;')
+        db.session.execute(' GRANT DELETE, SELECT, INSERT, UPDATE ON TABLE "Pcto".courses TO professor;')
 
         # PERMESSI TABELLA Schools
         db.session.execute('GRANT DELETE, SELECT, INSERT, UPDATE ON TABLE "Pcto".h_schools TO admin;')
@@ -46,7 +42,7 @@ with db.engine.connect() as con:
 
         db.session.execute('GRANT  SELECT ON TABLE "Pcto".h_schools TO professor;')
 
-        # PERMESSI TABELLA LESSONS
+        # PERMESSI TABELLA Lessons
         db.session.execute(' GRANT DELETE, SELECT, INSERT, UPDATE ON TABLE "Pcto".lessons TO admin;')
 
         db.session.execute('GRANT SELECT, INSERT, UPDATE , DELETE ON TABLE "Pcto".lessons TO segreteria;')

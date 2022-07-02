@@ -6,8 +6,9 @@ from flask_sqlalchemy import SQLAlchemy, Model
 
 
 class CRUDMixin(Model):
-    """Mixin that adds convenience methods for CRUD (create, read, update, delete) operations."""
+    """Mixin aggiunge metodi di convenienza per le operazioni CRUD (create, read, update, delete)"""
 
+    # Funzione per l'aggiornamento di un record
     def update(self):
         try:
             db.session.commit()
@@ -15,6 +16,7 @@ class CRUDMixin(Model):
             db.session.rollback()
             raise IntegrityError()
 
+    # Funzione per il salvataggio di un record
     def save(self, commit=True):
         """Save the record."""
         try:
@@ -26,6 +28,7 @@ class CRUDMixin(Model):
             db.session.rollback()
             raise IntegrityError()
 
+    # Funzione per la rimozione di un record
     def delete(self):
         """Remove the record from the database."""
         try:

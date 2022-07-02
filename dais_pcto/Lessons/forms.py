@@ -155,7 +155,7 @@ class TokenForm(FlaskForm):
     def validate_token(self, field):
         # Recupero della lezione associato al token
         l = lesson_with_id(self.id.data).first()
-        # Recupero del corso asscoiato alla lezione appena trovata (relativo all'utente)
+        # Recupero del corso associato alla lezione appena trovata (relativo all'utente)
         corso = db.session.query(User).join(Course._users).filter(User._user_id == self.user.data,
                                                                   Course._course_id == l.course).first()
         # Se non viene trovato un corso allora significa che l'utente non è iscritto a tale corso

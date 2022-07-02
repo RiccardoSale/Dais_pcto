@@ -38,20 +38,20 @@ with app.app_context():
             CHECK (_role = 'user' OR _role = 'professor' OR _role = 'admin');
             """)
 
-        # _role = 'professor' → _email = @unive.it
+        # _role = 'professor' → _email = unive.it
         db.session.execute(
             """
             ALTER TABLE users
             ADD CONSTRAINT check_role_professor_email_users
-            CHECK (NOT(_role = 'professor') OR (_email LIKE '%@unive.it'));
+            CHECK (NOT(_role = 'professor') OR (_email LIKE '%unive.it'));
             """)
 
-        # _role = 'admin' → _email = @segunive.it
+        # _role = 'admin' → _email = segunive.it
         db.session.execute(
             """
             ALTER TABLE users
             ADD CONSTRAINT check_role_admin_email_users
-            CHECK (NOT(_role = 'admin') OR (_email LIKE '%@segunive.it'));
+            CHECK (NOT(_role = 'admin') OR (_email LIKE '%segunive.it'));
             """)
 
         # COURSES

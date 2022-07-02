@@ -22,7 +22,7 @@ class coursesForm(FlaskForm):
     mode = SelectField('mode', choices=['presenza', 'online', 'blended'])
     description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9'àèìòù ]*$", 0, "La descrizione del corso deve contenere caratteri consoni")])
     max_student = IntegerField(validators=[InputRequired()])
-    min_student = IntegerField(validators=[InputRequired()])  # DEVE ESSERE MINORE DI MAX STUDENT DOVE METTO VINCOLO
+    min_student = IntegerField(validators=[InputRequired()])
     n_hour = IntegerField(validators=[InputRequired()])
     start_date = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
     end_date = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
@@ -57,10 +57,12 @@ class CourseSubscription(FlaskForm):
 
     # Controllo per verificare che l'utente non sia già iscritto
     def validate_id(self, data):
-        # q = corsi a cui l'utente si è iscritto
+        # q = id dell'utente che vuole iscriversi al corso, se si è già iscritto al medesimo
         q = db.session.query(User).join(Course._users).filter(User._user_id == self.user.data,
                                                               Course._course_id == self.id.data).first()
+        # Se il risultato non è vuoto si fa un controllo
         if q:
+            # Se l'utente è già iscritto non è possibile farlo ri-iscrivere
             if q._role == "user":
                 raise ValidationError("Sei già registrato al corso!")
         else:
@@ -77,14 +79,15 @@ class PartecipationCertificate(FlaskForm):
 
     # Controllo sulla validità dell'utente
     def validate_id(self, data):
-        # q = Lezioni che fanno parte del corso interessato
+        # q = Lezioni che sono associate al corso interessato
         q = db.session.query(Lesson).join(Course).filter(Course._course_id == self.id.data).all()
 
-        # subquery = Lezioni a cui l'utente ha partecipato di quel determinato corso e di cui ha registrato la presenza
+        # subquery = Lezioni a cui l'utente ha partecipato di quel determinato corso
+        # e di cui ha registrato la presenza
         subquery = db.session.query(Lesson).join(User._lessons).filter(User._user_id == self.user.data,
                                                                        Lesson.course == self.id.data).all()
 
-        # lessons = Lezioni che fanno parte del corso interessato ordinate per data
+        # lessons = Lezioni che sono associate al corso interessato ordinate per data
         lessons = db.session.query(Lesson).join(Course).filter(
             Course._course_id == self.id.data).order_by(
             Lesson._date).all()
@@ -98,7 +101,7 @@ class PartecipationCertificate(FlaskForm):
             else:
                 # Per generare il certificato è necessario che l'utente abbia registrato almeno il 70% delle presenze
                 if len(subquery) / len(q) * 100 < 70:
-                    raise ValidationError("Non hai attestato la partecipazione ad almeno il 70% delle lezioni!")
+                    raise ValidationError("Non è stata attestata la partecipazione ad almeno il 70% delle lezioni!")
         else:
             flash("Non ci sono lezioni!")
 
@@ -156,7 +159,7 @@ class ModifyCourse(FlaskForm):
                 # Se c'è una lezione dopo della nuova data di fine corso inserita allora la modifica non è concessa
                 if lessons[-1]._date > self.end_date.data:
                     flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
-                    raise ValidationError("Ci sono delle lezioni prima della data di fine corso che si sta cercando di inserire!")
+                    raise ValidationError("Ci sono delle lezioni dopo della data di fine corso che si sta cercando di inserire!")
 
     # Controllo sulla validità della data di inizio corso
     def validate_start_date(self, field):

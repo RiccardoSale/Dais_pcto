@@ -54,6 +54,7 @@ def single_course(course):
     # Utente iscritto al corso interessato
     utente_iscritto = db.session.query(Course).join(User._courses).filter(User._user_id == current_user._user_id,
                                                                           Course._name == course).first()
+    # Controllo della "proprietà" del corso
     owner_of_course = False
     if object_corse._professor == current_user._user_id:
         owner_of_course = True
@@ -65,7 +66,7 @@ def single_course(course):
     # course_lesson = lezioni che sono associate al corso interessato in ordine di data e di ora
     course_lesson = db.session.query(Lesson).join(Course).filter(Course._name == course).order_by(
         Lesson._date).order_by(Lesson._start_hour)
-    # count = numero lezioni totali
+    # count = numero utenti che partecipano al corso
     count = len(info_corso._users)
     progress_bar = 0
     # attivo = capire se il corso ha ancora posti disponibili
