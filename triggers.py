@@ -312,7 +312,7 @@ with app.app_context():
                   ((NEW._mode <> 'online' OR NEW._link = '' OR NEW._structure <> '') AND 
                     NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'online'))
                   OR
-                  ((NEW._mode <> ' blended' OR NEW._link = '' OR NEW._structure = '') AND 
+                  ((NEW._link = '' OR NEW._structure = '') AND 
                     NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended'))
 		          OR
                   OLD._date <= current_date
@@ -360,7 +360,7 @@ with app.app_context():
                   ((NEW._mode <> 'online' OR NEW._link = '' OR NEW._structure <> '') AND 
                     NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'online'))
                   OR
-                  ((NEW._mode <> ' blended' OR NEW._link = '' OR NEW._structure = '') AND 
+                  ((NEW._link = '' OR NEW._structure = '') AND 
                     NEW.course IN (SELECT _course_id FROM courses WHERE _mode = 'blended')))THEN
                     RETURN NULL;
                 END IF;
