@@ -87,11 +87,6 @@ class PartecipationCertificate(FlaskForm):
         subquery = db.session.query(Lesson).join(User._lessons).filter(User._user_id == self.user.data,
                                                                        Lesson.course == self.id.data).all()
 
-        # lessons = Lezioni che sono associate al corso interessato ordinate per data
-        lessons = db.session.query(Lesson).join(Course).filter(
-            Course._course_id == self.id.data).order_by(
-            Lesson._date).all()
-
         # Si è deciso che il certificato viene generato solo se l'utente ha partecipato ad almeno il 70 % delle lezioni
         # Se sono presenti lezioni
         if len(q) > 0:
