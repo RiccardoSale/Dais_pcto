@@ -25,7 +25,7 @@ def schools():
         Hschool(form.code.data, form.name.data, form.region.data, form.city.data, form.street.data, form.number.data,
                 form.phone.data).save()
         flash("La scuola è stata inserita con successo!", "success")
-        # Ritorno della pagina principale
+        # Ritorno della pagina delle scuole
         return redirect(url_for('Hschool.schools'))
 
     # q = tutte le scuole registrate
@@ -35,7 +35,7 @@ def schools():
     if form2.submit2.data and form2.validate_on_submit():
         rhschool = school_with_code(form2.id.data).first()
         rhschool.delete()
-        # Ritorno della pagina principale
+        # Ritorno della pagina delle scuole
         return redirect(url_for('Hschool.schools'))
     # Indirizzamento alla pagina delle scuole
     return render_template('schools.html', form=form, form2=form2, schools=q)
