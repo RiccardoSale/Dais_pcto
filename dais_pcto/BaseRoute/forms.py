@@ -22,6 +22,7 @@ class EditProfile(FlaskForm):
 # I dati richiesti per associare un utente alla scuola di provenienza sono
 # il nome, il cognome, l'id dell'utente e la scuola
 class EditProfileSeg(FlaskForm):
+    # Il nome e il cognome devono contenere caratteri consoni (non possono esserci numeri o caratteri particolari)
     name = StringField(validators=[Length(3, 64, message="Inserire un nome valido"), Optional(), Regexp(
         "^[A-Za-z][A-Za-z_. ]*$", 0, "Il nome deve contenere caratteri consoni",)])
     surname = StringField(
