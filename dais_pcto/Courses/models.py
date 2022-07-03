@@ -4,7 +4,7 @@ from dais_pcto.app import db
 from flask_login import UserMixin
 from dais_pcto.Auth.models import user_course
 
-
+# Dati necessari per indetificare un corso
 class Course(UserMixin, db.Model):
     __tablename__ = "courses"
     _course_id = db.Column(db.Integer, primary_key=True)
