@@ -2,7 +2,7 @@ from flask_login import UserMixin
 from dais_pcto.app import db
 from dais_pcto.Auth.models import user_lesson
 
-
+# Informazioni richieste per una lezione
 class Lesson(UserMixin, db.Model):
     __tablename__ = "lessons"
     _lesson_id = db.Column(db.Integer, primary_key=True)
