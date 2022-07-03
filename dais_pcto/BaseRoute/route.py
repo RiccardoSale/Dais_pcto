@@ -83,7 +83,7 @@ def profile():
         else:
             # Se la password non è corretta si avvisa l'utente
             flash("Controlla la password inserita!", "danger")
-    # Reindirizzamento alla pagina del profilo
+    # Indirizzamento alla pagina del profilo
     return render_template('profile.html', form=form, courses=courses, list=list)
 
 
@@ -104,5 +104,5 @@ def users():
         # Si associa l'utente alla scuola dichiarata
         school_with_phone(list[-1]).first().add_student(q)
         flash("La scuola è assegnata con successo!", "success")
-    # Reindirizzamento alla pagina degli utenti
+    # Indirizzamento alla pagina degli utenti
     return render_template("users.html", users=all_users, form=form)
