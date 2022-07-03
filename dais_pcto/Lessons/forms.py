@@ -13,9 +13,6 @@ from dais_pcto.Auth.models import User, user_with_id
 from dais_pcto.module_extensions import db
 
 # Dati richiesti per una singola lezione
-
-
-
 class LessonsForm(FlaskForm):
     start_hour = TimeField(validators=[InputRequired()])
     end_hour = TimeField(validators=[InputRequired()])
