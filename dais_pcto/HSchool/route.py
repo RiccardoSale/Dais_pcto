@@ -35,5 +35,5 @@ def schools():
         rhschool = school_with_code(form2.id.data).first()
         rhschool.delete()
         return redirect(url_for('Hschool.schools'))
-
+    # Indirizzamento alla pagina delle scuole
     return render_template('schools.html', form=form, form2=form2, schools=q)
