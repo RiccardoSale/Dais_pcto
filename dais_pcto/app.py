@@ -11,10 +11,9 @@ from dais_pcto.settings import ProdConfig, DevConfig
 from .Auth.models import User
 from .Errors.errors import forbidden, not_found
 from .HSchool.models import Hschool
-from .Lessons.models import Lesson  # NECESSARIO PER FAR VEDERE TABELLA ANCHE SE RISULTANO IMPORT INUSATI !!!!
+from .Lessons.models import Lesson  
 
-
-# from conduit.exceptions import InvalidUsage
+# Creazione
 def create_app(config_object=DevConfig):
     """An application factory, as explained here:
     http://flask.pocoo.org/docs/patterns/appfactories/.
@@ -28,9 +27,6 @@ def create_app(config_object=DevConfig):
     meta = MetaData()
     meta.bind = db
     register_blueprints(app)
-    # register_errorhandlers(app)
-    # register_shellcontext(app)
-    # register_commands(app)
     login_manager = LoginManager()
     login_manager.session_protection = "strong"
     login_manager.login_message_category = "info"
@@ -40,10 +36,10 @@ def create_app(config_object=DevConfig):
     app.register_error_handler(404, not_found)
     app.register_error_handler(403, forbidden)
 
-    # db.create_all()
-    @login_manager.user_loader  # -> diciamo a flask login come trovare uno specifico utente dall id che e salvato nella loro sessione dei cookie
+    # Si indica a flask login come trovare uno specifico utente dall'id che è salvato nella loro sessione dei cookie
+    @login_manager.user_loader  
     def load_user(user_id):
-        # usiamo l id per effettare la query ( chiave primaria)
+        # Si usa l'id dell'utente per effettare la query ( chiave primaria)
         return User.query.get(int(user_id))
 
     return app
@@ -64,36 +60,3 @@ def register_blueprints(app):
     app.register_blueprint(BaseRoute.route.blueprint)
     app.register_blueprint(Lessons.route.blueprint)
     app.register_blueprint(HSchool.route.blueprint)
-
-# def register_errorhandlers(app):
-#
-#     def errorhandler(error):
-#         response = error.to_json()
-#         response.status_code = error.status_code
-#         return response
-#
-#     app.errorhandler(InvalidUsage)(errorhandler)
-
-
-# def register_shellcontext(app):
-#     """Register shell context objects."""
-#     def shell_context():
-#         """Shell context objects."""
-#         return {
-#             'db': db,
-#             'User': user.models.User,
-#             'UserProfile': profile.models.UserProfile,
-#             'Article': articles.models.Article,
-#             'Tag': articles.models.Tags,
-#             'Comment': articles.models.Comment,
-#         }
-#
-#     app.shell_context_processor(shell_context)
-#
-#
-# def register_commands(app):
-#     """Register Click commands."""
-#     app.cli.add_command(commands.test)
-#     app.cli.add_command(commands.lint)
-#     app.cli.add_command(commands.clean)
-#     app.cli.add_command(commands.urls)
