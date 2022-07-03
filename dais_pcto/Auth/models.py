@@ -14,7 +14,7 @@ user_lesson = db.Table('user_lesson',
                        db.Column('lesson_id', db.Integer, db.ForeignKey('lessons._lesson_id'))
                        )
 
-
+# Ogni utente deve avere i seguenti dati
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     _user_id = db.Column(db.Integer, primary_key=True)
