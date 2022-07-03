@@ -31,7 +31,7 @@ def course_open_or_closed(count, max):
 
 @blueprint.route('/courses')
 def courses():
-    # Individuazione di tutti i corsi di un professore
+    # Individuazione di tutti i corsi di ciascun professore
     all_course_prof = db.session.query(Course).join(User)
     # Indirizzamento alla pagina dei corsi
     return render_template('courses.html', courses=all_course_prof)
