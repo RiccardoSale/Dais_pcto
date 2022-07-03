@@ -172,7 +172,8 @@ def single_course(course):
 
 
 @blueprint.route('/buildcourse', methods=("GET", "POST"))
-@professor.require(http_exception=403)  # la creazione del coros richiede di essere almeno professor
+# La creazione del corso richiede all'utente di aver almeno _role = 'professor'
+@professor.require(http_exception=403)  
 @login_required
 # Creazione di un corso
 def buildcourse():
