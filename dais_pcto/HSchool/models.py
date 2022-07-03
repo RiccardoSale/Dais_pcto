@@ -3,7 +3,7 @@ from sqlalchemy import UniqueConstraint
 from dais_pcto.app import db
 from flask_login import UserMixin
 
-
+# Dati richiesti per ogni singola scuola
 class Hschool(UserMixin, db.Model):
     __tablename__ = "h_schools"
     _hschool_code = db.Column(db.String(10), primary_key=True)
