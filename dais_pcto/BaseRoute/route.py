@@ -34,6 +34,7 @@ def certificate(course, professor, ore):
     # Rimando alla pagina in cui è presente il certificato per l'utente
     rendered = render_template('certificate.html', name=current_user._name, surname=current_user._surname,
                                professor=professor, course=course, date=date, ore=ore)
+    # Si fa in modo di poter scaricare il contenuto della pagina come un certificato in PDF
     path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
     pdf = pdfkit.from_string(rendered, False, configuration=config)
@@ -82,7 +83,7 @@ def profile():
         else:
             # Se la password non è corretta si avvisa l'utente
             flash("Controlla la password inserita!", "danger")
-
+    # Reindirizzamento alla pagina del profilo
     return render_template('profile.html', form=form, courses=courses, list=list)
 
 
@@ -103,4 +104,5 @@ def users():
         # Si associa l'utente alla scuola dichiarata
         school_with_phone(list[-1]).first().add_student(q)
         flash("La scuola è assegnata con successo!", "success")
+    # Reindirizzamento alla pagina degli utenti
     return render_template("users.html", users=all_users, form=form)
