@@ -39,7 +39,7 @@ class CRUDMixin(Model):
             db.session.rollback()
             raise IntegrityError()
 
-
+# Installazione pacchetti
 bcrypt = Bcrypt()
 db = SQLAlchemy(model_class=CRUDMixin)
 migrate = Migrate()
