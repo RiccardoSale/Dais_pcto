@@ -165,9 +165,10 @@ class TokenForm(FlaskForm):
         # Verifica del token
         if self.token.data != l._secret_token:
             raise ValidationError("Il token inserito non risulta valido!")
-        # Individuazione delle lezioni a cui l'utente ha già dichiarato la presenza
+        # Individuazione della lezione interessata se l'utente ha già dichiarato la presenza
         q = db.session.query(User).join(Lesson._users).filter(User._user_id == self.user.data,
                                                               Lesson._lesson_id == self.id.data).first()
+        # Se q ha un risultato non si può dichiarare 2 volte la presenza di un lezione
         if q:
             raise ValidationError("La presenza a questa lezione è già stata registrata!")
         else:
