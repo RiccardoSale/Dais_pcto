@@ -44,7 +44,7 @@ def create_app(config_object=DevConfig):
 
     return app
 
-
+# Registra le estensioni Flask
 def register_extensions(app):
     """Register Flask extensions."""
     bcrypt.init_app(app)
@@ -52,7 +52,7 @@ def register_extensions(app):
     migrate.init_app(app, db)
     Principal(app)
 
-
+# Registra progetti Flask
 def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(Auth.route.blueprint)
