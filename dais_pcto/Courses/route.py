@@ -31,8 +31,9 @@ def course_open_or_closed(count, max):
 
 @blueprint.route('/courses')
 def courses():
-    # Individuazione di tutti i corsi
+    # Individuazione di tutti i corsi di un professore
     all_course_prof = db.session.query(Course).join(User)
+    # Indirizzamento alla pagina dei corsi
     return render_template('courses.html', courses=all_course_prof)
 
 
@@ -93,6 +94,7 @@ def single_course(course):
                lesson_form.structure.data, lesson_form.description.data, info_corso._course_id,
                secrets.token_hex(16)).save()
         flash("La lezione è stata aggiunta con successo!", "success")
+        # Ritorno alla pagina del singolo corso
         return redirect(url_for('courses.single_course', course=course))
 
     # Dichiarazione della presenza a una determinata lezione
@@ -105,6 +107,7 @@ def single_course(course):
     if course_subscription_form.submit_subcription_course.data and course_subscription_form.validate_on_submit():
         current_user.subscribe_course(object_corse)
         flash("L'iscrizione è avvenuta con successo!", "success")
+        # Ritorno alla pagina del singolo corso
         return redirect(url_for('courses.single_course', course=course))
 
     # Generazione del certificato di partecipazione
@@ -115,6 +118,7 @@ def single_course(course):
     if remove_course_form.submit_remove_course.data and remove_course_form.validate_on_submit():
         object_corse.delete()
         all_course_prof = db.session.query(Course).join(User)
+        # Ritorno alla pagina di tutti i corsi
         return render_template('courses.html', courses=all_course_prof)
 
     # Rimozione di una lezione
@@ -122,6 +126,7 @@ def single_course(course):
         q = lesson_with_id(remove_lesson_form.id.data).first()
         q.delete()
         flash("La lezione è stata rimossa con successo!", "success")
+        # Ritorno alla pagina di un singolo corso
         return redirect(url_for('courses.single_course', course=course))
 
     # Modifica di un corso
@@ -140,6 +145,7 @@ def single_course(course):
         object_corse.set_end_date(modify_course_form.end_date.data)
         object_corse.update()
         flash("I dati del corso sono stati aggiornati con successo!", "success")
+        # Ritorno alla pagina di un singolo corso
         return redirect(url_for('courses.single_course', course=modify_course_form.name.data))
 
     # Modifica di una lezione
@@ -159,8 +165,10 @@ def single_course(course):
         q = user_with_id(unsubscribe_course_form.user.data).first()
         q.unsubscribe_course(object_corse)
         flash("La disiscrizione dal corso è stata effettuata correttamente!", "success")
+        # Ritorno alla pagina di un singolo corso
         return redirect(url_for('courses.single_course', course=object_corse._name))
 
+    # Indirizzamento alla pagina di un singolo corso
     return render_template('single_course.html', Course=info_corso, attivo=attivo, progress_bar=progress_bar,
                            Lessons=course_lesson, lesson_form=lesson_form, token_form=token_form,
                            course_subscription_form=course_subscription_form, certificate_form=certificate_form,
@@ -191,7 +199,9 @@ def buildcourse():
                professor._user_id).save()
 
         flash("Il corso è stato creato con successo!", "success")
+        # Ritorno alla pagina di un singolo corso
         return redirect(url_for('courses.single_course', course=form.name.data))
-
+    
+    # Indirizzamento alla pgina che permette di creare un corso
     return render_template('buildcourse.html', name=current_user._user_id, form=form, title="Course",
                            btn_action="Create course")
