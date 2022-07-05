@@ -266,7 +266,7 @@
                                 <div class="tab-pane" id="token{{ loop.index }}">
                                     {% if current_user._role == "professor" %}
                                         <p class=" card-text">Token segreto per prof: </p>
-                                        <p class=" card-text">{{ lesson._secret_token }}</p>
+                                        <p class=" card-text" style="text-transform: none;" >{{ lesson._secret_token }}</p>
                                     {% endif %}
                                     {% if current_user._role == "user" %}
                                         <form action method="POST">
