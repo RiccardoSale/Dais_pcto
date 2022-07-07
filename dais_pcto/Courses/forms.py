@@ -18,9 +18,9 @@ def all_professor():
 
 # Per inserire un corso sono necessarie diverse informazioni
 class coursesForm(FlaskForm):
-    name = StringField(validators=[InputRequired(), Length(1, 64), Regexp("^[A-Za-z][A-Za-z0-9_.'àèìòù ]*$", 0, "Il nome del corso deve contenere caratteri consoni")])
+    name = StringField(validators=[InputRequired(), Length(1, 64), Regexp("^[A-Za-z][A-Za-z0-9_.'àèìòù, ]*$", 0, "Il nome del corso deve contenere caratteri consoni")])
     mode = SelectField('mode', choices=['presenza', 'online', 'blended'])
-    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9'àèìòù ]*$", 0, "La descrizione del corso deve contenere caratteri consoni")])
+    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9'àèìòù.,:;!?() ]*$", 0, "La descrizione del corso deve contenere caratteri consoni")])
     max_student = IntegerField(validators=[InputRequired()])
     min_student = IntegerField(validators=[InputRequired()])
     n_hour = IntegerField(validators=[InputRequired()])
@@ -121,9 +121,9 @@ class UnsubscribeCourse(FlaskForm):
 
 # Dati richiesti per la modifica del corso
 class ModifyCourse(FlaskForm):
-    name = StringField(validators=[Length(1, 64), Regexp("^[A-Za-z][A-Za-z0-9_.'àèìòù ]*$", 0, "Il nome del corso deve contenere caratteri consoni"), Optional()])
+    name = StringField(validators=[Length(1, 64), Regexp("^[A-Za-z][A-Za-z0-9_.'àèìòù, ]*$", 0, "Il nome del corso deve contenere caratteri consoni"), Optional()])
     professor = SelectField(validators=[Optional()], choices=all_professor)
-    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9'àèìòù ]*$", 0, "La descrizione del corso deve contenere caratteri consoni"), Optional()])
+    description = StringField(validators=[Regexp("^[A-Za-z][A-Za-z0-9'àèìòù.,:;!?() ]*$", 0, "La descrizione del corso deve contenere caratteri consoni"), Optional()])
     max_student = IntegerField(validators=[Optional()])
     n_hour = IntegerField(validators=[Optional()])
     start_date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
