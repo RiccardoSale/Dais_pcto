@@ -80,10 +80,10 @@ class LessonsForm(FlaskForm):
         # Per ogni lezione si controlla che la lezione che si sta inserendo non si accavalli con altre lezioni
         for x in lessons:
             if x._date == self.date.data:
-                if (self.start_hour.data < x._end_hour < self.end_hour.data) or \
-                        (x._start_hour < self.start_hour.data < x._end_hour) or \
-                        (self.start_hour.data < x._start_hour and self.end_hour.data > x._end_hour) or \
-                        (self.start_hour.data < x._start_hour < self.end_hour.data < x._end_hour):
+                if (self.start_hour.data <= x._end_hour <= self.end_hour.data) or \
+                        (x._start_hour <= self.start_hour.data <= x._end_hour) or \
+                        (self.start_hour.data <= x._start_hour and self.end_hour.data >= x._end_hour) or \
+                        (self.start_hour.data <= x._start_hour <= self.end_hour.data <= x._end_hour):
                     flash("Operazione non riuscita. Riaprire il form per visualizzare l'errore!", 'warning')
                     raise ValidationError(
                         "Esiste già una lezione di nome :" + x._description + " nella fascia oraria inserita!")
